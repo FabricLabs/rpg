@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <script src="index.js" type="text/javascript"></script>
-</head>
-<body style="background-color: black;">
+  <head>
+    <script src="index.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+  </head>
+<body>
+  <header>
+    <h1>RPG</h1>
+    <p><code>ERA:</code> <code>dev</code></p>
+  </header>
   <canvas id="canvas" width="1024" height="768"></canvas>
-
   <script>
-    var userid = null;
-    var copycat_mode = false;
-    var default_walk_speed = 5;
-    var default_jump_speed = 25;
+    let userid = null;
+    let copycat_mode = false;
+    let default_walk_speed = 5;
+    let default_jump_speed = 25;
 
     //keyboard stuff
     function Key (code) {
@@ -21,18 +25,18 @@
       down: false
     };
 
-    function KeySet(){
-        this.up =    new Key(38);
-        this.down =  new Key(40);
-        this.left =  new Key(37);
-        this.right = new Key(39);
-        this.space = new Key(32);
+    function KeySet () {
+      this.up =    new Key(38);
+      this.down =  new Key(40);
+      this.left =  new Key(37);
+      this.right = new Key(39);
+      this.space = new Key(32);
     }
 
-    var keys = new KeySet();
+    let keys = new KeySet();
 
     function getKey (code) {
-      for (var key in keys) {
+      for (let key in keys) {
         if (keys.hasOwnProperty(key)) {
           if (keys[key].code === code) {
             return keys[key];
@@ -42,17 +46,17 @@
     }
 
     // Keyboard event listeners
-    window.addEventListener('keydown', function(e) {
-      var key = getKey(e.which);
+    window.addEventListener('keydown', function (e) {
+      let key = getKey(e.which);
       if (key) {
         key.down = true;
         e.preventDefault();
       }
     });
 
-    window.addEventListener('keyup', function(e) {
+    window.addEventListener('keyup', function (e) {
       // console.log('keyup', e.which);
-      var key = getKey(e.which);
+      let key = getKey(e.which);
       if (key) {
         key.down = false;
         e.preventDefault();
@@ -60,7 +64,7 @@
     });
 
     //image stuff
-    var images = {
+    let images = {
       drawRotatedImage: function (image, x, y, angle) {
         this.context.save();
         this.context.translate(x, y);
@@ -73,7 +77,7 @@
       },
       images:   {},
       getImage: function (src, cb) {
-        var img = this.images[src];
+        let img = this.images[src];
         if (img && cb){
           cb.call(img);
           return img;
@@ -86,8 +90,8 @@
         }
       },
       preload:  function (sources, cb) {
-        var self = this;
-        var ln = sources.length;
+        let self = this;
+        let ln = sources.length;
 
         sources.forEach(function (src) {
           self.getImage(src, function () {
@@ -146,7 +150,7 @@
           }
         }
         if (this.positions) {
-          var pos = this.positions[this.pos];
+          let pos = this.positions[this.pos];
           images.drawSprite(this.img, pos[0], pos[1], this.width, this.height, x, y, this.width2, this.height2, this.turned);
         } else {
           images.drawSprite(this.img, 0, 0, this.width, this.height, x, y, this.width2, this.height2, this.turned);
@@ -154,15 +158,15 @@
       }
     };
 
-    var copycat_mode = false;
-    var camera = {x : 0, y:0, width:1024, height:768, padding: 500, padding2: 300}
-    var scrollspeed = 20;
-    var gravity = .98;
-    var bricks = [];
-    var players = [];
-    var network_players = {};
-    var player = null;
-    var background = null;
+    let copycat_mode = false;
+    let camera = {x : 0, y:0, width:1024, height:768, padding: 500, padding2: 300}
+    let scrollspeed = 20;
+    let gravity = .98;
+    let bricks = [];
+    let players = [];
+    let network_players = {};
+    let player = null;
+    let background = null;
 
     function scrollCamera(player) {
       //scroll camera left
@@ -186,12 +190,12 @@
     function logicFrame () {
       // update players position,
       // listen for collisions etc
-      var player = players[0];
+      let player = players[0];
       runPhysics(player, true);
       scrollCamera(player);
       player.history.push({x: player.x, y:player.y});
       Object.keys(network_players).forEach(function(k){
-        var p = network_players[k];
+        let p = network_players[k];
         //p.x += p.dx;
         //p.y += p.dy;
         runPhysics(p);
@@ -199,11 +203,11 @@
 
       if (copycat_mode) {
         //player2
-        var player2 = players[1];
-        var cloneDelay = 100;
+        let player2 = players[1];
+        let cloneDelay = 100;
 
         if (player.history.length > cloneDelay) {
-          var targetState = player.history[player.history.length - cloneDelay];
+          let targetState = player.history[player.history.length - cloneDelay];
           player2.x = targetState.x;
           player2.y = targetState.y;
         }
@@ -212,41 +216,41 @@
       // process the game logic at a target of 60fps
       setTimeout(logicFrame, 1000/60);
 
-      for (var n = 1; n < players.length; n++) {
-        var npc = players[n];
+      for (let n = 1; n < players.length; n++) {
+        let npc = players[n];
         npc.x += -10  +  20 * Math.random();
         npc.y += -10  +  20 * Math.random();
       }
     }
 
 
-    function loadMap(){
+    function loadMap () {
       //starting area
-      /*var brick = images.getImage("brick.jpg");
-      for(var i=0; i<30; i++){
+      /*let brick = images.getImage("brick.jpg");
+      for(let i=0; i<30; i++){
           bricks.push(new Sprite(brick, 512, 512, 50, 50, i*50, 600));
       }*/
-      var grass = images.getImage("grass.jpg");
+      let grass = images.getImage('grass.jpg');
 
-      for (var j = 0; j< 50; j++) {
-        for (var i = 0; i < 30; i++) {
-          var tile = new Sprite(grass, 100, 100, 50, 50, i * 50, j * 50)
+      for (let j = 0; j< 50; j++) {
+        for (let i = 0; i < 30; i++) {
+          let tile = new Sprite(grass, 100, 100, 50, 50, i * 50, j * 50)
           tile.bg = true;
           bricks.push(tile);
         }
       }
 
-      var wall = images.getImage("brick.png");
+      let wall = images.getImage('brick.png');
 
-      for (var i = 1; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 1 * 50)); }
-      for (var i = 1; i < 15; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 12 * 50)); }
-      for (var i = 1; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, 18 * 50, i * 50)); }
+      for (let i = 1; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 1 * 50)); }
+      for (let i = 1; i < 15; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 12 * 50)); }
+      for (let i = 1; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, 18 * 50, i * 50)); }
     }
 
 
 
     function loadPlayers(){
-      var mario = images.getImage("mario.png");
+      let mario = images.getImage('mario.png');
 
       player = new Sprite(mario, 480, 640, 48, 64, 380, 380);
       player.dx = 0;
@@ -258,14 +262,14 @@
       players = [player];
 
       if (copycat_mode) {
-        var luigi = images.getImage("luigi.png");
-        var player2 = new Sprite(luigi, 480, 640, 48, 64, 20, 300);
+        let luigi = images.getImage('luigi.png');
+        let player2 = new Sprite(luigi, 480, 640, 48, 64, 20, 300);
         players.push(player2);
       }
 
-      for(var i = 0; i<7; i++) {
-        var goomba = images.getImage("goomba.png");
-        var player3 = new Sprite(goomba, 900, 900, 48, 64, i * 200, i * 200 + 100);
+      for(let i = 0; i<7; i++) {
+        let goomba = images.getImage('goomba.png');
+        let player3 = new Sprite(goomba, 900, 900, 48, 64, i * 200, i * 200 + 100);
 
         player3.dx = 0;  player3.x0 = player3.x; player3.y0 = player3.y;
         player3.dy = 0;
@@ -280,10 +284,10 @@
     loadPlayers();
 
     function runPhysics (player, processKeys) {
-      var dx = player.dx = processKeys ? 0 : player.dx;
-      var dy = player.dy = processKeys ? 0 : player.dy;
-      var walkspeed = player.walkspeed;
-      var jumpspeed = player.jumpspeed;
+      let dx = player.dx = processKeys ? 0 : player.dx;
+      let dy = player.dy = processKeys ? 0 : player.dy;
+      let walkspeed = player.walkspeed;
+      let jumpspeed = player.jumpspeed;
 
       if (processKeys) {
         if (keys.left.down) {
@@ -310,20 +314,20 @@
         }*/
       }
       //dy += gravity;
-      for (var i = 0; i < bricks.length; i++) {
-          var brick = bricks[i];
+      for (let i = 0; i < bricks.length; i++) {
+          let brick = bricks[i];
 
           if (brick.bg) continue;
 
-          var brickLeft = brick.x;
-          var brickRight = brick.x + brick.width2;
-          var brickTop = brick.y;
-          var brickBottom = brick.y + brick.height2;
-          var playerLeft = player.x + dx;
-          var playerRight = player.x + player.width2 + dx;
-          var playerTop = player.y + dy;
-          var playerBottom = player.y + player.height2 + dy;
-          var intersectHorizontal =
+          let brickLeft = brick.x;
+          let brickRight = brick.x + brick.width2;
+          let brickTop = brick.y;
+          let brickBottom = brick.y + brick.height2;
+          let playerLeft = player.x + dx;
+          let playerRight = player.x + player.width2 + dx;
+          let playerTop = player.y + dy;
+          let playerBottom = player.y + player.height2 + dy;
+          let intersectHorizontal =
               (playerLeft >= brickLeft && playerLeft <= brickRight) || (playerLeft >= brickLeft && playerRight <= brickRight) ||
               (brickLeft >= playerLeft && brickLeft <= playerRight) || (brickRight >= playerLeft && brickRight <= playerRight)  ;
 
@@ -344,7 +348,7 @@
           playerTop = player.y + dy;
           playerBottom = player.y + player.height2 + dy;
 
-          var intersectVertical =
+          let intersectVertical =
               (playerTop >= brickTop && playerTop <= brickBottom) || (playerBottom >= brickTop && playerBottom <= brickBottom) ||
               (brickTop >= playerTop && brickTop <= playerBottom) || (brickBottom >= playerTop && brickBottom <= playerBottom) ;
           //hit a wall on the right
@@ -365,7 +369,7 @@
 
     function drawPlayers() {
       Object.keys(network_players).forEach(function(k) {
-        var p = network_players[k];
+        let p = network_players[k];
         p.draw(p.x - camera.x, p.y - camera.y);
       });
 
@@ -380,8 +384,8 @@
       });
     }
     function drawFrame(){
-      var canvas = document.getElementById('canvas');
-      var context = canvas.getContext('2d');
+      let canvas = document.getElementById('canvas');
+      let context = canvas.getContext('2d');
 
       context.clearRect(0, 0, canvas.width, canvas.height);
       images.context = context;
@@ -397,10 +401,10 @@
     logicFrame();
 
     // Get the canvas element form the page
-    var canvas = document.queryselector('canvas');
+    let canvas = document.querySelector('canvas');
      
     function fullscreen () {
-      var el = document.getElementById('canvas');
+      let el = document.getElementById('canvas');
 
       if (el.webkitRequestFullScreen) {
         el.webkitRequestFullScreen();
@@ -409,11 +413,7 @@
       }
     }
      
-    canvas.addEventListener("click",fullscreen)
+    canvas.addEventListener('click', fullscreen)
   </script>
-
-  <div style="float:right;">
-    <button data-action="toggle-fullscreen">fullscreen</button>
-  </div>
 </body>
 </html>
