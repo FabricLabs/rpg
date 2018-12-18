@@ -28,7 +28,6 @@
     "@fabric/core": "FabricLabs/fabric#fabric-core-refactor"
   },
   "devDependencies": {
-    "browserify": "^16.2.3",
     "ecstatic": "^3.3.0",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2"
