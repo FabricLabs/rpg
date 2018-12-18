@@ -127,6 +127,7 @@
       this.height2 = height2;
       this.x = x;
       this.y = y;
+      this.z = 1; // layer 1
       this.positions = positions;
     }
 
@@ -158,8 +159,16 @@
       }
     };
 
-    let copycat_mode = false;
-    let camera = {x : 0, y:0, width:1024, height:768, padding: 500, padding2: 300}
+    let camera = {
+      x: 0,
+      y: 0,
+      z: 1,
+      width: 1024,
+      height:768,
+      padding: 500,
+      padding2: 300
+    };
+
     let scrollspeed = 20;
     let gravity = .98;
     let bricks = [];
@@ -191,10 +200,17 @@
       // update players position,
       // listen for collisions etc
       let player = players[0];
+
       runPhysics(player, true);
       scrollCamera(player);
-      player.history.push({x: player.x, y:player.y});
-      Object.keys(network_players).forEach(function(k){
+
+      player.history.push({
+        x: player.x,
+        y: player.y,
+        z: 1
+      });
+
+      Object.keys(network_players).forEach(function (k) {
         let p = network_players[k];
         //p.x += p.dx;
         //p.y += p.dy;
@@ -249,7 +265,7 @@
 
 
 
-    function loadPlayers(){
+    function loadPlayers () {
       let mario = images.getImage('mario.png');
 
       player = new Sprite(mario, 480, 640, 48, 64, 380, 380);
@@ -367,23 +383,25 @@
       player.dy = dy;
     }
 
-    function drawPlayers() {
-      Object.keys(network_players).forEach(function(k) {
+    function drawPlayers () {
+      Object.keys(network_players).forEach(function (k) {
         let p = network_players[k];
         p.draw(p.x - camera.x, p.y - camera.y);
       });
 
-      players.forEach(function(p){
+      players.forEach(function (p) {
         p.draw(p.x - camera.x, p.y - camera.y);
         //console.log("drawing player")
       });
     }
-    function drawMap(){
-      bricks.forEach(function(b){
+
+    function drawMap () {
+      bricks.forEach(function (b) {
         b.draw(b.x - camera.x, b.y - camera.y);
       });
     }
-    function drawFrame(){
+
+    function drawFrame () {
       let canvas = document.getElementById('canvas');
       let context = canvas.getContext('2d');
 
@@ -402,7 +420,7 @@
 
     // Get the canvas element form the page
     let canvas = document.querySelector('canvas');
-     
+
     function fullscreen () {
       let el = document.getElementById('canvas');
 
@@ -412,7 +430,7 @@
        el.mozRequestFullScreen();
       }
     }
-     
+
     canvas.addEventListener('click', fullscreen)
   </script>
 </body>
