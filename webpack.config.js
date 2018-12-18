@@ -3,9 +3,10 @@ const path = require('path');
 
 module.exports = {
   entry: './components/index.js',
-  mode: 'development',
+  mode: 'production',
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'assets')
-  }
+  },
+  target: 'web'
 };

@@ -11,24 +11,29 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/melnx/rpg.git"
+    "url": "git+https://github.com/FabricLabs/rpg.git"
   },
   "keywords": [
     "rpg",
     "fabric",
     "game"
   ],
-  "author": "Lexer?",
+  "author": "Fabric Labs",
+  "contributors": [
+    "Alexey Melnichenko",
+    "Eric Martindale"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/melnx/rpg/issues"
+    "url": "https://github.com/FabricLabs/rpg/issues"
   },
-  "homepage": "https://github.com/melnx/rpg#readme",
+  "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
     "@fabric/core": "FabricLabs/fabric#fabric-core-refactor"
   },
   "devDependencies": {
     "ecstatic": "^3.3.0",
+    "level-browserify": "^2.0.0",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2"
   }
