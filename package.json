@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#fabric-core-refactor"
+    "@fabric/core": "FabricLabs/fabric#pruning"
   },
   "devDependencies": {
     "ecstatic": "^3.3.0",
