@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack",
     "coverage": "nyc report --reporter html npm test",
+    "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
     "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
     "start": "npm run build && ecstatic assets",
     "test": "nyc mocha tests"
