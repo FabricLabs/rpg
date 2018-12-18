@@ -33,7 +33,10 @@
     "@fabric/core": "FabricLabs/fabric#fabric-core-refactor"
   },
   "devDependencies": {
+    "codecov": "^3.1.0",
     "ecstatic": "^3.3.0",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2"
   },
