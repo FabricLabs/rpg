@@ -1,0 +1,27 @@
+{
+  "name": "@fabric/rpg",
+  "version": "0.0.0-dev",
+  "description": "simple RPG",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/melnx/rpg.git"
+  },
+  "keywords": [
+    "rpg",
+    "fabric",
+    "game"
+  ],
+  "author": "Lexer?",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/melnx/rpg/issues"
+  },
+  "homepage": "https://github.com/melnx/rpg#readme",
+  "dependencies": {
+    "@fabric/core": "FabricLabs/fabric#fabric-core-refactor"
+  }
+}
