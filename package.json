@@ -4,7 +4,10 @@
   "description": "simple RPG",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "build": "webpack",
+    "coverage": "nyc mocha tests",
+    "start": "npm run build && ecstatic assets",
+    "test": "mocha tests"
   },
   "repository": {
     "type": "git",
@@ -23,5 +26,10 @@
   "homepage": "https://github.com/melnx/rpg#readme",
   "dependencies": {
     "@fabric/core": "FabricLabs/fabric#fabric-core-refactor"
+  },
+  "devDependencies": {
+    "ecstatic": "^3.3.0",
+    "webpack": "^4.27.1",
+    "webpack-cli": "^3.1.2"
   }
 }
