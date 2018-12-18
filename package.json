@@ -1,13 +1,14 @@
 {
   "name": "@fabric/rpg",
-  "version": "0.0.0-dev",
-  "description": "simple RPG",
-  "main": "index.js",
+  "version": "0.1.0-dev",
+  "description": "RPG is a template for building role-playing games.",
+  "main": "components/index.js",
   "scripts": {
     "build": "webpack",
-    "coverage": "nyc mocha tests",
+    "coverage": "nyc report --reporter html npm test",
+    "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
     "start": "npm run build && ecstatic assets",
-    "test": "mocha tests"
+    "test": "nyc mocha tests"
   },
   "repository": {
     "type": "git",
@@ -33,8 +34,13 @@
   },
   "devDependencies": {
     "ecstatic": "^3.3.0",
-    "level-browserify": "^2.0.0",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2"
+  },
+  "nyc": {
+    "exclude": [
+      "tests"
+    ],
+    "report-dir": "./reports/code-coverage"
   }
 }
