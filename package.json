@@ -1,27 +1,50 @@
 {
   "name": "@fabric/rpg",
-  "version": "0.0.0-dev",
-  "description": "simple RPG",
-  "main": "index.js",
+  "version": "0.1.0-dev",
+  "description": "RPG is a template for building role-playing games.",
+  "main": "components/index.js",
   "scripts": {
-    "test": "mocha"
+    "build": "webpack",
+    "coverage": "nyc report --reporter html npm test",
+    "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
+    "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
+    "start": "npm run build && ecstatic assets",
+    "test": "nyc mocha tests"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/melnx/rpg.git"
+    "url": "git+https://github.com/FabricLabs/rpg.git"
   },
   "keywords": [
     "rpg",
     "fabric",
     "game"
   ],
-  "author": "Lexer?",
+  "author": "Fabric Labs",
+  "contributors": [
+    "Alexey Melnichenko",
+    "Eric Martindale"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/melnx/rpg/issues"
+    "url": "https://github.com/FabricLabs/rpg/issues"
   },
-  "homepage": "https://github.com/melnx/rpg#readme",
+  "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#fabric-core-refactor"
+    "@fabric/core": "FabricLabs/fabric#pruning"
+  },
+  "devDependencies": {
+    "codecov": "^3.1.0",
+    "ecstatic": "^3.3.0",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0",
+    "webpack": "^4.27.1",
+    "webpack-cli": "^3.1.2"
+  },
+  "nyc": {
+    "exclude": [
+      "tests"
+    ],
+    "report-dir": "./reports/code-coverage"
   }
 }
