@@ -1,17 +1,16 @@
 'use strict';
 
-const App = require('../lib/application');
+const RPG = require('./application');
 
+// main program
 async function main () {
-  let app = new App();
-  let element = document.querySelector('*[data-bind=fabric]');
-  let rendered = app.render();
+  let app = new RPG();
+
+  app.envelop('*[data-bind=fabric]');
+  app.render();
 
   await app.start();
 
-  element.innerHTML = rendered;
-
-  console.log('[FABRIC]', 'rendered:', rendered);
   console.log('[FABRIC]', 'booted:', app);
 
   let ui = await UI();
@@ -411,7 +410,7 @@ async function UI () {
   }
 
   function drawFrame () {
-    let canvas = document.getElementById('canvas');
+    let canvas = document.querySelector('rpg-application canvas');
     let context = canvas.getContext('2d');
 
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -422,27 +421,14 @@ async function UI () {
     drawPlayers();
 
     window.requestAnimationFrame(drawFrame);
+
+    return canvas;
   }
 
   drawFrame();
   logicFrame();
 
-  // Get the canvas element form the page
-  let canvas = document.querySelector('canvas');
-
-  function fullscreen () {
-    let el = document.getElementById('canvas');
-
-    if (el.webkitRequestFullScreen) {
-      el.webkitRequestFullScreen();
-    } else {
-     el.mozRequestFullScreen();
-    }
-  }
-
-  canvas.addEventListener('click', fullscreen);
-
-  return canvas;
+  return this;
 }
 
 module.exports = main();
