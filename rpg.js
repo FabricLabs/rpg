@@ -1,12 +1,15 @@
 'use strict';
 
 const RPG = require('./lib/rpg');
+const Server = require('./lib/server');
 
 async function main () {
+  let server = new Server();
   let rpg = new RPG({
     path: './stores/rpg'
   });
 
+  await server.start();
   await rpg.start();
 
   let player = await rpg._registerPlayer({
@@ -24,6 +27,7 @@ async function main () {
   }
 
   await rpg.stop();
+  // await server.stop();
 }
 
 main();

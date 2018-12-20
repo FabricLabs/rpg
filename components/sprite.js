@@ -12,6 +12,10 @@ class Sprite {
       }
     }, entity);
   }
+
+  render () {
+    return this.element.draw();
+  }
 }
 
 module.exports = Sprite;
