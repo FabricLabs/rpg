@@ -5,3 +5,7 @@ body {
 .right.floated {
   float: right;
 }
+
+header {
+  color:white;
+}

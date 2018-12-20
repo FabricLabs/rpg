@@ -24,6 +24,8 @@ async function UI () {
   let copycat_mode = false;
   let default_walk_speed = 5;
   let default_jump_speed = 25;
+  let map_size = 30;
+  let tile_size = 50;
 
   //keyboard stuff
   function Key (code) {
@@ -111,14 +113,20 @@ async function UI () {
       });
     },
     drawSprite: function (img, left, top, width, height, x, y, width2, height2, turned) {
+
+      var x_scale = 1;
+
       if (turned) {
-        //this.context.save();
-        //    this.context.translate(width2, 0);
-        //  this.context.scale(-1, 1);
-      } if (width2 && height2) {
-        this.context.drawImage(img, left, top, width, height, x, y, width2, height2);
+        /*this.context.save();
+        this.context.translate(width2, 0);
+        this.context.scale(-1, 1);
+        x_scale = -1;*/
+      }
+
+      if (width2 && height2) {
+        this.context.drawImage(img, left, top, width, height, x, y, width2*x_scale, height2);
       } else {
-        this.context.drawImage(img, left, top, width, height, x, y, width, height);
+        this.context.drawImage(img, left, top, width, height, x, y, width*x_scale, height);
       }
 
       if (turned) {
@@ -183,6 +191,7 @@ async function UI () {
   let bricks = [];
   let players = [];
   let network_players = {};
+  let missiles = [];
   let player = null;
   let background = null;
 
@@ -226,6 +235,12 @@ async function UI () {
       runPhysics(p);
     });
 
+    Object.keys(missiles).forEach(function(k){
+      let m = missiles[k];
+      runPhysics(m);
+      if(m.deleted) delete missiles[k];
+    })
+
     if (copycat_mode) {
       //player2
       let player2 = players[1];
@@ -257,19 +272,28 @@ async function UI () {
     }*/
     let grass = images.getImage('grass.jpg');
 
-    for (let j = 0; j< 50; j++) {
-      for (let i = 0; i < 30; i++) {
+    for (let j = 0; j< map_size; j++) {
+      for (let i = 0; i < map_size; i++) {
         let tile = new Sprite(grass, 100, 100, 50, 50, i * 50, j * 50)
         tile.bg = true;
         bricks.push(tile);
       }
     }
 
+    let rocks = images.getImage('rocks.jpg');
+
+    for (let j = 0; j< map_size; j++) {
+      bricks.push(new Sprite(rocks, 400, 400, tile_size, tile_size, j * tile_size, -tile_size));
+      bricks.push(new Sprite(rocks, 400, 400, tile_size, tile_size, j * tile_size, map_size * tile_size));
+      bricks.push(new Sprite(rocks, 400, 400, tile_size, tile_size, -tile_size, j * tile_size));
+      bricks.push(new Sprite(rocks, 400, 400, tile_size, tile_size, map_size * tile_size, j * tile_size));
+    }
+
     let wall = images.getImage('brick.png');
 
-    for (let i = 1; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 1 * 50)); }
-    for (let i = 1; i < 15; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 12 * 50)); }
-    for (let i = 1; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, 18 * 50, i * 50)); }
+    for (let i = 2; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 2 * 50)); }
+    for (let i = 2; i < 15; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 12 * 50)); }
+    for (let i = 2; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, 18 * 50, i * 50)); }
   }
 
 
@@ -308,6 +332,9 @@ async function UI () {
   loadMap();
   loadPlayers();
 
+  let fireball = images.getImage('fireball.ico');
+  let lastFire = 0;
+
   function runPhysics (player, processKeys) {
     let dx = player.dx = processKeys ? 0 : player.dx;
     let dy = player.dy = processKeys ? 0 : player.dy;
@@ -324,11 +351,11 @@ async function UI () {
         dx = walkspeed;
       }
       if (keys.up.down) {
-        player.turned = true;
+        //player.turned = true;
         dy = -walkspeed;
       }
       if (keys.down.down) {
-        player.turned = false;
+        //player.turned = false;
         dy = walkspeed;
       }
 
@@ -337,7 +364,35 @@ async function UI () {
               dy = -jumpspeed;
           }
       }*/
+      if(keys.space.down && new Date() - lastFire > 500){
+          let missile = new Sprite(fireball, 250, 250, 40, 40, player.x, player.y);
+          missile.dx = dx + (player.turned ? -10 : 10);
+          missile.dy = dy;
+          missile.max_bounces = 5;
+          missile.bounces = 0;
+          missiles.push(missile);
+          lastFire = new Date();
+      }
+
     }
+
+    function bounceLogicY(){
+      if(player.max_bounces){
+        if(player.bounces < player.max_bounces) dy *= -1;
+        else{ player.deleted = true; dy = 0; }
+        player.bounces++
+      }
+      else dy = 0; //0.01;
+    }
+    function bounceLogicX(){
+      if(player.max_bounces){
+        if(player.bounces < player.max_bounces) dx *= -1;
+        else{ player.deleted = true; dx = 0; }
+        player.bounces++
+      }
+      else dx = 0;
+    }
+
     //dy += gravity;
     for (let i = 0; i < bricks.length; i++) {
         let brick = bricks[i];
@@ -356,33 +411,32 @@ async function UI () {
             (playerLeft >= brickLeft && playerLeft <= brickRight) || (playerLeft >= brickLeft && playerRight <= brickRight) ||
             (brickLeft >= playerLeft && brickLeft <= playerRight) || (brickRight >= playerLeft && brickRight <= playerRight)  ;
 
+
+
         //hit the ground
         if (playerBottom >= brickTop && playerBottom <= brickBottom && intersectHorizontal){
-          if (dy > 0) {
-            dy = 0;
-          }
+          if (dy > 0) bounceLogicY();
         }
 
         //hit the ceiling
         if (playerTop <= brickBottom && playerTop >= brickTop && intersectHorizontal){
-          if (dy < 0){
-            dy = 0.01;
-          }
+          if (dy < 0) bounceLogicY()
         }
 
         playerTop = player.y + dy;
         playerBottom = player.y + player.height2 + dy;
+
 
         let intersectVertical =
             (playerTop >= brickTop && playerTop <= brickBottom) || (playerBottom >= brickTop && playerBottom <= brickBottom) ||
             (brickTop >= playerTop && brickTop <= playerBottom) || (brickBottom >= playerTop && brickBottom <= playerBottom) ;
         //hit a wall on the right
         if (playerRight > brickLeft && playerRight < brickRight && intersectVertical) {
-          dx = 0;
+          if(dx > 0) bounceLogicX();
         }
         //hit a wall on the left
         if (playerLeft <= brickRight && playerLeft >= brickLeft && intersectVertical) {
-          dx = 0;
+          if(dx < 0)  bounceLogicX();
         }
     }
 
@@ -404,6 +458,13 @@ async function UI () {
     });
   }
 
+  function drawMissiles(){
+    missiles.forEach(function (m) {
+      m.draw(m.x - camera.x, m.y - camera.y);
+      //console.log("drawing player")
+    });
+  }
+
   function drawMap () {
     bricks.forEach(function (b) {
       b.draw(b.x - camera.x, b.y - camera.y);
@@ -420,6 +481,7 @@ async function UI () {
     //drawBackground();
     drawMap();
     drawPlayers();
+    drawMissiles();
 
     window.requestAnimationFrame(drawFrame);
   }
