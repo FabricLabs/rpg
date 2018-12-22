@@ -19,7 +19,11 @@ class Application extends Fabric.App {
   constructor (configuration = {}) {
     super(configuration);
 
+    // An authority is required when running in a browser.
+    this.authority = null;
+
     this['@data'] = Object.assign({
+      authority: 'localhost:9999',
       canvas: {
         height: 1024,
         width: 768
@@ -40,6 +44,13 @@ class Application extends Fabric.App {
     } catch (E) {
       this.error('Could not start RPG:', E);
       return null;
+    }
+
+    try {
+      this.authority = new Authority();
+      this.authority._connect();
+    } catch (E) {
+      this.error('Could not establish connection to authority:', E);
     }
 
     this.log('[APP]', 'Started!');

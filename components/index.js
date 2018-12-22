@@ -4,7 +4,10 @@ const RPG = require('./application');
 
 // main program
 async function main () {
-  let app = new RPG();
+  let app = new RPG({
+    height: 768,
+    width: 1024
+  });
 
   app.envelop('*[data-bind=fabric]');
   app.render();
