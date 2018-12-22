@@ -395,7 +395,7 @@ async function UI () {
 
     function processDamage(brick){
       brick.hp -= player.damage;
-      if(brick.hp <= 0) brick.deleted = true;
+      if(brick.hp <= 0) brick.dead = true;
       player.deleted = true;
     }
 
@@ -435,6 +435,7 @@ async function UI () {
 
         if(brick == player) continue;
         if (brick.bg) continue;
+        if (brick.dead) continue;
 
         let brickLeft = brick.x;
         let brickRight = brick.x + brick.width2;
@@ -479,9 +480,9 @@ async function UI () {
           if(dx < 0)  bounceLogicX(brick);
         }
 
-        if(brick.deleted){
+        /*if(brick.deleted){
           //delete players[ players.indexOf(brick) ]
-        }
+        }*/
     }
 
     if(xbounce && ybounce) dy = dy0;
@@ -499,7 +500,7 @@ async function UI () {
     });
 
     players.forEach(function (p) {
-      if(p.deleted) return;
+      if(p.dead) return;
       p.draw(p.x - camera.x, p.y - camera.y);
       //console.log("drawing player")
     });
