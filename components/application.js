@@ -53,6 +53,10 @@ class Application extends Fabric.App {
       this.error('Could not establish connection to authority:', E);
     }
 
+    this.authority.post(`/players`, {
+      name: Math.random()
+    });
+
     this.log('[APP]', 'Started!');
 
     return this;

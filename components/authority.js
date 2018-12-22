@@ -1,5 +1,7 @@
 'use strict';
 
+const Fabric = require('@fabric/core');
+
 class Authority {
   constructor (configuration) {
     // super(configuration);
@@ -13,6 +15,21 @@ class Authority {
     this.queue = [];
 
     return this;
+  }
+
+  post (key, value) {
+    let message = Fabric.Message.fromVector([
+      '0x80',
+      JSON.stringify({
+        '@type': 'UntrustedMessage',
+        '@data': {
+          path: key,
+          value: value
+        }
+      })
+    ]);
+
+    console.log('message:', message);
   }
 
   _connect () {
