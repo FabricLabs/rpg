@@ -26,6 +26,7 @@ async function UI () {
   let default_jump_speed = 25;
   let map_size = 30;
   let tile_size = 50;
+  let tile_index = {};
 
   //keyboard stuff
   function Key (code) {
@@ -241,6 +242,10 @@ async function UI () {
       if(m.deleted) delete missiles[k];
     })
 
+    for(var i = 1 ; i<players.length; i++){
+      runPhysics(players[i]);
+    }
+
     if (copycat_mode) {
       //player2
       let player2 = players[1];
@@ -256,11 +261,11 @@ async function UI () {
     // process the game logic at a target of 60fps
     setTimeout(logicFrame, 1000/60);
 
-    for (let n = 1; n < players.length; n++) {
+    /*for (let n = 1; n < players.length; n++) {
       let npc = players[n];
       npc.x += -10  +  20 * Math.random();
       npc.y += -10  +  20 * Math.random();
-    }
+    }*/
   }
 
 
@@ -316,12 +321,16 @@ async function UI () {
       players.push(player2);
     }
 
+    let goomba = images.getImage('goomba.png');
+
     for(let i = 0; i<7; i++) {
-      let goomba = images.getImage('goomba.png');
       let player3 = new Sprite(goomba, 900, 900, 48, 64, i * 200, i * 200 + 100);
 
-      player3.dx = 0;  player3.x0 = player3.x; player3.y0 = player3.y;
-      player3.dy = 0;
+      player3.dx = Math.floor( Math.random() * 3 + 2 );
+      player3.dy = Math.floor( Math.random() * 3 + 2);
+      player3.x0 = player3.x; player3.y0 = player3.y;
+      player3.max_bounces = 100000;
+      player3.bounces = 0;
       player3.walkspeed = default_walk_speed;
       player3.jumpspeed = default_jump_speed;
       player3.history = [];
@@ -338,6 +347,7 @@ async function UI () {
   function runPhysics (player, processKeys) {
     let dx = player.dx = processKeys ? 0 : player.dx;
     let dy = player.dy = processKeys ? 0 : player.dy;
+    let dx0 = dx; let dy0 = dy;
     let walkspeed = player.walkspeed;
     let jumpspeed = player.jumpspeed;
 
@@ -366,7 +376,7 @@ async function UI () {
       }*/
       if(keys.space.down && new Date() - lastFire > 500){
           let missile = new Sprite(fireball, 250, 250, 40, 40, player.x, player.y);
-          missile.dx = dx + (player.turned ? -10 : 10);
+          missile.dx = dx + (player.turned ? -1 : 1);
           missile.dy = dy;
           missile.max_bounces = 5;
           missile.bounces = 0;
@@ -376,25 +386,34 @@ async function UI () {
 
     }
 
+    var ybounce; var xbounce;
+
     function bounceLogicY(){
       if(player.max_bounces){
-        if(player.bounces < player.max_bounces) dy *= -1;
+        if(player.bounces < player.max_bounces){ dy *= -1; ybounce = true; }
         else{ player.deleted = true; dy = 0; }
-        player.bounces++
+        player.bounces++;
       }
-      else dy = 0; //0.01;
+      else{
+        dy = 0; //0.01;
+        //console.log('stop vert')
+      }
     }
     function bounceLogicX(){
       if(player.max_bounces){
-        if(player.bounces < player.max_bounces) dx *= -1;
+        if(player.bounces < player.max_bounces){ dx *= -1; xbounce = true; }
         else{ player.deleted = true; dx = 0; }
-        player.bounces++
+        player.bounces++;
       }
-      else dx = 0;
+      else{
+        dx = 0;
+      }
     }
 
+    var cols = bricks//.concat(players)
+
     //dy += gravity;
-    for (let i = 0; i < bricks.length; i++) {
+    for (let i = 0; i < cols.length; i++) {
         let brick = bricks[i];
 
         if (brick.bg) continue;
@@ -407,25 +426,28 @@ async function UI () {
         let playerRight = player.x + player.width2 + dx;
         let playerTop = player.y + dy;
         let playerBottom = player.y + player.height2 + dy;
-        let intersectHorizontal =
+
+
+        /*let intersectHorizontal =
             (playerLeft >= brickLeft && playerLeft <= brickRight) || (playerLeft >= brickLeft && playerRight <= brickRight) ||
-            (brickLeft >= playerLeft && brickLeft <= playerRight) || (brickRight >= playerLeft && brickRight <= playerRight)  ;
-
-
-
-        //hit the ground
-        if (playerBottom >= brickTop && playerBottom <= brickBottom && intersectHorizontal){
-          if (dy > 0) bounceLogicY();
-        }
+            (brickLeft >= playerLeft && brickLeft <= playerRight) || (brickRight >= playerLeft && brickRight <= playerRight)  */
+        let intersectHorizontal =
+            (playerLeft >= brickLeft && playerLeft <= brickRight) || (playerRight >= brickLeft && playerRight <= brickRight) ||
+            (brickLeft >= playerLeft && brickLeft <= playerRight) || (brickRight >= playerLeft && brickRight <= playerRight);
 
         //hit the ceiling
         if (playerTop <= brickBottom && playerTop >= brickTop && intersectHorizontal){
+          console.log('ceiling')
           if (dy < 0) bounceLogicY()
+        }
+        //hit the ground
+        if (playerBottom >= brickTop && playerBottom <= brickBottom && intersectHorizontal){
+          //console.log('floor')
+          if (dy > 0) bounceLogicY();
         }
 
         playerTop = player.y + dy;
         playerBottom = player.y + player.height2 + dy;
-
 
         let intersectVertical =
             (playerTop >= brickTop && playerTop <= brickBottom) || (playerBottom >= brickTop && playerBottom <= brickBottom) ||
@@ -439,6 +461,8 @@ async function UI () {
           if(dx < 0)  bounceLogicX();
         }
     }
+
+    if(xbounce && ybounce) dy = dy0;
 
     player.x += dx;
     player.y += dy;
