@@ -245,7 +245,7 @@ async function UI () {
     })
 
     for(var i = 1 ; i<players.length; i++){
-      runPhysics(players[i]);
+      runPhysics(players[i], false, true);
     }
 
     if (copycat_mode) {
@@ -315,6 +315,7 @@ async function UI () {
     player.jumpspeed = default_jump_speed;
     player.damage = 3;
     player.hp = 10;
+    player.team = 0;
     player.history = [];
 
     players = [player];
@@ -340,6 +341,7 @@ async function UI () {
       player3.history = [];
       player3.hp = 10;
       player3.damage = 10;
+      player3.team = 1;
       players.push(player3);
     }
   }
@@ -387,6 +389,7 @@ async function UI () {
           missile.max_bounces = 5;
           missile.bounces = 0;
           missile.damage = player.damage;
+          missile.team = player.team;
           missiles.push(missile);
           lastFire = new Date();
       }
@@ -402,7 +405,7 @@ async function UI () {
     }
 
     function bounceLogicY(brick){
-      if(brick.hp) processDamage(brick);
+      if(brick.hp && player.team != brick.team) processDamage(brick);
       else if(player.max_bounces){
         if(player.bounces < player.max_bounces){ dy *= -1; ybounce = true; }
         else{ player.deleted = true; dy = 0; }
@@ -414,7 +417,7 @@ async function UI () {
       }
     }
     function bounceLogicX(brick){
-      if(brick.hp) processDamage(brick);
+      if(brick.hp && player.team != brick.team) processDamage(brick);
       else if(player.max_bounces){
         if(player.bounces < player.max_bounces){ dx *= -1; xbounce = true; }
         else{ player.deleted = true; dx = 0; }
@@ -427,7 +430,7 @@ async function UI () {
 
     var cols = bricks//.concat(players)
 
-    if(processUnits) cols = cols.concat(players.slice(1));
+    if(processUnits) cols = players.slice(1).concat(cols);
 
 
 
