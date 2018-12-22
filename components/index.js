@@ -240,7 +240,7 @@ async function UI () {
 
     Object.keys(missiles).forEach(function(k){
       let m = missiles[k];
-      runPhysics(m);
+      runPhysics(m, false, true);
       if(m.deleted) delete missiles[k];
     })
 
@@ -350,7 +350,7 @@ async function UI () {
   let fireball = images.getImage('fireball.ico');
   let lastFire = 0;
 
-  function runPhysics (player, processKeys, processMissiles) {
+  function runPhysics (player, processKeys, processUnits) {
     let dx = player.dx = processKeys ? 0 : player.dx;
     let dy = player.dy = processKeys ? 0 : player.dy;
     let dx0 = dx; let dy0 = dy;
@@ -395,8 +395,15 @@ async function UI () {
 
     var ybounce; var xbounce;
 
-    function bounceLogicY(){
-      if(player.max_bounces){
+    function processDamage(brick){
+      brick.hp -= player.damage;
+      if(brick.hp <= 0) brick.dead = true;
+      player.deleted = true;
+    }
+
+    function bounceLogicY(brick){
+      if(brick.hp) processDamage(brick);
+      else if(player.max_bounces){
         if(player.bounces < player.max_bounces){ dy *= -1; ybounce = true; }
         else{ player.deleted = true; dy = 0; }
         player.bounces++;
@@ -406,8 +413,9 @@ async function UI () {
         //console.log('stop vert')
       }
     }
-    function bounceLogicX(){
-      if(player.max_bounces){
+    function bounceLogicX(brick){
+      if(brick.hp) processDamage(brick);
+      else if(player.max_bounces){
         if(player.bounces < player.max_bounces){ dx *= -1; xbounce = true; }
         else{ player.deleted = true; dx = 0; }
         player.bounces++;
@@ -419,12 +427,17 @@ async function UI () {
 
     var cols = bricks//.concat(players)
 
+    if(processUnits) cols = cols.concat(players.slice(1));
+
+
+
     //dy += gravity;
     for (let i = 0; i < cols.length; i++) {
-        let brick = bricks[i];
+        let brick = cols[i];
 
         if(brick == player) continue;
         if (brick.bg) continue;
+        if (brick.dead) continue;
 
         let brickLeft = brick.x;
         let brickRight = brick.x + brick.width2;
@@ -446,12 +459,12 @@ async function UI () {
         //hit the ceiling
         if (playerTop <= brickBottom && playerTop >= brickTop && intersectHorizontal){
           //console.log('ceiling')
-          if(dy < 0) bounceLogicY()
+          if(dy < 0) bounceLogicY(brick)
         }
         //hit the ground
         if (playerBottom >= brickTop && playerBottom <= brickBottom && intersectHorizontal){
           //console.log('floor')
-          if(dy > 0) bounceLogicY();
+          if(dy > 0) bounceLogicY(brick);
         }
 
         playerTop = player.y + dy;
@@ -462,12 +475,16 @@ async function UI () {
             (brickTop >= playerTop && brickTop <= playerBottom) || (brickBottom >= playerTop && brickBottom <= playerBottom) ;
         //hit a wall on the right
         if (playerRight > brickLeft && playerRight < brickRight && intersectVertical) {
-          if(dx > 0) bounceLogicX();
+          if(dx > 0) bounceLogicX(brick);
         }
         //hit a wall on the left
         if (playerLeft <= brickRight && playerLeft >= brickLeft && intersectVertical) {
-          if(dx < 0)  bounceLogicX();
+          if(dx < 0)  bounceLogicX(brick);
         }
+
+        /*if(brick.deleted){
+          //delete players[ players.indexOf(brick) ]
+        }*/
     }
 
     if(xbounce && ybounce) dy = dy0;
@@ -485,6 +502,7 @@ async function UI () {
     });
 
     players.forEach(function (p) {
+      if(p.dead) return;
       p.draw(p.x - camera.x, p.y - camera.y);
       //console.log("drawing player")
     });
