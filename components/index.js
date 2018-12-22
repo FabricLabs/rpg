@@ -311,6 +311,8 @@ async function UI () {
     player.dy = 0;
     player.walkspeed = default_walk_speed;
     player.jumpspeed = default_jump_speed;
+    player.damage = 3;
+    player.hp = 10;
     player.history = [];
 
     players = [player];
@@ -334,6 +336,8 @@ async function UI () {
       player3.walkspeed = default_walk_speed;
       player3.jumpspeed = default_jump_speed;
       player3.history = [];
+      player3.hp = 10;
+      player3.damage = 10;
       players.push(player3);
     }
   }
@@ -344,7 +348,7 @@ async function UI () {
   let fireball = images.getImage('fireball.ico');
   let lastFire = 0;
 
-  function runPhysics (player, processKeys) {
+  function runPhysics (player, processKeys, processMissiles) {
     let dx = player.dx = processKeys ? 0 : player.dx;
     let dy = player.dy = processKeys ? 0 : player.dy;
     let dx0 = dx; let dy0 = dy;
@@ -380,6 +384,7 @@ async function UI () {
           missile.dy = dy;
           missile.max_bounces = 5;
           missile.bounces = 0;
+          missile.damage = player.damage;
           missiles.push(missile);
           lastFire = new Date();
       }
@@ -416,6 +421,7 @@ async function UI () {
     for (let i = 0; i < cols.length; i++) {
         let brick = bricks[i];
 
+        if(brick == player) continue;
         if (brick.bg) continue;
 
         let brickLeft = brick.x;
@@ -437,13 +443,13 @@ async function UI () {
 
         //hit the ceiling
         if (playerTop <= brickBottom && playerTop >= brickTop && intersectHorizontal){
-          console.log('ceiling')
-          if (dy < 0) bounceLogicY()
+          //console.log('ceiling')
+          if(dy < 0) bounceLogicY()
         }
         //hit the ground
         if (playerBottom >= brickTop && playerBottom <= brickBottom && intersectHorizontal){
           //console.log('floor')
-          if (dy > 0) bounceLogicY();
+          if(dy > 0) bounceLogicY();
         }
 
         playerTop = player.y + dy;
@@ -495,6 +501,24 @@ async function UI () {
     });
   }
 
+  function drawUi(ctx){
+
+    var player = players[0];
+
+
+    ctx.filleStyle = "#000000";
+    ctx.fillRect(i * 20, 20, 150, 100);
+
+    ctx.fillStyle = "#00FF00";
+
+    for(var i = 0; i<player.hp; i++){
+      ctx.fillRect(20 + i * 20, 20, 10, 20);
+    }
+
+    ctx.font = "30px Courier New";
+    ctx.fillText(player.hp + " HP", 40 + 10 * 20, 40);
+  }
+
   function drawFrame () {
     let canvas = document.getElementById('canvas');
     let context = canvas.getContext('2d');
@@ -506,6 +530,7 @@ async function UI () {
     drawMap();
     drawPlayers();
     drawMissiles();
+    drawUi(context);
 
     window.requestAnimationFrame(drawFrame);
   }
