@@ -7,6 +7,7 @@
     "build": "webpack",
     "coverage": "nyc report --reporter html npm test",
     "dev": "webpack-dev-server",
+    "docs": "jsdoc lib/ README.md -d docs && ecstatic docs",
     "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
     "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
     "start": "npm run build && ecstatic assets",

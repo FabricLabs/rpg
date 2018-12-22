@@ -3,6 +3,7 @@
 const Fabric = require('@fabric/core');
 const RPG = require('../lib/rpg');
 
+const Authority = require('./authority');
 const Canvas = require('./canvas');
 
 /**
@@ -18,7 +19,13 @@ class Application extends Fabric.App {
   constructor (configuration = {}) {
     super(configuration);
 
-    this['@data'] = Object.assign({}, configuration);
+    this['@data'] = Object.assign({
+      canvas: {
+        height: 1024,
+        width: 768
+      }
+    }, configuration);
+
     this.rpg = new RPG(configuration);
     this.trust(this.rpg);
 
@@ -46,8 +53,8 @@ class Application extends Fabric.App {
    */
   render () {
     let canvas = new Canvas({
-      height: 768,
-      width: 1024
+      height: this.config.height,
+      width: this.config.width
     });
 
     // let drawn = canvas.draw();
