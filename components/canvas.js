@@ -12,6 +12,80 @@ class Canvas extends Fabric.App {
     }, entity);
 
     this['@data'] = this.config;
+    this.bindings = {
+      'click': this._handleClick.bind(this),
+      'touchstart': this._handleTouchStart.bind(this),
+      'touchend': this._handleTouchEnd.bind(this),
+      'touchcancel': this._handleTouchCancel.bind(this),
+      'touchmove': this._handleTouchMove.bind(this)
+    };
+
+    this.element = document.createElement('canvas');
+    this.context = this.element.getContext('2d');
+    this.interactions = [];
+
+    return this;
+  }
+
+  _copyTouch (touch) {
+    return {
+      identifier: touch.identifier,
+      target: {
+        x: touch.pageX,
+        y: touch.pageY
+      }
+    };
+  }
+
+  _handleClick (event) {
+    event.preventDefault();
+    console.log('click:', event);
+    return this;
+  }
+
+  _handleTouchStart (event) {
+    event.preventDefault();
+    let touches = event.changedTouches;
+
+    for (let i = 0; i < touches.length; i++) {
+      let touch = this._copyTouch(touches[i]);
+      this.interactions.push(touch);
+    }
+
+    return this;
+  }
+
+  _handleTouchCancel (event) {
+    event.preventDefault();
+    let touches = event.changedTouches;
+
+    for (let i = 0; i < touches.length; i++) {
+      delete this.interaction[touches[i]];
+    }
+
+    return this;
+  }
+
+  _handleTouchEnd (event) {
+    event.preventDefault();
+    let touches = event.changedTouches;
+
+    for (let i = 0; i < touches.length; i++) {
+      console.log('touch end:', touches[i]);
+      delete this.interaction[touches[i]];
+    }
+
+    return this;
+  }
+
+  _handleTouchMove (event) {
+    event.preventDefault();
+    let touches = event.changedTouches;
+
+    for (let i = 0; i < touches.length; i++) {
+      let touch = this._copyTouch(touches[i]);
+      this.interactions.push(touch);
+    }
 
     return this;
   }
