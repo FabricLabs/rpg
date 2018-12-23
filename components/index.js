@@ -398,8 +398,8 @@ async function UI () {
 
     function processDamage(brick){
 
-      if(false && player.hp) player.hp -= brick.damage;
-      else {
+      //if(false && player.hp) player.hp -= brick.damage;
+      if(!player.dead){
         brick.hp -= player.damage;
         if (brick.hp <= 0) {
           brick.dead = true;
