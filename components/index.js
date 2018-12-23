@@ -220,7 +220,7 @@ async function UI () {
     // listen for collisions etc
     let player = players[0];
 
-    runPhysics(player, true);
+    runPhysics(player, true, false);
     scrollCamera(player);
 
     player.history.push({
@@ -312,7 +312,7 @@ async function UI () {
     player.walkspeed = default_walk_speed;
     player.jumpspeed = default_jump_speed;
     player.damage = 3;
-    player.hp = 10;
+    player.hp = player.max_hp = 10;
     player.team = 0;
     player.history = [];
 
@@ -337,8 +337,8 @@ async function UI () {
       player3.walkspeed = default_walk_speed;
       player3.jumpspeed = default_jump_speed;
       player3.history = [];
-      player3.hp = 10;
-      player3.damage = 10;
+      player3.hp = player3.max_hp = 10;
+      player3.damage = 3;
       player3.team = 1;
       players.push(player3);
     }
@@ -397,14 +397,25 @@ async function UI () {
     var ybounce; var xbounce;
 
     function processDamage(brick){
-      brick.hp -= player.damage;
-      if(brick.hp <= 0) brick.dead = true;
+
+      if(false && player.hp) player.hp -= brick.damage;
+      else {
+        brick.hp -= player.damage;
+        if (brick.hp <= 0) {
+          brick.dead = true;
+          setTimeout(function(){
+            brick.dead = false;
+            brick.hp = brick.max_hp;
+          }, 15000)
+        }
+      }
       player.deleted = true;
     }
 
     function bounceLogicY(brick){
       if(brick.hp && player.team != brick.team) processDamage(brick);
-      else if(player.max_bounces){
+
+      if(player.max_bounces){
         if(player.bounces < player.max_bounces){ dy *= -1; ybounce = true; }
         else{ player.deleted = true; dy = 0; }
         player.bounces++;
@@ -416,7 +427,8 @@ async function UI () {
     }
     function bounceLogicX(brick){
       if(brick.hp && player.team != brick.team) processDamage(brick);
-      else if(player.max_bounces){
+
+      if(player.max_bounces){
         if(player.bounces < player.max_bounces){ dx *= -1; xbounce = true; }
         else{ player.deleted = true; dx = 0; }
         player.bounces++;
@@ -428,9 +440,7 @@ async function UI () {
 
     var cols = bricks//.concat(players)
 
-    if(processUnits) cols = players.slice(1).concat(cols);
-
-
+    if(processUnits) cols = players.concat(cols);
 
     //dy += gravity;
     for (let i = 0; i < cols.length; i++) {
@@ -439,6 +449,7 @@ async function UI () {
         if(brick == player) continue;
         if (brick.bg) continue;
         if (brick.dead) continue;
+        if (brick.team == player.team) continue;
 
         let brickLeft = brick.x;
         let brickRight = brick.x + brick.width2;
