@@ -25,8 +25,8 @@ class Application extends Fabric.App {
     this['@data'] = Object.assign({
       authority: 'localhost:9999',
       canvas: {
-        height: 1024,
-        width: 768
+        height: 768,
+        width: 1024
       }
     }, configuration);
 
