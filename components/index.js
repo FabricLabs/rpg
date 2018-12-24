@@ -394,6 +394,7 @@ async function UI () {
           missile.bounces = 0;
           missile.damage = player.damage;
           missile.team = player.team;
+          missile.missile = true;
           missiles.push(missile);
           lastFire = new Date();
       }
@@ -455,7 +456,7 @@ async function UI () {
         if(brick == player) continue;
         if (brick.bg) continue;
         if (brick.dead) continue;
-        if (brick.team == player.team) continue;
+        if (brick.team == player.team && player.missile) continue;
 
         let brickLeft = brick.x;
         let brickRight = brick.x + brick.width2;
