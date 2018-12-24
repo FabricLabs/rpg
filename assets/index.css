@@ -10,3 +10,7 @@ body {
 header {
   color:white;
 }
+
+header nav {
+  text-align: right;
+}

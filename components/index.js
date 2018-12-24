@@ -4,17 +4,21 @@ const RPG = require('./application');
 
 // main program
 async function main () {
-  let app = new RPG({
+  window.rpg = new RPG({
     height: 768,
     width: 1024
   });
 
-  app.envelop('*[data-bind=fabric]');
-  app.render();
+  rpg.envelop('*[data-bind=fabric]');
+  rpg.render();
 
-  await app.start();
+  await rpg.start();
 
-  console.log('[FABRIC]', 'booted:', app);
+  document.querySelector('*[data-action=toggle-fullscreen]').addEventListener('click', function () {
+    rpg._toggleFullscreen();
+  });
+
+  console.log('[FABRIC]', 'booted:', rpg);
 
   let ui = await UI();
 

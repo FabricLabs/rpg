@@ -8,7 +8,11 @@
 <body>
   <header>
     <h1>RPG</h1>
+    <nav data-bind="controls">
+      <button data-action="toggle-fullscreen">fullscreen</button>
+    </nav>
     <p><code>ERA:</code> <code>dev</code></p>
+    <p><strong>Source:</strong> <a href="https://github.com/FabricLabs/rpg">fabric:github.com/FabricLabs/rpg</a>
   </header>
   <div data-bind="fabric">
     <canvas id="canvas" width="1024" height="768"></canvas>

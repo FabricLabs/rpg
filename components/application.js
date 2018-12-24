@@ -62,6 +62,12 @@ class Application extends Fabric.App {
     return this;
   }
 
+  _toggleFullscreen () {
+    if (this.element.webkitRequestFullScreen) {
+      this.element.webkitRequestFullScreen();
+    }
+  }
+
   /**
    * Get the output of our program.
    * @return {String}           Output of the program.
