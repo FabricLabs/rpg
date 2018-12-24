@@ -382,7 +382,7 @@ async function UI () {
               dy = -jumpspeed;
           }
       }*/
-      if(keys.space.down && new Date() - lastFire > 500){
+      if(!player.dead && keys.space.down && new Date() - lastFire > 500){
           let missile = new Sprite(fireball, 250, 250, 40, 40, player.x, player.y);
           missile.dx = dx + (player.turned ? -1 : 1);
           missile.dy = dy;
