@@ -90,6 +90,10 @@ class Canvas extends Fabric.App {
     return this;
   }
 
+  export () {
+    this.element.toDataURL();
+  }
+
   draw () {
     let canvas = document.querySelector('rpg-application canvas');
     let context = canvas.getContext('2d');

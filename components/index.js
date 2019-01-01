@@ -1,18 +1,20 @@
 'use strict';
 
+const config = require('../config');
 const RPG = require('./application');
 
 // main program
 async function main () {
-  window.rpg = new RPG({
-    height: 768,
-    width: 1024
-  });
+  window.rpg = new RPG(config);
 
   rpg.envelop('*[data-bind=fabric]');
   rpg.render();
 
   await rpg.start();
+
+  document.querySelector('*[data-action=request-name]').addEventListener('click', function () {
+    rpg._requestName();
+  });
 
   document.querySelector('*[data-action=toggle-fullscreen]').addEventListener('click', function () {
     rpg._toggleFullscreen();
@@ -93,7 +95,7 @@ async function UI () {
     drawDot: function (x, y) {
       this.context.fillRect(x, y, 1, 1);
     },
-    images:   {},
+    images: {},
     getImage: function (src, cb) {
       let img = this.images[src];
       if (img && cb){
@@ -107,7 +109,7 @@ async function UI () {
         return img;
       }
     },
-    preload:  function (sources, cb) {
+    preload: function (sources, cb) {
       let self = this;
       let ln = sources.length;
 
@@ -141,7 +143,6 @@ async function UI () {
       }
     }
   };
-
 
   function Sprite (img, width, height, width2, height2, x, y, positions) {
     this.img = img;
@@ -188,7 +189,7 @@ async function UI () {
     y: 0,
     z: 1,
     width: 1024,
-    height:768,
+    height: 768,
     padding: 500,
     padding2: 300
   };

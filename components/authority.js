@@ -2,34 +2,40 @@
 
 const Fabric = require('@fabric/core');
 
-class Authority {
+class Authority extends Fabric.Oracle {
   constructor (configuration) {
-    // super(configuration);
+    super(configuration);
 
     this.config = Object.assign({
       host: 'localhost',
       port: 9999
     });
 
+    this.attempt = 1;
     this.timer = null;
     this.queue = [];
 
     return this;
   }
 
-  post (key, value) {
-    let message = Fabric.Message.fromVector([
-      '0x80',
-      JSON.stringify({
-        '@type': 'UntrustedMessage',
-        '@data': {
-          path: key,
-          value: value
-        }
-      })
-    ]);
+  patch (key, value) {
+    this.socket.send(JSON.stringify({
+      '@type': 'PATCH',
+      '@data': {
+        path: key,
+        value: value
+      }
+    }));
+  }
 
-    console.log('message:', message);
+  post (key, value) {
+    this.socket.send(JSON.stringify({
+      '@type': 'POST',
+      '@data': {
+        path: key,
+        value: value
+      }
+    }));
   }
 
   _connect () {
@@ -50,14 +56,15 @@ class Authority {
   }
 
   _onClose (event) {
-    let attempt = 0;
-    let reconnectionTimes = [0, 100, 1000, 10000, 30000, 60000, 120000, 300000];
+    this.status = 'disconnected';
 
-    this.timer = setTimeout(function reconnect () {
-      clearTimeout(this.timer);
-      this._connect();
-      attempt++;
-    }, reconnectionTimes[attempt]);
+    let authority = this;
+
+    authority.timer = setTimeout(function reconnect () {
+      clearTimeout(authority.timer);
+      authority.attempt++;
+      authority._connect();
+    }, Math.pow(authority.attempt, 2.5) * 1000);
   }
 }
 

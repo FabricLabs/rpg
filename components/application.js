@@ -33,31 +33,26 @@ class Application extends Fabric.App {
     this.rpg = new RPG(configuration);
     this.trust(this.rpg);
 
+    this.bgm = new Audio({ sources: ['madeon-icarus.mid'] } );
+
     return this;
   }
 
-  async start () {
-    this.log('[APP]', 'Starting...');
+  _handleMessage (msg) {
+    console.log('message from authority:', msg);
+  }
 
-    try {
-      await this.rpg.start();
-    } catch (E) {
-      this.error('Could not start RPG:', E);
-      return null;
-    }
+  _requestName () {
+    let name = prompt('What is your name?');
+    let player = {
+      name: name
+    };
 
-    try {
-      this.authority = new Authority();
-      this.authority._connect();
-    } catch (E) {
-      this.error('Could not establish connection to authority:', E);
-    }
+    this.authority.post(`/players`, player);
 
-    this.authority.post(`/players`, {
-      name: Math.random()
-    });
+    console.log('chosen name:', name);
 
-    this.log('[APP]', 'Started!');
+    this.player = player;
 
     return this;
   }
@@ -92,6 +87,31 @@ class Application extends Fabric.App {
     canvas.envelop('rpg-application canvas');
 
     return rendered;
+  }
+
+  async start () {
+    this.log('[APP]', 'Starting...');
+
+    try {
+      await this.rpg.start();
+    } catch (E) {
+      this.error('Could not start RPG:', E);
+      return null;
+    }
+
+    try {
+      this.authority = new Authority();
+      this.authority.on('message', this._handleMessage.bind(this));
+      // this.authority.on('changes', this._handleMessage.bind(this));
+      this.authority._connect();
+    } catch (E) {
+      this.error('Could not establish connection to authority:', E);
+    }
+
+    this.log('[APP]', 'Started!');
+    this.log('[APP]', 'State:', this.authority);
+
+    return this;
   }
 }
 
