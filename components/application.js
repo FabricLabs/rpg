@@ -23,7 +23,7 @@ class Application extends Fabric.App {
     this.authority = null;
 
     this['@data'] = Object.assign({
-      authority: 'localhost:9999',
+      authority: 'rpg.fabric.pub',
       canvas: {
         height: 768,
         width: 1024

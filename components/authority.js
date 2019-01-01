@@ -7,9 +7,9 @@ class Authority extends Fabric.Oracle {
     super(configuration);
 
     this.config = Object.assign({
-      host: 'localhost',
-      port: 9999
-    });
+      host: 'rpg.verse.pub',
+      port: 443
+    }, configuration);
 
     this.attempt = 1;
     this.timer = null;
@@ -39,7 +39,7 @@ class Authority extends Fabric.Oracle {
   }
 
   _connect () {
-    this.socket = new WebSocket(`ws://${this.config.host}:${this.config.port}`);
+    this.socket = new WebSocket(`wss://${this.config.host}:${this.config.port}/connections`);
     this.socket.onopen = this._onConnection.bind(this);
     this.socket.onmessage = this._onMessage.bind(this);
     this.socket.onclose = this._onClose.bind(this);
