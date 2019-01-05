@@ -33,8 +33,6 @@ class Application extends Fabric.App {
     this.rpg = new RPG(configuration);
     this.trust(this.rpg);
 
-    this.bgm = new Audio({ sources: ['madeon-icarus.mid'] } );
-
     return this;
   }
 
