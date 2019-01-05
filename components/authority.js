@@ -11,7 +11,7 @@ class Authority extends Fabric.Oracle {
       port: 443
     }, configuration);
 
-    this.attempt = 1;
+    this.attempt = 0;
     this.timer = null;
     this.queue = [];
 
@@ -59,12 +59,15 @@ class Authority extends Fabric.Oracle {
     this.status = 'disconnected';
 
     let authority = this;
+    let distance = Math.pow(authority.attempt, 2) * 1000;
+
+    console.log('[RPG:AUTHORITY]', `connection closed, retrying in ${distance} milliseconds.`);
 
     authority.timer = setTimeout(function reconnect () {
       clearTimeout(authority.timer);
       authority.attempt++;
       authority._connect();
-    }, Math.pow(authority.attempt, 2.5) * 1000);
+    }, distance);
   }
 }
 

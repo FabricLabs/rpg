@@ -74,18 +74,20 @@ class Application extends Fabric.App {
   }
 
   _requestName () {
+    // TODO: async generation
+    let key = new Fabric.Key();
     let name = prompt('What is your name?');
     let player = {
-      name: name
+      name: name,
+      key: key
     };
+
+    console.log('chosen name:', name);
+    console.log('key:', key);
 
     this.authority.post(`/players`, player);
 
-    console.log('chosen name:', name);
-
-    var hash = document.location.hash;
-    let id = hash ? hash.substr(1) : '0';
-    player.id = id;
+    player.id = key.address;
 
     this.player = player;
 
