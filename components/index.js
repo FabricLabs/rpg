@@ -28,6 +28,9 @@ async function main () {
 }
 
 async function UI () {
+  var hash = document.location.hash;
+  let myid = hash ? hash.substr(1) : '0';
+
   let userid = null;
   let copycat_mode = false;
   let default_walk_speed = 5;
@@ -222,6 +225,12 @@ async function UI () {
     }
   }
 
+  function networkFrame () {
+    let player = players[0];
+    rpg._updatePosition(player.x, player.y, player.z);
+    setTimeout(networkFrame, 1000/10);
+  }
+
   function logicFrame () {
     // update players position,
     // listen for collisions etc
@@ -267,12 +276,6 @@ async function UI () {
 
     // process the game logic at a target of 60fps
     setTimeout(logicFrame, 1000/60);
-
-    /*for (let n = 1; n < players.length; n++) {
-      let npc = players[n];
-      npc.x += -10  +  20 * Math.random();
-      npc.y += -10  +  20 * Math.random();
-    }*/
   }
 
 
@@ -579,6 +582,31 @@ async function UI () {
 
   drawFrame();
   logicFrame();
+  networkFrame();
+
+  function dataCallback(data){
+    //console.log("DATA CB", data)
+
+    let path = data.path;
+
+    let np = network_players[path];
+    if(!np && data.value.id != myid){
+      let wario = images.getImage('wario.png');
+
+      np = new Sprite(wario, 480, 640, 48, 64, 380, 380);
+      np.dx = 0;
+      np.dy = 0;
+
+      network_players[path] = np;
+    }
+
+    if(np) {
+      np.x = data.value.x;
+      np.y = data.value.y;
+    }
+  }
+
+  rpg._onData(dataCallback)
 
   return this;
 }

@@ -39,7 +39,40 @@ class Application extends Fabric.App {
   }
 
   _handleMessage (msg) {
-    console.log('message from authority:', msg);
+    //console.log('message from authority:', msg);
+
+    let data = msg.data;
+
+    if(data){
+      let parsed = JSON.parse(data);
+
+      //console.log("DATA",parsed);
+
+      let atdata = parsed['@data'];
+
+      if(atdata){
+        if(typeof atdata == 'string') atdata = JSON.parse(atdata);
+
+        //console.log("@DATA", atdata)
+
+        if(atdata['@type'] == 'PATCH'){
+          var patch = atdata['@data'];
+          //console.log("player", patch.path);
+          //console.log("new pos", patch.value);
+
+          //console.log("YOU PLAYER", patch)
+
+          if(this.dataCallback){
+            this.dataCallback(patch);
+          }
+        }else{
+          if(this.dataCallback && atdata.value){
+            //console.log("OTHER PLAYER", atdata)
+            this.dataCallback(atdata);
+          }
+        }
+      }
+    }
   }
 
   _requestName () {
@@ -52,15 +85,30 @@ class Application extends Fabric.App {
 
     console.log('chosen name:', name);
 
+    var hash = document.location.hash;
+    let id = hash ? hash.substr(1) : '0';
+    player.id = id;
+
     this.player = player;
 
+    console.log('id', this.player.id)
+
     return this;
+  }
+
+  _updatePosition(x, y, z){
+    if(!this.player) return;
+    this.authority.patch(`/players/${this.player.id}`, {id:this.player.id, x:x, y:y, z:z});
   }
 
   _toggleFullscreen () {
     if (this.element.webkitRequestFullScreen) {
       this.element.webkitRequestFullScreen();
     }
+  }
+
+  _onData (fn) {
+    this.dataCallback = fn;
   }
 
   /**
