@@ -73,17 +73,31 @@ class Application extends Fabric.App {
     }
   }
 
-  _requestName () {
+  async _createCharacter () {
     // TODO: async generation
     let key = new Fabric.Key();
-    let name = prompt('What is your name?');
-    let player = {
-      name: name,
-      key: key
+    let struct = {
+      address: key.address,
+      private: key.private.toString('hex'),
+      public: key.public
     };
 
-    console.log('chosen name:', name);
     console.log('key:', key);
+    console.log('private:', key.private);
+
+    let vector = new Fabric.State(struct);
+    let result = await this.stash._PUT(`/identities/${key.address}`, struct);
+    let item = await this.stash._POST(`/identities`, vector['@id']);
+
+    console.log('saved key:', result);
+    console.log('collection put:', item);
+  }
+
+  async _requestName () {
+    let name = prompt('What is your name?');
+    let player = {
+      name: name
+    };
 
     this.authority.post(`/players`, player);
 
@@ -94,6 +108,18 @@ class Application extends Fabric.App {
     console.log('id', this.player.id)
 
     return this;
+  }
+
+  async _restorePlayer () {
+    let identities = null;
+
+    try {
+      identities = await this.stash._GET(`/identities`);
+    } catch (E) {
+      console.error('Could not load history:', E);
+    }
+
+    console.log('identities:', identities);
   }
 
   _updatePosition(x, y, z){
@@ -147,10 +173,13 @@ class Application extends Fabric.App {
       return null;
     }
 
+    let identities = await this._restorePlayer();
+    console.log('identities (in start):', identities);
+
     try {
       this.authority = new Authority();
       this.authority.on('message', this._handleMessage.bind(this));
-      // this.authority.on('changes', this._handleMessage.bind(this));
+      // this.authority.on('changes', this._handleChanges.bind(this));
       this.authority._connect();
     } catch (E) {
       this.error('Could not establish connection to authority:', E);

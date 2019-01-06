@@ -5,20 +5,17 @@ const RPG = require('./application');
 
 // main program
 async function main () {
-  window.rpg = new RPG(config);
+  let rpg = window.rpg = new RPG(config);
 
   rpg.envelop('*[data-bind=fabric]');
   rpg.render();
 
   await rpg.start();
 
-  document.querySelector('*[data-action=request-name]').addEventListener('click', function () {
-    rpg._requestName();
-  });
-
-  document.querySelector('*[data-action=toggle-fullscreen]').addEventListener('click', function () {
-    rpg._toggleFullscreen();
-  });
+  // TODO: move to envelop()
+  document.querySelector('*[data-action=generate-identity]').addEventListener('click', rpg._createCharacter.bind(rpg));
+  document.querySelector('*[data-action=toggle-fullscreen]').addEventListener('click', rpg._toggleFullscreen.bind(rpg));
+  // document.querySelector('*[data-action=request-name]').addEventListener('click', rpg._requestName.bind(rpg));
 
   console.log('[FABRIC]', 'booted:', rpg);
 
