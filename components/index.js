@@ -1,11 +1,11 @@
 'use strict';
 
 const config = require('../config');
-const RPG = require('./application');
+const Application = require('./application');
 
 // main program
 async function main () {
-  let rpg = window.rpg = new RPG(config);
+  let rpg = window.application = new Application(config);
 
   rpg.envelop('*[data-bind=fabric]');
   rpg.render();
@@ -224,7 +224,7 @@ async function UI () {
 
   function networkFrame () {
     let player = players[0];
-    rpg._updatePosition(player.x, player.y, player.z);
+    window.application._updatePosition(player.x, player.y, player.z);
     setTimeout(networkFrame, 1000/10);
   }
 
@@ -336,8 +336,8 @@ async function UI () {
     for(let i = 0; i<7; i++) {
       let player3 = new Sprite(goomba, 900, 900, 48, 64, i * 200, i * 200 + 100);
 
-      player3.dx = Math.floor( Math.random() * 3 + 2 );
-      player3.dy = Math.floor( Math.random() * 3 + 2);
+      player3.dx = Math.floor( application.machine.generator.next.percent() * 3 + 2 );
+      player3.dy = Math.floor( application.machine.generator.next.percent() * 3 + 2);
       player3.x0 = player3.x; player3.y0 = player3.y;
       player3.max_bounces = 100000;
       player3.bounces = 0;
@@ -542,11 +542,10 @@ async function UI () {
   }
 
   function drawUi(ctx){
-
     var player = players[0];
 
 
-    ctx.filleStyle = "#000000";
+    ctx.fillStyle = "#000000";
     ctx.fillRect(i * 20, 20, 150, 100);
 
     ctx.fillStyle = "#00FF00";

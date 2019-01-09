@@ -142,7 +142,7 @@ class Application extends Fabric.App {
    * @return {String}           Output of the program.
    */
   render () {
-    let canvas = new Canvas({
+    let canvas = this.canvas = new Canvas({
       height: this.config.height,
       width: this.config.width
     });
