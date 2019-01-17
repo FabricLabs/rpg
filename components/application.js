@@ -5,6 +5,7 @@ const RPG = require('../lib/rpg');
 
 const Authority = require('./authority');
 const Canvas = require('./canvas');
+const Swarm = require('./swarm');
 
 /**
  * Primary Application Definition
@@ -31,49 +32,46 @@ class Application extends Fabric.App {
     }, configuration);
 
     this.rpg = new RPG(configuration);
+    this.swarm = new Swarm();
     this.trust(this.rpg);
 
     return this;
   }
 
   _handleMessage (msg) {
-    //console.log('message from authority:', msg);
+    if (!msg.data) return console.error(`Malformed message:`, msg);
 
-    let data = msg.data;
+    let parsed = null;
 
-    if(data){
-      let parsed = JSON.parse(data);
+    try {
+      parsed = JSON.parse(msg.data);
+    } catch (E) {
+      return console.error(`Couldn't parse data:`, E);
+    }
 
-      //console.log("DATA",parsed);
+    if (!parsed['@type']) return console.error(`No type provided:`, parsed);
+    if (!parsed['@data']) return console.error(`No data provided:`, parsed);
 
-      let atdata = parsed['@data'];
+    if (typeof parsed['@data'] === 'string') {
+      console.warn('Found string:', parsed);
+      parsed['@data'] = JSON.parse(parsed['@data']);
+    }
 
-      if(atdata){
-        if(typeof atdata == 'string') atdata = JSON.parse(atdata);
-
-        //console.log("@DATA", atdata)
-
-        if(atdata['@type'] == 'PATCH'){
-          var patch = atdata['@data'];
-          //console.log("player", patch.path);
-          //console.log("new pos", patch.value);
-
-          //console.log("YOU PLAYER", patch)
-
-          if(this.dataCallback){
-            this.dataCallback(patch);
-          }
-        }else{
-          if(this.dataCallback && atdata.value){
-            //console.log("OTHER PLAYER", atdata)
-            this.dataCallback(atdata);
-          }
-        }
-      }
+    switch (parsed['@data']['@type']) {
+      default:
+        console.warn(`Unhandled type:`, parsed['@data']['@type']);
+        this._processInstruction(parsed['@data']);
+        break;
+      case 'PATCH':
+        this._processInstruction(parsed['@data']);
+        break;
     }
   }
 
   async _createCharacter () {
+    let item = null;
+    let result = null;
+
     // TODO: async generation
     let key = new Fabric.Key();
     let struct = {
@@ -86,11 +84,19 @@ class Application extends Fabric.App {
     console.log('private:', key.private);
 
     let vector = new Fabric.State(struct);
-    let result = await this.stash._PUT(`/identities/${key.address}`, struct);
-    let item = await this.stash._POST(`/identities`, vector['@id']);
+    // let result = await this.stash._PUT(`/identities/${key.address}`, struct);
+    
+    try {
+      item = await this.stash._POST(`/identities`, vector['@id']);
+      result = await this.stash._GET(item);
+    } catch (E) {
+      console.error('broken:', E);
+    }
 
-    console.log('saved key:', result);
     console.log('collection put:', item);
+    console.log('result:', result);
+
+    return struct;
   }
 
   async _requestName () {
@@ -105,7 +111,7 @@ class Application extends Fabric.App {
 
     this.player = player;
 
-    console.log('id', this.player.id)
+    console.log('id', this.player.id);
 
     return this;
   }
@@ -122,9 +128,14 @@ class Application extends Fabric.App {
     console.log('identities:', identities);
   }
 
-  _updatePosition(x, y, z){
-    if(!this.player) return;
-    this.authority.patch(`/players/${this.player.id}`, {id:this.player.id, x:x, y:y, z:z});
+  _updatePosition (x, y, z) {
+    if (!this.player) return;
+    this.authority.patch(`/players/${this.player.id}`, {
+      id: this.player.id,
+      x: x,
+      y: y,
+      z: z
+    });
   }
 
   _toggleFullscreen () {
@@ -133,8 +144,19 @@ class Application extends Fabric.App {
     }
   }
 
-  _onData (fn) {
-    this.dataCallback = fn;
+  _processInstruction (instruction) {
+    console.log('process instruction:');
+  }
+
+  _onMessage (message) {
+    console.log('hello, message:', message);
+    let fake = {
+      data: JSON.stringify({
+        '@type': 'PeerMessage',
+        '@data': message
+      })
+    };
+    this.authority._onMessage(fake);
   }
 
   /**
@@ -176,6 +198,10 @@ class Application extends Fabric.App {
     let identities = await this._restorePlayer();
     console.log('identities (in start):', identities);
 
+    if (!identities) {
+      identities = [await this._createCharacter()];
+    }
+
     try {
       this.authority = new Authority();
       this.authority.on('message', this._handleMessage.bind(this));
@@ -184,6 +210,12 @@ class Application extends Fabric.App {
     } catch (E) {
       this.error('Could not establish connection to authority:', E);
     }
+
+    console.log('[SWARM]', 'beginning:', identities);
+
+    this.swarm.on('message', this._onMessage.bind(this));
+    this.swarm.identify(identities[0].address);
+    // this.swarm.connect('test');
 
     this.log('[APP]', 'Started!');
     this.log('[APP]', 'State:', this.authority);
