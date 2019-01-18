@@ -38,9 +38,6 @@ class Application extends Fabric.App {
     this.swarm = new Swarm();
     this.trust(this.rpg);
 
-    this.bgm = new Audio({ sources: ['madeon-icarus.mid'] } );
-    this.channel = new Channel();
-
     return this;
   }
 
