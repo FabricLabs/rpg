@@ -148,12 +148,33 @@ class Application extends Fabric.App {
       parsed['@data'] = JSON.parse(parsed['@data']);
     }
 
-    switch (parsed['type']) {
+    console.log('hello:', parsed['@type'], parsed);
+
+    switch (parsed['@type']) {
       default:
-        console.error('[APP:_handleMessage]', `Unhandled type:`, parsed['type']);
+        console.error('[APP:_handleMessage]', `Unhandled type:`, parsed['type'], parsed);
         break;
       case 'PeerMessage':
-        this._processInstruction(parsed['@data']);
+        let content = parsed['@data'].object;
+
+        switch (content['@type']) {
+          default:
+            console.log('[PEER:MESSAGE]', 'unhandled type', parsed['@data'].object['@type']);
+            break;
+          case 'PATCH':
+            console.log('peer gave us PATCH:', content);
+
+            try {
+              let result = await this.authority.patch(content['@data'].path, content['@data'].value);
+              let answer = await this.stash._PATCH(content['@data'].path, content['@data'].value);
+              console.log('result:', result);
+              console.log('answer:', answer);
+            } catch (E) {
+              console.log('could not patch:', E);
+            }
+
+            break;
+        }
         break;
       case 'PATCH':
         this._processInstruction(parsed['@data']);

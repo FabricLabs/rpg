@@ -7,6 +7,10 @@ const Application = require('./application');
 async function main () {
   let rpg = window.application = new Application(config);
 
+  rpg.on('error', function (err) {
+    console.error(err);
+  });
+
   rpg.envelop('*[data-bind=fabric]');
   rpg.render();
 
@@ -198,7 +202,6 @@ async function UI () {
   let gravity = .98;
   let bricks = [];
   let players = [];
-  let network_players = {};
   let missiles = [];
   let player = null;
   let background = null;
@@ -242,8 +245,8 @@ async function UI () {
       z: 1
     });
 
-    Object.keys(network_players).forEach(function (k) {
-      let p = network_players[k];
+    Object.keys(window.application.networkPlayers).forEach(function (k) {
+      let p = window.application.networkPlayers[k];
       //p.x += p.dx;
       //p.y += p.dy;
       runPhysics(p);
@@ -516,8 +519,8 @@ async function UI () {
   }
 
   function drawPlayers () {
-    Object.keys(network_players).forEach(function (k) {
-      let p = network_players[k];
+    Object.keys(window.application.networkPlayers).forEach(function (k) {
+      let p = window.application.networkPlayers[k];
       p.draw(p.x - camera.x, p.y - camera.y);
     });
 
