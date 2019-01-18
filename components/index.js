@@ -602,8 +602,6 @@ async function UI () {
     }
   }
 
-  rpg._onData(dataCallback)
-
   return this;
 }
 

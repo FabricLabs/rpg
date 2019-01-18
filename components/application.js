@@ -22,6 +22,9 @@ class Application extends Fabric.App {
 
     // An authority is required when running in a browser.
     this.authority = null;
+    this.identity = null;
+    this.identities = {};
+    this.networkPlayers = {};
 
     this['@data'] = Object.assign({
       authority: 'rpg.fabric.pub',
@@ -35,37 +38,30 @@ class Application extends Fabric.App {
     this.swarm = new Swarm();
     this.trust(this.rpg);
 
+    this.bgm = new Audio({ sources: ['madeon-icarus.mid'] } );
+    this.channel = new Channel();
+
     return this;
   }
 
-  _handleMessage (msg) {
-    if (!msg.data) return console.error(`Malformed message:`, msg);
-
-    let parsed = null;
-
-    try {
-      parsed = JSON.parse(msg.data);
-    } catch (E) {
-      return console.error(`Couldn't parse data:`, E);
+  async _handleAuthorityReady () {
+    // TODO: load identity in caller
+    if (!this.identity) {
+      await this._createCharacter();
     }
 
-    if (!parsed['@type']) return console.error(`No type provided:`, parsed);
-    if (!parsed['@data']) return console.error(`No data provided:`, parsed);
+    console.log('Authority ready!  calling _announcePlayer:', this.identity);
 
-    if (typeof parsed['@data'] === 'string') {
-      console.warn('Found string:', parsed);
-      parsed['@data'] = JSON.parse(parsed['@data']);
-    }
+    await this._announcePlayer(this.identity);
+    await this.swarm.identify(this.identity.address);
+  }
 
-    switch (parsed['@data']['@type']) {
-      default:
-        console.warn(`Unhandled type:`, parsed['@data']['@type']);
-        this._processInstruction(parsed['@data']);
-        break;
-      case 'PATCH':
-        this._processInstruction(parsed['@data']);
-        break;
-    }
+  async _announcePlayer (identity) {
+    let instance = await this.authority.post(`/peers`, identity);
+    console.log('posted peer:', instance);
+
+    let player = await this.stash._PUT(`/players/${identity.address}`, identity);
+    console.log('player:', player);
   }
 
   async _createCharacter () {
@@ -75,6 +71,7 @@ class Application extends Fabric.App {
     // TODO: async generation
     let key = new Fabric.Key();
     let struct = {
+      name: prompt('What shall be your name?'),
       address: key.address,
       private: key.private.toString('hex'),
       public: key.public
@@ -83,11 +80,8 @@ class Application extends Fabric.App {
     console.log('key:', key);
     console.log('private:', key.private);
 
-    let vector = new Fabric.State(struct);
-    // let result = await this.stash._PUT(`/identities/${key.address}`, struct);
-    
     try {
-      item = await this.stash._POST(`/identities`, vector['@id']);
+      item = await this.stash._POST(`/identities`, struct);
       result = await this.stash._GET(item);
     } catch (E) {
       console.error('broken:', E);
@@ -96,7 +90,14 @@ class Application extends Fabric.App {
     console.log('collection put:', item);
     console.log('result:', result);
 
-    return struct;
+    this.identities[struct.address] = struct;
+    this.identity = struct;
+
+    // TODO: remove public key from character, use only address (or direct hash)
+    return {
+      address: struct.address,
+      public: struct.public
+    };
   }
 
   async _requestName () {
@@ -105,7 +106,7 @@ class Application extends Fabric.App {
       name: name
     };
 
-    this.authority.post(`/players`, player);
+    await this.authority.post(`/players`, player);
 
     player.id = key.address;
 
@@ -125,12 +126,70 @@ class Application extends Fabric.App {
       console.error('Could not load history:', E);
     }
 
-    console.log('identities:', identities);
+    console.log('[APP:_restorePlayer]', 'identities:', identities);
   }
 
-  _updatePosition (x, y, z) {
+  async _handleMessage (msg) {
+    if (!msg.data) return console.error(`Malformed message:`, msg);
+
+    let parsed = null;
+
+    try {
+      parsed = JSON.parse(msg.data);
+    } catch (E) {
+      return console.error(`Couldn't parse data:`, E);
+    }
+
+    if (!parsed['@type']) return console.error(`No type provided:`, parsed);
+    if (!parsed['@data']) return console.error(`No data provided:`, parsed);
+
+    if (typeof parsed['@data'] === 'string') {
+      console.warn('Found string:', parsed);
+      parsed['@data'] = JSON.parse(parsed['@data']);
+    }
+
+    switch (parsed['type']) {
+      default:
+        console.error('[APP:_handleMessage]', `Unhandled type:`, parsed['type']);
+        break;
+      case 'PeerMessage':
+        this._processInstruction(parsed['@data']);
+        break;
+      case 'PATCH':
+        this._processInstruction(parsed['@data']);
+        break;
+      case 'POST':
+        this._processInstruction(parsed['@data']);
+        break;
+    }
+  }
+
+  async _onMessage (message) {
+    console.log('hello, message:', message);
+
+    switch (message['@type']) {
+      default:
+        console.log('application onMessage received unknown type:', message['@type']);
+        break;
+      case 'PeerMessage':
+        console.log('hi peermessage:', message);
+
+        await this.stash._POST(`/messages/${message.id}`, message);
+
+        let fake = {
+          data: JSON.stringify(message)
+        };
+
+        await this._handleMessage(fake);
+
+        break;
+    }
+  }
+
+  async _updatePosition (x, y, z) {
     if (!this.player) return;
-    this.authority.patch(`/players/${this.player.id}`, {
+
+    await this.authority.patch(`/players/${this.player.id}`, {
       id: this.player.id,
       x: x,
       y: y,
@@ -145,18 +204,7 @@ class Application extends Fabric.App {
   }
 
   _processInstruction (instruction) {
-    console.log('process instruction:');
-  }
-
-  _onMessage (message) {
-    console.log('hello, message:', message);
-    let fake = {
-      data: JSON.stringify({
-        '@type': 'PeerMessage',
-        '@data': message
-      })
-    };
-    this.authority._onMessage(fake);
+    console.log('process instruction:', instruction);
   }
 
   /**
@@ -196,14 +244,11 @@ class Application extends Fabric.App {
     }
 
     let identities = await this._restorePlayer();
-    console.log('identities (in start):', identities);
-
-    if (!identities) {
-      identities = [await this._createCharacter()];
-    }
+    console.log('[APP:DEBUG]', 'identities (in start):', identities);
 
     try {
-      this.authority = new Authority();
+      this.authority = new Authority(this['@data']);
+      this.authority.on('connection:ready', this._handleAuthorityReady.bind(this));
       this.authority.on('message', this._handleMessage.bind(this));
       // this.authority.on('changes', this._handleChanges.bind(this));
       this.authority._connect();
@@ -214,7 +259,6 @@ class Application extends Fabric.App {
     console.log('[SWARM]', 'beginning:', identities);
 
     this.swarm.on('message', this._onMessage.bind(this));
-    this.swarm.identify(identities[0].address);
     // this.swarm.connect('test');
 
     this.log('[APP]', 'Started!');
