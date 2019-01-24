@@ -42,11 +42,6 @@ class Application extends Fabric.App {
   }
 
   async _handleAuthorityReady () {
-    // TODO: load identity in caller
-    if (!this.identity) {
-      await this._createCharacter();
-    }
-
     console.log('Authority ready!  calling _announcePlayer:', this.identity);
 
     await this._announcePlayer(this.identity);
@@ -54,10 +49,13 @@ class Application extends Fabric.App {
   }
 
   async _announcePlayer (identity) {
-    let instance = await this.authority.post(`/peers`, identity);
-    console.log('posted peer:', instance);
+    if (this.authority.status === 'connected') {
+      let instance = await this.authority.post(`/peers`, identity);
+      console.log('posted peer:', instance);
+    }
 
-    let player = await this.stash._PUT(`/players/${identity.address}`, identity);
+    let link = await this.stash._POST(`/players`, identity);
+    let player = await this.stash._GET(link);
     console.log('player:', player);
   }
 
@@ -75,7 +73,7 @@ class Application extends Fabric.App {
     };
 
     console.log('key:', key);
-    console.log('private:', key.private);
+    console.warn('private:', key.private);
 
     try {
       item = await this.stash._POST(`/identities`, struct);
@@ -204,6 +202,15 @@ class Application extends Fabric.App {
     }
   }
 
+  async _onConnection (id) {
+    let connection = {
+      address: id
+    };
+
+    let posted = await this.authority.post(`/connections`, connection);
+    let x = await this.authority.post(`/peers`, connection);
+  }
+
   async _updatePosition (x, y, z) {
     if (!this.player) return;
 
@@ -254,11 +261,17 @@ class Application extends Fabric.App {
   async start () {
     this.log('[APP]', 'Starting...');
 
+    await super.start();
+
     try {
       await this.rpg.start();
     } catch (E) {
       this.error('Could not start RPG:', E);
       return null;
+    }
+
+    if (!this.identity) {
+      await this._createCharacter();
     }
 
     let identities = await this._restorePlayer();
@@ -267,7 +280,8 @@ class Application extends Fabric.App {
     try {
       this.authority = new Authority(this['@data']);
       this.authority.on('connection:ready', this._handleAuthorityReady.bind(this));
-      this.authority.on('message', this._handleMessage.bind(this));
+      // TODO: enable message handler for production
+      // this.authority.on('message', this._handleMessage.bind(this));
       // this.authority.on('changes', this._handleChanges.bind(this));
       this.authority._connect();
     } catch (E) {
@@ -277,6 +291,7 @@ class Application extends Fabric.App {
     console.log('[SWARM]', 'beginning:', identities);
 
     this.swarm.on('message', this._onMessage.bind(this));
+    this.swarm.on('connection', this._onConnection.bind(this));
     // this.swarm.connect('test');
 
     this.log('[APP]', 'Started!');

@@ -14,12 +14,13 @@ class Authority extends Fabric.Oracle {
     this.attempt = 0;
     this.timer = null;
     this.queue = [];
+    this.peers = {};
 
     return this;
   }
 
-  patch (key, value) {
-    this.socket.send(JSON.stringify({
+  async patch (key, value) {
+    return this.socket.send(JSON.stringify({
       '@type': 'PATCH',
       '@data': {
         path: key,
@@ -28,8 +29,8 @@ class Authority extends Fabric.Oracle {
     }));
   }
 
-  post (key, value) {
-    this.socket.send(JSON.stringify({
+  async post (key, value) {
+    return this.socket.send(JSON.stringify({
       '@type': 'POST',
       '@data': {
         path: key,
@@ -38,16 +39,45 @@ class Authority extends Fabric.Oracle {
     }));
   }
 
+  async put (key, value) {
+    let result = await this._PUT(key, value);
+
+    this.socket.send(JSON.stringify({
+      '@type': 'PUT',
+      '@data': {
+        path: key,
+        value: value
+      }
+    }));
+
+    return result;
+  }
+
+  async get (key) {
+    let result = await this._GET(key);
+
+    this.socket.send(JSON.stringify({
+      '@type': 'GET',
+      '@data': {
+        path: key
+      }
+    }));
+
+    return result;
+  }
+
   _connect () {
     this.socket = new WebSocket(`wss://${this.config.host}:${this.config.port}/connections`);
     this.socket.onopen = this._onConnection.bind(this);
     this.socket.onmessage = this._onMessage.bind(this);
     this.socket.onclose = this._onClose.bind(this);
     this.socket.onerror = this._onClose.bind(this);
+    return this.socket;
   }
 
   _onConnection (event) {
     this.status = 'connected';
+    this.emit('connection:ready');
   }
 
   _onMessage (event) {
