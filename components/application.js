@@ -46,10 +46,12 @@ class Application extends Fabric.App {
     let peers = await this.stash._GET(`/peers`);
     console.log('peers:', peers);
     if (!this.swarm.connections[destination]) console.error('Not connected to peer:', destination);
-    this.swarm.connections[destination].send({
+    let delivery = await this.swarm.connections[destination].send({
       '@type': 'Document',
+      '@destination': destination,
       '@data': message
     });
+    console.log('delivery:', delivery);
   }
 
   async _handleAuthorityReady () {

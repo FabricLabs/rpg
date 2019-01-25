@@ -25,6 +25,7 @@ class Swarm extends EventEmitter {
     if (this.connections[id]) return console.error(`Cannot connect to peer ${id} more than once.`);
     this.connections[id] = this.agent.connect(id, { label: this.agent.id });
     this.connections[id].on('open', this._handleReady.bind(this));
+    this.connections[id].on('data', this._onData.bind(this));
     return this.connections[id];
   }
 
@@ -53,6 +54,14 @@ class Swarm extends EventEmitter {
     this.connections[connection.peer].on('open', this._onOpen.bind(this));
     this.connections[connection.peer].on('message', this._onMessage.bind(this));
     this.emit('connection', connection.peer);
+  }
+
+  _onData (msg) {
+    return this._onMessage({
+      '@actor': this.agent.id,
+      '@data': msg['@data'],
+      '@type': msg['@type']
+    });
   }
 
   _onMessage (msg) {
