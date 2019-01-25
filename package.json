@@ -7,7 +7,7 @@
     "build": "webpack",
     "coverage": "nyc report --reporter html npm test",
     "dev": "webpack-dev-server",
-    "docs": "jsdoc lib/ README.md -d docs && ecstatic docs",
+    "docs": "jsdoc -c jsdoc.json lib/ README.md -d docs && ecstatic docs",
     "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
     "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
     "start": "npm run build && ecstatic assets",
@@ -41,6 +41,7 @@
   "devDependencies": {
     "codecov": "^3.1.0",
     "ecstatic": "^3.3.0",
+    "jsdoc": "FabricLabs/jsdoc",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0",
     "source-map": "^0.7.3",
