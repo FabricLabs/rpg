@@ -11,6 +11,7 @@ class Swarm extends EventEmitter {
     this.config = configuration;
     this.agent = null;
     this.connections = {};
+    this.peers = [];
   }
 
   identify (id) {
@@ -27,18 +28,27 @@ class Swarm extends EventEmitter {
     return this.connections[id];
   }
 
+  start () {
+    this.status = 'ready';
+    this.emit('ready');
+  }
+
   _handleReady (connection) {
     console.log('[SWARM:_handleReady]', 'ready! agent:', this.agent.id);
     console.log('[SWARM:_handleReady]', 'connection:', connection);
   }
 
   _onOpen (connection) {
+    this.peers = [{
+      address: this.agent.id
+    }];
     console.log('[SWARM:_onOpen]', 'opened! agent:', this.agent.id);
-    console.log('[SWARM:_onOpen]', 'connection id:', connection);
+    console.log('[SWARM:_onOpen]', 'connection id:', this.agent.id);
   }
 
   _onInbound (connection) {
     console.log(`incoming connection:`, connection);
+    console.log(`context:`, this);
     this.connections[connection.peer] = new Peer(connection);
     this.connections[connection.peer].on('open', this._onOpen.bind(this));
     this.connections[connection.peer].on('message', this._onMessage.bind(this));

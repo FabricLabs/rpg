@@ -41,6 +41,17 @@ class Application extends Fabric.App {
     return this;
   }
 
+  async _deliver (destination, message) {
+    console.log('[APPLICATION]', 'delivering:', destination, message);
+    let peers = await this.stash._GET(`/peers`);
+    console.log('peers:', peers);
+    if (!this.swarm.connections[destination]) console.error('Not connected to peer:', destination);
+    this.swarm.connections[destination].send({
+      '@type': 'Document',
+      '@data': message
+    });
+  }
+
   async _handleAuthorityReady () {
     console.log('Authority ready!  calling _announcePlayer:', this.identity);
 
@@ -49,14 +60,24 @@ class Application extends Fabric.App {
   }
 
   async _announcePlayer (identity) {
+    let player = Object.assign({
+      address: identity.address,
+      name: identity.name
+    });
+    
     if (this.authority.status === 'connected') {
-      let instance = await this.authority.post(`/peers`, identity);
+      let instance = await this.authority.post(`/peers`, player);
       console.log('posted peer:', instance);
     }
 
-    let link = await this.stash._POST(`/players`, identity);
-    let player = await this.stash._GET(link);
+    let link = await this.stash._POST(`/players`, player);
+    let result = await this.stash._GET(link);
+
+    console.log('link:', link);
     console.log('player:', player);
+    console.log('result:', result);
+
+    return result;
   }
 
   async _createCharacter () {
@@ -152,9 +173,21 @@ class Application extends Fabric.App {
       case 'PeerMessage':
         let content = parsed['@data'].object;
 
+        console.log('parsed data:', parsed['@data']);
+
         switch (content['@type']) {
           default:
             console.log('[PEER:MESSAGE]', 'unhandled type', parsed['@data'].object['@type']);
+            break;
+          case 'GET':
+            // TODO: deduct funds from channel
+            console.log('this:', this);
+            console.log('path:', parsed['@data'].object['@data'].path);
+            let answer = await this.stash._GET(parsed['@data'].object['@data'].path);
+            let parts = parsed['@data'].actor.split('/');
+            let result = await this._deliver(parts[2], answer);
+            console.log('answer:', answer);
+            console.log('result:', result);
             break;
           case 'PATCH':
             console.log('peer gave us PATCH:', content);
@@ -202,13 +235,25 @@ class Application extends Fabric.App {
     }
   }
 
+  async _onSwarmReady () {
+    let link = await this.stash._POST(`/peers`, {
+      address: this.identity.address
+    });
+    let result = await this.stash._GET(link);
+  }
+
   async _onConnection (id) {
+    console.log('hello, connection:', id);
     let connection = {
       address: id
     };
 
-    let posted = await this.authority.post(`/connections`, connection);
-    let x = await this.authority.post(`/peers`, connection);
+    let posted = await this.stash._POST(`/connections`, connection);
+    let link = await this.stash._POST(`/peers`, connection);
+    console.log('posted:', posted);
+    console.log('link:', link);
+    
+    console.log('connections:', this.swarm.connections);
   }
 
   async _updatePosition (x, y, z) {
@@ -290,9 +335,12 @@ class Application extends Fabric.App {
 
     console.log('[SWARM]', 'beginning:', identities);
 
+    this.swarm.on('ready', this._onSwarmReady.bind(this));
     this.swarm.on('message', this._onMessage.bind(this));
     this.swarm.on('connection', this._onConnection.bind(this));
     // this.swarm.connect('test');
+
+    await this.swarm.start();
 
     this.log('[APP]', 'Started!');
     this.log('[APP]', 'State:', this.authority);
