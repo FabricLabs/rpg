@@ -10,7 +10,7 @@
     "docs": "jsdoc -c jsdoc.json lib/ README.md -d docs && ecstatic docs",
     "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
     "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
-    "start": "npm run build && ecstatic assets",
+    "start": "npm run build && node rpg.js",
     "test": "nyc mocha tests"
   },
   "repository": {

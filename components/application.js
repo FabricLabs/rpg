@@ -41,17 +41,22 @@ class Application extends Fabric.App {
     return this;
   }
 
+  /**
+   * Deliver a message to an address.
+   * @param  {String}  destination Address in the Fabric network.
+   * @param  {Mixed}  message     Message to deliver.
+   * @return {Promise}             Resolves once the message has been broadcast.
+   */
   async _deliver (destination, message) {
     console.log('[APPLICATION]', 'delivering:', destination, message);
-    let peers = await this.stash._GET(`/peers`);
-    console.log('peers:', peers);
     if (!this.swarm.connections[destination]) console.error('Not connected to peer:', destination);
     let delivery = await this.swarm.connections[destination].send({
       '@type': 'Document',
       '@destination': destination,
       '@data': message
     });
-    console.log('delivery:', delivery);
+    this.log('message delivered:', delivery);
+    return delivery;
   }
 
   async _handleAuthorityReady () {
@@ -66,7 +71,7 @@ class Application extends Fabric.App {
       address: identity.address,
       name: identity.name
     });
-    
+
     if (this.authority.status === 'connected') {
       let instance = await this.authority.post(`/peers`, player);
       console.log('posted peer:', instance);
@@ -238,10 +243,17 @@ class Application extends Fabric.App {
   }
 
   async _onSwarmReady () {
+    // Add self to stash.
     let link = await this.stash._POST(`/peers`, {
       address: this.identity.address
     });
-    let result = await this.stash._GET(link);
+
+    // TODO: remove above into new function
+    let candidates = await this.stash._GET(`/peers`);
+
+    for (let i = 0; candidates.length; i++) {
+      this.swarm.connect(candidates[i].address);
+    }
   }
 
   async _onConnection (id) {
@@ -263,9 +275,11 @@ class Application extends Fabric.App {
 
     await this.authority.patch(`/players/${this.player.id}`, {
       id: this.player.id,
-      x: x,
-      y: y,
-      z: z
+      position: {
+        x: x,
+        y: y,
+        z: z
+      }
     });
   }
 
@@ -323,7 +337,17 @@ class Application extends Fabric.App {
 
     let identities = await this._restorePlayer();
     console.log('[APP:DEBUG]', 'identities (in start):', identities);
+    console.log('[SWARM]', 'beginning:', identities);
 
+    this.swarm.on('ready', this._onSwarmReady.bind(this));
+    this.swarm.on('message', this._onMessage.bind(this));
+    this.swarm.on('connection', this._onConnection.bind(this));
+    // this.swarm.connect('test');
+
+    await this.swarm.identify(this.identity.address);
+    await this.swarm.start();
+
+    // lastly, connect to an authority
     try {
       this.authority = new Authority(this['@data']);
       this.authority.on('connection:ready', this._handleAuthorityReady.bind(this));
@@ -334,15 +358,6 @@ class Application extends Fabric.App {
     } catch (E) {
       this.error('Could not establish connection to authority:', E);
     }
-
-    console.log('[SWARM]', 'beginning:', identities);
-
-    this.swarm.on('ready', this._onSwarmReady.bind(this));
-    this.swarm.on('message', this._onMessage.bind(this));
-    this.swarm.on('connection', this._onConnection.bind(this));
-    // this.swarm.connect('test');
-
-    await this.swarm.start();
 
     this.log('[APP]', 'Started!');
     this.log('[APP]', 'State:', this.authority);

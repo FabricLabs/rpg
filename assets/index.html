@@ -7,8 +7,8 @@
   </head>
 <body>
   <header>
-    <h1>RPG</h1>
-    <p>JavaScript required.  Spacebar to use ability.  Arrow keys to move.  Only a demo!</p>
+    <h1>RPG: <small><a href="https://www.roleplaygateway.com/">the many worlds</a></small></h1>
+    <p>JavaScript required.  Spacebar to use currently-selected ability.  Arrow keys to move.  Only a demo!</p>
     <nav data-bind="controls">
       <button data-action="generate-identity">create new character</button>
       <button data-action="toggle-fullscreen">fullscreen</button>
@@ -17,7 +17,7 @@
     <p><strong>Source:</strong> <a href="https://github.com/FabricLabs/rpg">fabric:github.com/FabricLabs/rpg</a>
   </header>
   <div data-bind="fabric">
-    <canvas id="canvas" width="1024" height="768"></canvas>
+    <canvas id="canvas" width="400" height="300"></canvas>
     <noscript>
       <h3>JavaScript Renderer Available</h3>
       <p>If you're reading this, you should consider enabling JavaScript for full effect.</p>
