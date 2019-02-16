@@ -34,6 +34,9 @@
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
     "@fabric/core": "FabricLabs/fabric#pruning",
+    "dotparser": "^0.4.0",
+    "express": "^4.16.4",
+    "level-browserify": "^2.0.0",
     "peer": "^0.2.10",
     "peerjs": "^0.3.18",
     "ws": "^6.1.2"

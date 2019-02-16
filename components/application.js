@@ -38,7 +38,7 @@ class Application extends Fabric.App {
     this.swarm = new Swarm();
     this.remote = new Fabric.Remote({
       host: this['@data'].authority,
-      secure: false
+      secure: (this['@data'].secure !== false)
     });
 
     this.trust(this.rpg);
