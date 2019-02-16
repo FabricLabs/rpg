@@ -16,9 +16,17 @@ class Swarm extends EventEmitter {
 
   identify (id) {
     this.id = id;
-    this.agent = new Agent(id);
+    this.agent = new Agent(id, {
+      host: 'rpg.verse.pub',
+      path: '/services/peering'
+    });
+
     this.agent.on('open', this._onOpen.bind(this));
     this.agent.on('connection', this._onInbound.bind(this));
+
+    this.status = 'identified';
+
+    return this;
   }
 
   connect (id) {

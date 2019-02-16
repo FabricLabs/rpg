@@ -67,7 +67,7 @@ class Authority extends Fabric.Oracle {
   }
 
   _connect () {
-    this.socket = new WebSocket(`wss://${this.config.host}:${this.config.port}/connections`);
+    this.socket = new WebSocket(`wss://${this.config.host}:${this.config.port}/peers`);
     this.socket.onopen = this._onConnection.bind(this);
     this.socket.onmessage = this._onMessage.bind(this);
     this.socket.onclose = this._onClose.bind(this);
