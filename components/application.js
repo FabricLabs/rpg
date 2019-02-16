@@ -36,6 +36,11 @@ class Application extends Fabric.App {
 
     this.rpg = new RPG(configuration);
     this.swarm = new Swarm();
+    this.remote = new Fabric.Remote({
+      host: this['@data'].authority,
+      secure: false
+    });
+
     this.trust(this.rpg);
 
     return this;
@@ -63,7 +68,12 @@ class Application extends Fabric.App {
     console.log('Authority ready!  calling _announcePlayer:', this.identity);
 
     await this._announcePlayer(this.identity);
-    await this.swarm.identify(this.identity.address);
+
+    let peers = await this.remote._GET('/peers');
+
+    for (let i = 0; i < peers.length; i++) {
+      this.swarm.connect(peers[i].address);
+    }
   }
 
   async _announcePlayer (identity) {
@@ -242,18 +252,15 @@ class Application extends Fabric.App {
     }
   }
 
+  async _onPeer (peer) {
+    console.log('swarm notified of peer:', peer);
+  }
+
   async _onSwarmReady () {
     // Add self to stash.
     let link = await this.stash._POST(`/peers`, {
       address: this.identity.address
     });
-
-    // TODO: remove above into new function
-    let candidates = await this.stash._GET(`/peers`);
-
-    for (let i = 0; candidates.length; i++) {
-      this.swarm.connect(candidates[i].address);
-    }
   }
 
   async _onConnection (id) {
@@ -339,6 +346,7 @@ class Application extends Fabric.App {
     console.log('[APP:DEBUG]', 'identities (in start):', identities);
     console.log('[SWARM]', 'beginning:', identities);
 
+    this.swarm.on('peer', this._onPeer.bind(this));
     this.swarm.on('ready', this._onSwarmReady.bind(this));
     this.swarm.on('message', this._onMessage.bind(this));
     this.swarm.on('connection', this._onConnection.bind(this));
