@@ -4,5 +4,20 @@
   "secure": true,
   "height": 768,
   "width": 1024,
-  "path": "./stores/rpg.verse.pub"
+  "path": "./stores/rpg.verse.pub",
+  "seed": "alpha beta kappa gamma delta omega",
+  "resources": {
+    "Peer": {
+      "components": {
+        "list": "/peers",
+        "view": "/peers/:id"
+      }
+    },
+    "Player": {
+      "components": {
+        "list": "/players",
+        "view": "/players/:id"
+      }
+    }
+  }
 }

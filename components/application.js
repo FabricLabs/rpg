@@ -56,7 +56,7 @@ class Application extends Fabric.App {
     console.log('[APPLICATION]', 'delivering:', destination, message);
     if (!this.swarm.connections[destination]) console.error('Not connected to peer:', destination);
     let delivery = await this.swarm.connections[destination].send({
-      '@type': 'Document',
+      '@type': 'UntypedDocument',
       '@destination': destination,
       '@data': message
     });
@@ -82,22 +82,30 @@ class Application extends Fabric.App {
       name: identity.name
     });
 
-    if (this.authority.status === 'connected') {
-      let instance = await this.authority.post(`/peers`, player);
-      console.log('posted peer:', instance);
-    }
-
+    let peer = await this.stash._POST(`/peers`, { address: player.address });
     let link = await this.stash._POST(`/players`, player);
     let result = await this.stash._GET(link);
 
+    // TODO: unify remote into flow (automate on all events)
+    let remote = await this.remote._POST('/peers', { address: player.address });
+    let instance = await this.remote._POST(`/players`, player);
+
+    // broadcast to network
+    let broadcast = await this.swarm._broadcast({
+      '@type': 'Player',
+      '@data': player
+    });
+
+    console.log('peer:', peer);
     console.log('link:', link);
     console.log('player:', player);
     console.log('result:', result);
+    console.log('broadcast:', broadcast);
 
     return result;
   }
 
-  async _createCharacter () {
+  async _createIdentity () {
     let item = null;
     let result = null;
 
@@ -110,18 +118,12 @@ class Application extends Fabric.App {
       public: key.public
     };
 
-    console.log('key:', key);
-    console.warn('private:', key.private);
-
     try {
       item = await this.stash._POST(`/identities`, struct);
       result = await this.stash._GET(item);
     } catch (E) {
       console.error('broken:', E);
     }
-
-    console.log('collection put:', item);
-    console.log('result:', result);
 
     this.identities[struct.address] = struct;
     this.identity = struct;
@@ -150,7 +152,7 @@ class Application extends Fabric.App {
     return this;
   }
 
-  async _restorePlayer () {
+  async _restoreIdentity () {
     let identities = null;
 
     try {
@@ -158,8 +160,12 @@ class Application extends Fabric.App {
     } catch (E) {
       console.error('Could not load history:', E);
     }
-
-    console.log('[APP:_restorePlayer]', 'identities:', identities);
+    
+    if (!identities || !identities.length) {
+      return this._createIdentity();
+    } else {
+      return identities[0];
+    }
   }
 
   async _handleMessage (msg) {
@@ -210,9 +216,8 @@ class Application extends Fabric.App {
             console.log('peer gave us PATCH:', content);
 
             try {
-              let result = await this.authority.patch(content['@data'].path, content['@data'].value);
+              // let result = await this.authority.patch(content['@data'].path, content['@data'].value);
               let answer = await this.stash._PATCH(content['@data'].path, content['@data'].value);
-              console.log('result:', result);
               console.log('answer:', answer);
             } catch (E) {
               console.log('could not patch:', E);
@@ -257,6 +262,7 @@ class Application extends Fabric.App {
   }
 
   async _onSwarmReady () {
+    console.log('swarm ready!  adding self to stash...');
     // Add self to stash.
     let link = await this.stash._POST(`/peers`, {
       address: this.identity.address
@@ -265,21 +271,15 @@ class Application extends Fabric.App {
 
   async _onConnection (id) {
     console.log('hello, connection:', id);
-    let connection = {
-      address: id
-    };
-
+    let connection = { address: id };
     let posted = await this.stash._POST(`/connections`, connection);
-    let link = await this.stash._POST(`/peers`, connection);
     console.log('posted:', posted);
-    console.log('link:', link);
-    
     console.log('connections:', this.swarm.connections);
   }
 
   async _updatePosition (x, y, z) {
     if (!this.player) return;
-
+    return console.log('short circuited position patch');
     await this.authority.patch(`/players/${this.player.id}`, {
       id: this.player.id,
       position: {
@@ -338,13 +338,10 @@ class Application extends Fabric.App {
       return null;
     }
 
-    if (!this.identity) {
-      await this._createCharacter();
-    }
+    this.identity = await this._restoreIdentity();
 
-    let identities = await this._restorePlayer();
-    console.log('[APP:DEBUG]', 'identities (in start):', identities);
-    console.log('[SWARM]', 'beginning:', identities);
+    console.log('[APP:DEBUG]', 'identity (in start):', this.identity);
+    console.log('[SWARM]', 'binding events...');
 
     this.swarm.on('peer', this._onPeer.bind(this));
     this.swarm.on('ready', this._onSwarmReady.bind(this));

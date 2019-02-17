@@ -71,7 +71,7 @@ class Authority extends Fabric.Oracle {
     this.socket.onopen = this._onConnection.bind(this);
     this.socket.onmessage = this._onMessage.bind(this);
     this.socket.onclose = this._onClose.bind(this);
-    this.socket.onerror = this._onClose.bind(this);
+    this.socket.onerror = this._onError.bind(this);
     return this.socket;
   }
 
@@ -83,6 +83,10 @@ class Authority extends Fabric.Oracle {
   _onMessage (event) {
     this.queue.push(event);
     this.emit('message', event);
+  }
+
+  _onError (error) {
+    this.emit('error', error);
   }
 
   _onClose (event) {

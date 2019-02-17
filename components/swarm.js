@@ -31,9 +31,15 @@ class Swarm extends EventEmitter {
 
   connect (id) {
     if (this.connections[id]) return console.error(`Cannot connect to peer ${id} more than once.`);
-    this.connections[id] = this.agent.connect(id, { label: this.agent.id });
-    this.connections[id].on('open', this._handleReady.bind(this));
+
+    this.connections[id] = this.agent.connect(id, {
+      label: this.agent.id,
+      reliable: true
+    });
+
+    this.connections[id].on('open', this._handleConnectionOpen.bind(this));
     this.connections[id].on('data', this._onData.bind(this));
+
     return this.connections[id];
   }
 
@@ -42,9 +48,16 @@ class Swarm extends EventEmitter {
     this.emit('ready');
   }
 
-  _handleReady (connection) {
-    console.log('[SWARM:_handleReady]', 'ready! agent:', this.agent.id);
-    console.log('[SWARM:_handleReady]', 'connection:', connection);
+  _broadcast (msg) {
+    if (!msg['@type']) return console.error(`Cannot broadcast untyped message:`, msg);
+    if (msg['@data'] && !msg['@data'].path) return console.error(`No path.`);
+
+    this._relayFrom(this.agent.id, msg);
+  }
+
+  _handleConnectionOpen (connection) {
+    console.log('[SWARM:_handleConnectionOpen]', 'ready! agent:', this.agent.id);
+    console.log('[SWARM:_handleConnectionOpen]', 'connection:', connection);
   }
 
   _onOpen (connection) {
@@ -58,10 +71,10 @@ class Swarm extends EventEmitter {
   _onInbound (connection) {
     console.log(`incoming connection:`, connection);
     console.log(`context:`, this);
-    this.connections[connection.peer] = new Peer(connection);
-    this.connections[connection.peer].on('open', this._onOpen.bind(this));
-    this.connections[connection.peer].on('message', this._onMessage.bind(this));
-    this.emit('connection', connection.peer);
+    this.connections[connection.label] = new Peer(connection);
+    this.connections[connection.label].on('open', this._onOpen.bind(this));
+    this.connections[connection.label].on('message', this._onMessage.bind(this));
+    this.emit('connection', connection.label);
   }
 
   _onData (msg) {
@@ -73,7 +86,7 @@ class Swarm extends EventEmitter {
   }
 
   _onMessage (msg) {
-    console.log('message:', msg);
+    console.log('[INBOUND]', 'message:', msg);
 
     let vector = new Fabric.State({
       actor: `/actors/${msg['@actor']}`,

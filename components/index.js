@@ -17,7 +17,7 @@ async function main () {
   await rpg.start();
 
   // TODO: move to envelop()
-  document.querySelector('*[data-action=generate-identity]').addEventListener('click', rpg._createCharacter.bind(rpg));
+  document.querySelector('*[data-action=generate-identity]').addEventListener('click', rpg._createIdentity.bind(rpg));
   document.querySelector('*[data-action=toggle-fullscreen]').addEventListener('click', rpg._toggleFullscreen.bind(rpg));
   // document.querySelector('*[data-action=request-name]').addEventListener('click', rpg._requestName.bind(rpg));
 
@@ -231,7 +231,7 @@ async function UI () {
     setTimeout(networkFrame, 1000/10);
   }
 
-  function logicFrame () {
+  async function logicFrame () {
     // update players position,
     // listen for collisions etc
     let player = players[0];
@@ -274,10 +274,32 @@ async function UI () {
       }
     }
 
+    // TODO: commit to game state (hash) 60x per second
+    // in practice, the below line updates (broadcasts) a new player position
+    // at the expected interval of 60/s
+    /* await window.application.stash._PATCH(`/players/${window.application.swarm.agent.id}`, {
+      id: window.application.swarm.agent.id,
+      position: {
+        x: player.x,
+        y: player.y,
+        z: player.z
+      }
+    }); */
+
+    let identity = window.application.swarm.agent.id;
+    if (identity && false) {
+      await window.application._applyChanges([
+        {
+          op: 'replace',
+          path: `/players/0/position`,
+          value: player.position
+        }
+      ]);
+    }
+
     // process the game logic at a target of 60fps
     setTimeout(logicFrame, 1000/60);
   }
-
 
   function loadMap () {
     //starting area
@@ -561,7 +583,7 @@ async function UI () {
     ctx.fillText(player.hp + " HP", 40 + 10 * 20, 40);
   }
 
-  function drawFrame () {
+  async function drawFrame () {
     let canvas = document.querySelector('rpg-application canvas');
     let context = canvas.getContext('2d');
 
@@ -580,7 +602,7 @@ async function UI () {
   }
 
   drawFrame();
-  logicFrame();
+  await logicFrame();
   networkFrame();
 
   function dataCallback(data){
