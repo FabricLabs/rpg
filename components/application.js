@@ -65,8 +65,7 @@ class Application extends Fabric.App {
   }
 
   async _handleAuthorityReady () {
-    console.log('Authority ready!  calling _announcePlayer:', this.identity);
-
+    console.log('authority ready!  announcing player:', this.identity);
     await this._announcePlayer(this.identity);
 
     let peers = await this.remote._GET('/peers');
