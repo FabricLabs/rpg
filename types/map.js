@@ -30,10 +30,10 @@ class Map extends Event.EventEmitter {
 
     // TODO: replace with random from Fabric.Machine
     this.key = new Fabric.Key();
-    console.log('fabric seed:', this.key.id);
+    console.log(`[MAP]`, 'fabric seed:', this.key.id);
     this.seed = this.key.id.toString('hex');
-    console.log('local seed:', typeof this.seed, this.seed.length, this.seed);
-    console.log('magic length:', 0xC0D3F33D.toString().length);
+    console.log(`[MAP]`, 'local seed:', typeof this.seed, this.seed.length, this.seed);
+    console.log(`[MAP]`, 'magic length:', 0xC0D3F33D.toString().length);
     this.data = Buffer.alloc(this.size);
 
     this.header = Buffer.alloc(HEADER_LENGTH);

@@ -2,7 +2,16 @@
 
 const Map = require('./map');
 
+/**
+ * The {@link World} is our primary tool for interacting with game worlds.
+ * @property {Map} map Instance of the World's {@link Map}.
+ */
 class World {
+  /**
+   * Create a {@link World} instance.
+   * @param  {Object} [settings={}] Configuration object.
+   * @return {World}               Instance of the World.
+   */
   constructor (settings = {}) {
     this.settings = Object.assign({}, settings);
     this.map = new Map();
