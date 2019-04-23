@@ -2,15 +2,15 @@
   "name": "@fabric/rpg",
   "version": "0.1.0-dev",
   "description": "RPG is a template for building role-playing games.",
-  "main": "components/index.js",
+  "main": "types/rpg.js",
   "scripts": {
     "build": "webpack",
     "coverage": "nyc report --reporter html npm test",
     "dev": "webpack-dev-server",
-    "docs": "jsdoc lib/ README.md -d docs && ecstatic docs",
+    "docs": "jsdoc -c jsdoc.json types README.md -d docs && ecstatic docs",
     "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
     "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
-    "start": "npm run build && ecstatic assets",
+    "start": "npm run build && node rpg.js",
     "test": "nyc mocha tests"
   },
   "repository": {
@@ -34,11 +34,20 @@
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
     "@fabric/core": "FabricLabs/fabric#pruning",
+    "@fabric/http": "FabricLabs/web#fabric-0.1.0",
+    "body-parser": "^1.18.3",
+    "dotparser": "^0.4.0",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "level-browserify": "^2.0.0",
+    "peer": "^0.2.10",
+    "peerjs": "^0.3.18",
     "ws": "^6.1.2"
   },
   "devDependencies": {
-    "codecov": "^3.1.0",
+    "codecov": "^3.2.0",
     "ecstatic": "^3.3.0",
+    "jsdoc": "FabricLabs/jsdoc",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0",
     "source-map": "^0.7.3",
@@ -47,6 +56,10 @@
     "webpack-dev-server": "^3.1.10"
   },
   "nyc": {
+    "include": [
+      "components/*.js",
+      "types/*.js"
+    ],
     "exclude": [
       "tests"
     ],

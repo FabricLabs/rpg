@@ -1,24 +1,25 @@
 'use strict';
 
 const config = require('../config');
-const RPG = require('./application');
+const Application = require('./application');
 
 // main program
 async function main () {
-  window.rpg = new RPG(config);
+  let rpg = window.application = new Application(config);
+
+  rpg.on('error', function (err) {
+    console.error(err);
+  });
 
   rpg.envelop('*[data-bind=fabric]');
   rpg.render();
 
   await rpg.start();
 
-  document.querySelector('*[data-action=request-name]').addEventListener('click', function () {
-    rpg._requestName();
-  });
-
-  document.querySelector('*[data-action=toggle-fullscreen]').addEventListener('click', function () {
-    rpg._toggleFullscreen();
-  });
+  // TODO: move to envelop()
+  document.querySelector('*[data-action=generate-identity]').addEventListener('click', rpg._createIdentity.bind(rpg));
+  document.querySelector('*[data-action=toggle-fullscreen]').addEventListener('click', rpg._toggleFullscreen.bind(rpg));
+  // document.querySelector('*[data-action=request-name]').addEventListener('click', rpg._requestName.bind(rpg));
 
   console.log('[FABRIC]', 'booted:', rpg);
 
@@ -28,6 +29,9 @@ async function main () {
 }
 
 async function UI () {
+  var hash = document.location.hash;
+  let myid = hash ? hash.substr(1) : '0';
+
   let userid = null;
   let copycat_mode = false;
   let default_walk_speed = 5;
@@ -198,7 +202,6 @@ async function UI () {
   let gravity = .98;
   let bricks = [];
   let players = [];
-  let network_players = {};
   let missiles = [];
   let player = null;
   let background = null;
@@ -222,7 +225,13 @@ async function UI () {
     }
   }
 
-  function logicFrame () {
+  function networkFrame () {
+    let player = players[0];
+    window.application._updatePosition(player.x, player.y, player.z);
+    setTimeout(networkFrame, 1000/10);
+  }
+
+  async function logicFrame () {
     // update players position,
     // listen for collisions etc
     let player = players[0];
@@ -236,8 +245,8 @@ async function UI () {
       z: 1
     });
 
-    Object.keys(network_players).forEach(function (k) {
-      let p = network_players[k];
+    Object.keys(window.application.networkPlayers).forEach(function (k) {
+      let p = window.application.networkPlayers[k];
       //p.x += p.dx;
       //p.y += p.dy;
       runPhysics(p);
@@ -265,16 +274,32 @@ async function UI () {
       }
     }
 
+    // TODO: commit to game state (hash) 60x per second
+    // in practice, the below line updates (broadcasts) a new player position
+    // at the expected interval of 60/s
+    /* await window.application.stash._PATCH(`/players/${window.application.swarm.agent.id}`, {
+      id: window.application.swarm.agent.id,
+      position: {
+        x: player.x,
+        y: player.y,
+        z: player.z
+      }
+    }); */
+
+    let identity = window.application.swarm.agent.id;
+    if (identity && false) {
+      await window.application._applyChanges([
+        {
+          op: 'replace',
+          path: `/players/0/position`,
+          value: player.position
+        }
+      ]);
+    }
+
     // process the game logic at a target of 60fps
     setTimeout(logicFrame, 1000/60);
-
-    /*for (let n = 1; n < players.length; n++) {
-      let npc = players[n];
-      npc.x += -10  +  20 * Math.random();
-      npc.y += -10  +  20 * Math.random();
-    }*/
   }
-
 
   function loadMap () {
     //starting area
@@ -336,8 +361,8 @@ async function UI () {
     for(let i = 0; i<7; i++) {
       let player3 = new Sprite(goomba, 900, 900, 48, 64, i * 200, i * 200 + 100);
 
-      player3.dx = Math.floor( Math.random() * 3 + 2 );
-      player3.dy = Math.floor( Math.random() * 3 + 2);
+      player3.dx = Math.floor( application.machine.generator.next.percent() * 3 + 2 );
+      player3.dy = Math.floor( application.machine.generator.next.percent() * 3 + 2);
       player3.x0 = player3.x; player3.y0 = player3.y;
       player3.max_bounces = 100000;
       player3.bounces = 0;
@@ -516,8 +541,8 @@ async function UI () {
   }
 
   function drawPlayers () {
-    Object.keys(network_players).forEach(function (k) {
-      let p = network_players[k];
+    Object.keys(window.application.networkPlayers).forEach(function (k) {
+      let p = window.application.networkPlayers[k];
       p.draw(p.x - camera.x, p.y - camera.y);
     });
 
@@ -542,11 +567,10 @@ async function UI () {
   }
 
   function drawUi(ctx){
-
     var player = players[0];
 
 
-    ctx.filleStyle = "#000000";
+    ctx.fillStyle = "#000000";
     ctx.fillRect(i * 20, 20, 150, 100);
 
     ctx.fillStyle = "#00FF00";
@@ -559,7 +583,7 @@ async function UI () {
     ctx.fillText(player.hp + " HP", 40 + 10 * 20, 40);
   }
 
-  function drawFrame () {
+  async function drawFrame () {
     let canvas = document.querySelector('rpg-application canvas');
     let context = canvas.getContext('2d');
 
@@ -578,7 +602,30 @@ async function UI () {
   }
 
   drawFrame();
-  logicFrame();
+  await logicFrame();
+  networkFrame();
+
+  function dataCallback(data){
+    //console.log("DATA CB", data)
+
+    let path = data.path;
+
+    let np = network_players[path];
+    if(!np && data.value.id != myid){
+      let wario = images.getImage('wario.png');
+
+      np = new Sprite(wario, 480, 640, 48, 64, 380, 380);
+      np.dx = 0;
+      np.dy = 0;
+
+      network_players[path] = np;
+    }
+
+    if(np) {
+      np.x = data.value.x;
+      np.y = data.value.y;
+    }
+  }
 
   return this;
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" manifest="assets/cache.manifest">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>RPG</title>
@@ -7,16 +7,17 @@
   </head>
 <body>
   <header>
-    <h1>RPG</h1>
+    <h1>RPG: <small><a href="https://www.roleplaygateway.com/">the many worlds</a></small></h1>
+    <p>Use `[spacebar]` to activate the currently-selected ability.  Arrow keys to move.  This is only a demo!</p>
     <nav data-bind="controls">
-      <button data-action="request-name">login</button>
+      <button data-action="generate-identity">create new character</button>
       <button data-action="toggle-fullscreen">fullscreen</button>
     </nav>
     <p><code>ERA:</code> <code>dev</code></p>
     <p><strong>Source:</strong> <a href="https://github.com/FabricLabs/rpg">fabric:github.com/FabricLabs/rpg</a>
   </header>
   <div data-bind="fabric">
-    <canvas id="canvas" width="1024" height="768"></canvas>
+    <canvas id="canvas" width="400" height="300"></canvas>
     <noscript>
       <h3>JavaScript Renderer Available</h3>
       <p>If you're reading this, you should consider enabling JavaScript for full effect.</p>
@@ -24,6 +25,32 @@
       <p>All hyperlinks will resolve to fully-rendered HTML documents on the legacy web.  This is done to ensure the accessibility, compatibility, and durability of game state.</p>
     </noscript>
   </div>
+  <!-- [0]: README [dot] md -->
+  <!--
+# RPG `@fabric/rpg`
+## STOP HERE AND READ ME FIRST!
+Before continuing, let us be the first to welcome you to the Source.  While it
+might be confusing at first, there's a lot you can learn if you make the time.
+
+Use this URI:
+> https://www.roleplaygateway.com/
+
+From there, links like `hub.roleplaygateway.com` might "pop up" from time to
+time.  With a bit of navigating around, you can earn credit for your progress.
+
+Continue:
+> https://chat.roleplaygateway.com/
+
+Offline:
+> https://www.roleplaygateway.com/medals/beta-tester
+
+Remember: never be afraid to explore!  Curiosity might have killed the cat, but
+that's why he had nine lives.
+
+Good luck, have fun (`gl;hf o/`), and enjoy!
+
+                                           — the RPG team
+-->
   <script src="index.js" type="text/javascript"></script>
 </body>
 </html>

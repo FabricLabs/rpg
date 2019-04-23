@@ -2,8 +2,8 @@
 
 const config = require('./config');
 
-const RPG = require('./lib/rpg');
-const Server = require('./lib/server');
+const RPG = require('./types/rpg');
+const Server = require('@fabric/http');
 
 async function main () {
   let server = new Server(config);

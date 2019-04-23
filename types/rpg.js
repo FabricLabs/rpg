@@ -1,8 +1,20 @@
 'use strict';
 
+// Fabric Core
 const Fabric = require('@fabric/core');
 
-class RPG extends Fabric {
+// Load in types...
+const World = require('./world');
+
+/**
+ * Primary RPG builder.
+ */
+class RPG extends Fabric.App {
+  /**
+   * Build an RPG with the {@link Fabric} tools.
+   * @param  {Object} configuration Settings to configure the RPG with.
+   * @return {RPG} Instance of the RPG.
+   */
   constructor (configuration) {
     super(configuration);
 
@@ -12,6 +24,16 @@ class RPG extends Fabric {
       path: './stores/rpg',
       authority: 'rpg.verse.pub',
       persistent: true,
+      globals: {
+        tick: 0
+      },
+      resources: {
+        'Peer': {
+          attributes: {
+            address: { type: 'String', required: true, id: true }
+          }
+        }
+      },
       canvas: {
         height: 300,
         width: 400
@@ -19,8 +41,11 @@ class RPG extends Fabric {
       interval: 60000
     }, configuration);
 
+    this['@world'] = new World(this['@configuration']['entropy']);
     this['@data'] = Object.assign({
-      globals: {}
+      globals: {
+        tick: 0
+      }
     }, this['@configuration']);
 
     this.timer = null;
@@ -33,6 +58,12 @@ class RPG extends Fabric {
 
   async tick () {
     console.log('[RPG]', 'Beginning tick...', Date.now());
+
+    let commit = this.commit();
+    // console.log('tick:', commit);
+
+    this.emit('tick'); // note: no return value
+    return this;
   }
 
   async _registerPlayer (data) {
@@ -49,12 +80,7 @@ class RPG extends Fabric {
 
   async start () {
     await super.start();
-
-    let authority = this.remote;
-    let options = await authority._OPTIONS('/');
-
-    console.log('options:', options);
-
+    await this['@world'].start();
     this.timer = setInterval(this.tick.bind(this), this['@configuration'].interval);
     return this;
   }
