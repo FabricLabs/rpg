@@ -2,4 +2,4 @@
 simple Fabric-hosted RPG
 
 ## Quick Start
-`npm install && npm run`
+`npm install && npm start`

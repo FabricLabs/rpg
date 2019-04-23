@@ -68,6 +68,14 @@ class Entity extends Fabric.State {
   toObject () {
     return this.data;
   }
+
+  /**
+   * As a {@link Buffer}.
+   * @return {Buffer} Slice of memory.
+   */
+  toRaw () {
+    return Buffer.from(this.toJSON(), 'utf8');
+  }
 }
 
 module.exports = Entity;
@@ -79,10 +87,10 @@ module.exports = Entity;
 
 
     </div>
-    <nav><h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li></ul></nav>
+    <nav><h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="RPG.html">RPG</a></li><li><a href="World.html">World</a></li></ul></nav>
     <br class="clear" />
     <footer>
-        <a href="https://github.com/FabricLabs/rpg">git://</a> &middot; <a href="https://chat.verse.im/#/room/#rpg:verse.im">Community</a>
+        <a href="https://github.com/FabricLabs/rpg">git://</a> &middot; <a href="https://chat.roleplaygateway.com/#/room/#rpg:roleplaygateway.com">Community</a>
     </footer>
     <script> prettyPrint(); </script>
     <script src="scripts/linenumber.js"></script>

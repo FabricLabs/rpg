@@ -8,9 +8,10 @@ const WebSocket = require('ws');
 const PeerServer = require('peer').ExpressPeerServer;
 
 const Fabric = require('@fabric/core');
+const Server = require('@fabric/http');
 const RPG = require('./rpg');
 
-class Server extends Fabric.Oracle {
+class Hub extends Fabric.Oracle {
   constructor (configuration = {}) {
     super(configuration);
 
@@ -28,10 +29,11 @@ class Server extends Fabric.Oracle {
     this.express = express();
     this.sessions = session({ secret: this.config.seed });
     this.peer = new PeerServer(this.express, {
-      path: '/services/peering'
+      // path: '/services/peering'
     });
 
     this.rpg = new RPG(this.config);
+    this.server = new Server();
 
     return this;
   }
@@ -44,6 +46,8 @@ class Server extends Fabric.Oracle {
   }
 
   _handleWebSocket (socket, request) {
+    // console.log('incoming WebSocket:', socket);
+
     let buffer = Buffer.from(request.headers['sec-websocket-key'], 'base64');
     let server = this;
     let player = new Fabric.State({
@@ -57,6 +61,8 @@ class Server extends Fabric.Oracle {
 
     // TODO: message handler on base class
     socket.on('message', async function handler (msg) {
+      console.log('websocket incoming message:', msg);
+
       socket.send(JSON.stringify({
         '@type': 'Receipt',
         '@actor': buffer.toString('hex'),
@@ -91,6 +97,10 @@ class Server extends Fabric.Oracle {
         console.error('could not parse message:', E);
         console.log('you should disconnect from this peer:', buffer.toString('hex'));
       }
+    });
+
+    socket.oracle = server.on('patches', function (patches) {
+      console.log('magic oracle patches:', patches);
     });
 
     server.connections[player['@data'].connection] = socket;
@@ -235,4 +245,4 @@ class Server extends Fabric.Oracle {
   }
 }
 
-module.exports = Server;
+module.exports = Hub;

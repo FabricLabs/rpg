@@ -7,8 +7,8 @@ class Authority extends Fabric.Oracle {
     super(configuration);
 
     this.config = Object.assign({
-      host: 'rpg.verse.pub',
-      port: 443
+      host: 'chat.roleplaygateway.com',
+      port: 9999
     }, configuration);
 
     this.attempt = 0;
@@ -67,7 +67,7 @@ class Authority extends Fabric.Oracle {
   }
 
   _connect () {
-    this.socket = new WebSocket(`wss://${this.config.host}:${this.config.port}/peers`);
+    this.socket = new WebSocket(`ws://${this.config.host}:${this.config.port}/peers`);
     this.socket.onopen = this._onConnection.bind(this);
     this.socket.onmessage = this._onMessage.bind(this);
     this.socket.onclose = this._onClose.bind(this);
