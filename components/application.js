@@ -1,7 +1,8 @@
 'use strict';
 
 const Fabric = require('@fabric/core');
-const RPG = require('../lib/rpg');
+const RPG = require('../types/rpg');
+const Map = require('../types/map');
 
 const Authority = require('./authority');
 const Canvas = require('./canvas');
