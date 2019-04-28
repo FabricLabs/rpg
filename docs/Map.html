@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Class: RPG &middot; Docs</title>
+    <title>Class: Map &middot; Docs</title>
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -13,7 +13,7 @@
   </head>
   <body>
     <div id="main">
-      <h1 class="page-title">Class: RPG</h1>
+      <h1 class="page-title">Class: Map</h1>
       
 
 
@@ -23,9 +23,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>RPG<span class="signature">(configuration)</span><span class="type-signature"> &rarr; {<a href="RPG.html">RPG</a>}</span></h2>
-        
-            <div class="class-description">Primary RPG builder.</div>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Map<span class="signature">(data<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="Map.html">Map</a>}</span></h2>
         
     
 </header>
@@ -36,11 +34,9 @@
         
 
     
-    <h2>Constructor</h2>
-    
 
     
-    <h4 class="name" id="RPG"><span class="type-signature"></span>new RPG<span class="signature">(configuration)</span><span class="type-signature"> &rarr; {<a href="RPG.html">RPG</a>}</span></h4>
+    <h4 class="name" id="Map"><span class="type-signature"></span>new Map<span class="signature">(data<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="Map.html">Map</a>}</span></h4>
     
 
     
@@ -48,7 +44,9 @@
 
 
 <div class="description">
-    Build an RPG with the Fabric tools.
+    Create an instance of <a href="Map.html">Map</a> to track players within a space.  By
+default, maps are 256^3, where 3 equals the number of dimensions in our
+grid.  Use these parameters wisely.
 </div>
 
 
@@ -72,7 +70,11 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -84,7 +86,7 @@
 
         <tr>
             
-                <td class="name"><code>configuration</code></td>
+                <td class="name"><code>data</code></td>
             
 
             <td class="type">
@@ -97,10 +99,26 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
             
 
-            <td class="description last">Settings to configure the RPG with.</td>
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last">Input data to configure the <a href="Map.html">Map</a>.</td>
         </tr>
 
     
@@ -141,7 +159,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="rpg.js.html">rpg.js</a>, <a href="rpg.js.html#line18">line 18</a>
+        <a href="map.js.html">map.js</a>, <a href="map.js.html#line20">line 20</a>
     </li></ul></dd>
     
 
@@ -170,7 +188,7 @@
 
         
 <div class="param-desc">
-    Instance of the RPG.
+    Low-level representation of the <a href="Map.html">Map</a>.
 </div>
 
 
@@ -181,7 +199,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="RPG.html">RPG</a></span>
+<span class="param-type"><a href="Map.html">Map</a></span>
 
 
     </dd>
