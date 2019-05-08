@@ -10,7 +10,9 @@ class Player {
    */
   constructor (settings = {}) {
     this.settings = Object.assign({}, settings);
+    this.position = null;
     this.key = new Fabric.Key();
+    this.id = this.key.address;
     return this;
   }
 

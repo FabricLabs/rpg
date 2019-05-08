@@ -4,10 +4,11 @@
   "description": "RPG is a template for building role-playing games.",
   "main": "types/rpg.js",
   "scripts": {
+    "agents": "node scripts/agents.js",
     "build": "webpack",
     "coverage": "nyc report --reporter html npm test",
     "dev": "webpack-dev-server",
-    "docs": "jsdoc -c jsdoc.json types README.md -d docs && ecstatic docs",
+    "docs": "npm run build && jsdoc -c jsdoc.json types README.md -d docs && ecstatic docs",
     "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
     "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
     "start": "npm run build && node rpg.js",
