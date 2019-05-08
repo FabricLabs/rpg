@@ -1,10 +1,15 @@
 'use strict';
 
+const {
+  TICK_INTERVAL
+} = require('../constants');
+
 // Fabric Core
 const Fabric = require('@fabric/core');
 
 // Load in types...
 const World = require('./world');
+const Player = require('./player');
 
 /**
  * Primary RPG builder.
@@ -38,13 +43,14 @@ class RPG extends Fabric {
         height: 300,
         width: 400
       },
-      interval: 60000
+      interval: TICK_INTERVAL
     }, configuration);
 
     // start with empty game state
     this.state = {};
 
     this['@world'] = new World(this['@configuration']['entropy']);
+    this['@player'] = new Player();
     this['@data'] = Object.assign({
       globals: {
         tick: 0
@@ -68,13 +74,33 @@ class RPG extends Fabric {
     return this;
   }
 
+  async _POST (path, data) {
+    let id = await super._POST(path, data);
+    let obj = await super._GET(id);
+
+    // assign state
+    this.state['players'][obj.id] = obj;
+
+    // commit
+    this.commit();
+
+    return id;
+  }
+
   async _registerPlayer (data) {
     let result = null;
+    let state = new Fabric.State(data);
+    let transform = [state.id, state.render()];
+
+    let profile = Object.assign({
+      id: `local/${state.id}`,
+      sharing: transform
+    }, data);
 
     try {
-      result = await this._POST(`/players`, data);
+      result = await this._POST(`/players`, profile);
     } catch (E) {
-      this.error(E);
+      return this.error('Cannot create player:', E);
     }
 
     return result;
@@ -86,8 +112,17 @@ class RPG extends Fabric {
   }
 
   async save () {
+    let result = null;
     let data = JSON.stringify(this.state);
-    return this._PUT('/memories', data);
+    try {
+      let saved = await this._PUT('/memories', data);
+      this.log('[RPG]', 'saved:', saved);
+      result = saved;
+    } catch (E) {
+      this.error('cannot save:', E);
+    }
+
+    return result;
   }
 
   async restore () {
@@ -108,8 +143,18 @@ class RPG extends Fabric {
 
   async start () {
     await super.start();
+
+    // TODO: clean up the clock
+    this.state.clock = this['@configuration'].globals.tick;
+    this.state.entropy = {};
+    this.state.players = {};
+    this.state.peers = {};
+
     await this['@world'].start();
+
+    // TODO: document the process
     this.timer = setInterval(this.tick.bind(this), this['@configuration'].interval);
+
     return this;
   }
 

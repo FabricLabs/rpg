@@ -10,6 +10,13 @@ const Fabric = require('@fabric/core');
 const Tile = require('./tile');
 
 class Map extends Event.EventEmitter {
+  /**
+   * Create an instance of {@link Map} to track players within a space.  By
+   * default, maps are 256^3, where 3 equals the number of dimensions in our
+   * grid.  Use these parameters wisely.
+   * @param  {Object} [data={}] Input data to configure the {@link Map}.
+   * @return {Map}           Low-level representation of the {@link Map}.
+   */
   constructor (data = {}) {
     super(data);
 
@@ -61,6 +68,7 @@ class Map extends Event.EventEmitter {
 
   _dump () {
     console.log('memory:', this.data);
+    return this.data;
   }
 }
 
