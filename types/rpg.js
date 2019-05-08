@@ -69,8 +69,27 @@ class RPG extends Fabric {
     console.log('[RPG]', 'Beginning tick...', Date.now());
     let commit = this.commit();
     // console.log('tick:', commit);
+    let origin = new Fabric.State(this.state);
+
+    // Our first and primary order of business is to update the clock.  Once
+    // we've computed the game state for the next round, we can share it with
+    // the world.
+    //
+    // Let's finish our work up front.
+    this.state.clock++;
+
+    // Snapshot of our state...
+    let state = new Fabric.State(this.state);
+    let json = state.render();
+
+    this.log('[RPG:TICK]', `#${state.id}`, 'game state:', json);
+
+    // Save the game state to disk.
     await this.save();
-    this.emit('tick'); // note: no return value
+
+    // Looks like we're all done, so let's be courteous and notify subscribers.
+    this.emit('tick', state.id);
+
     return this;
   }
 
