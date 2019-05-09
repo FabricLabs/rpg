@@ -25,10 +25,20 @@ async function main () {
     console.log('rpg info:', msg);
   });
 
+  // The "tick" event indicates the game world has progressed normally, as per
+  // our original expectations.  This could be fast, say 60 "ticks" per second,
+  // or slow, like IdleRPG's 10-minute rounds.
+  rpg.on('tick', async function (id) {
+    let state = await rpg._GET(`/blobs/${id}`);
+    console.log(`got tick, ${id}:`, state);
+  });
+
+  // Generic message handler.
   rpg.on('message', function (msg) {
     console.log('rpg message:', msg);
   });
 
+  // New player notiications.
   rpg.on('player', function (msg) {
     console.log('rpg player:', msg);
   });

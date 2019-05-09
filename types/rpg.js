@@ -27,7 +27,7 @@ class RPG extends Fabric {
     this['@configuration'] = Object.assign({
       name: 'RPG',
       path: './stores/rpg',
-      authority: 'rpg.verse.pub',
+      authority: 'api.roleplaygateway.com',
       persistent: true,
       globals: {
         tick: 0
@@ -67,6 +67,8 @@ class RPG extends Fabric {
 
   async tick () {
     console.log('[RPG]', 'Beginning tick...', Date.now());
+    console.log('[RPG]', 'STATE (@entity)', this['@entity']);
+
     let commit = this.commit();
     // console.log('tick:', commit);
     let origin = new Fabric.State(this.state);
@@ -79,10 +81,11 @@ class RPG extends Fabric {
     this.state.clock++;
 
     // Snapshot of our state...
-    let state = new Fabric.State(this.state);
-    let json = state.render();
+    let data = Object.assign(this.state, this['@entity']);
+    let state = new Fabric.State(data);
+    // let json = state.render();
 
-    this.log('[RPG:TICK]', `#${state.id}`, 'game state:', json);
+    this.log('[RPG:TICK]', `#${state.id}`, data);
 
     // Save the game state to disk.
     await this.save();
@@ -98,13 +101,35 @@ class RPG extends Fabric {
     let obj = await super._GET(id);
 
     // assign state
-    this.state['players'][obj.id] = obj;
+    // this.state['players'][obj.id] = obj;
 
     // commit
     this.commit();
 
     return id;
   }
+
+  /* async _registerActor (data) {
+    await super._registerActor(data);
+
+    let result = null;
+    let state = new Fabric.State(data);
+    let transform = [state.id, state.render()];
+
+    let actor = Object.assign({
+      id: `local/${state.id}`,
+      type: data.type || 'Actor',
+      sharing: transform
+    }, data);
+
+    try {
+      result = await this._POST(`/actors`, actor);
+    } catch (E) {
+      return this.error('Cannot register place:', E);
+    }
+
+    return result;
+  } */
 
   async _registerPlayer (data) {
     let result = null;
@@ -113,16 +138,53 @@ class RPG extends Fabric {
 
     let profile = Object.assign({
       id: `local/${state.id}`,
+      type: 'Player',
       sharing: transform
     }, data);
 
     try {
-      result = await this._POST(`/players`, profile);
+      await this.set(`/players/${state.id}`, profile);
+      result = this.get(`/players/${state.id}`);
     } catch (E) {
-      return this.error('Cannot create player:', E);
+      return console.error('Cannot register player:', E);
     }
 
     return result;
+  }
+
+  async _registerPlace (data) {
+    let result = null;
+    let state = new Fabric.State(data);
+    let transform = [state.id, state.render()];
+
+    console.log('registering place:', data);
+
+    let place = Object.assign({
+      id: `local/${state.id}`,
+      type: 'Place',
+      sharing: transform
+    }, data);
+
+    try {
+      await this.set(`/places/${state.id}`, place);
+      result = this.get(`/places/${state.id}`);
+    } catch (E) {
+      return console.error('Cannot register place:', E);
+    }
+
+    return result;
+  }
+
+  async _syncFromGateway () {
+    let places = await this.remote._GET('/places');
+
+    console.log('got places:', places);
+    // TODO: make async
+    for (let i = 0; i <= places.length; i++) {
+      await this._registerPlace(places[i]);
+    }
+
+    return this;
   }
 
   async build () {
@@ -135,19 +197,16 @@ class RPG extends Fabric {
     let data = JSON.stringify(this.state);
     try {
       let saved = await this._PUT('/memories', data);
-      this.log('[RPG]', 'saved:', saved);
       result = saved;
     } catch (E) {
       this.error('cannot save:', E);
     }
-
     return result;
   }
 
   async restore () {
     let blob = await this._GET(`/memories`);
     let data = null;
-
     try {
       let result = JSON.parse(blob);
       if (result) {
@@ -156,7 +215,6 @@ class RPG extends Fabric {
     } catch (E) {
       console.error('Could not load restore:', E);
     }
-
     return data;
   }
 
@@ -169,6 +227,8 @@ class RPG extends Fabric {
     this.state.players = {};
     this.state.peers = {};
 
+    await this.restore();
+    // await this._syncFromGateway();
     await this['@world'].start();
 
     // TODO: document the process

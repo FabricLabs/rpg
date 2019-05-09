@@ -4,8 +4,10 @@ const Fabric = require('@fabric/core');
 const RPG = require('../types/rpg');
 const Map = require('../types/map');
 
+const Audio = require('./audio');
 const Authority = require('./authority');
 const Canvas = require('./canvas');
+const History = require('./history');
 const Swarm = require('./swarm');
 
 /**
@@ -28,7 +30,7 @@ class Application extends Fabric.App {
     this.networkPlayers = {};
 
     this['@data'] = Object.assign({
-      authority: 'localhost:9999',
+      authority: 'alpha.roleplaygateway.com:9999',
       canvas: {
         height: 768,
         width: 1024
