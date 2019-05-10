@@ -7,7 +7,10 @@ const {
 // Fabric Core
 const Fabric = require('@fabric/core');
 
-// Load in types...
+// ### Internal Types
+// Here we've created a few internal classes to keep IdleRPG well-organized.
+const Encounter = require('./encounter');
+const Entity = require('./entity');
 const World = require('./world');
 const Player = require('./player');
 
@@ -32,13 +35,6 @@ class RPG extends Fabric {
       globals: {
         tick: 0
       },
-      resources: {
-        'Peer': {
-          attributes: {
-            address: { type: 'String', required: true, id: true }
-          }
-        }
-      },
       canvas: {
         height: 300,
         width: 400
@@ -46,8 +42,16 @@ class RPG extends Fabric {
       interval: TICK_INTERVAL
     }, configuration);
 
-    // start with empty game state
-    this.state = {};
+    // ### Our Game State
+    // The Game State holds all information necessary to reconstruct your game.
+    // We use human-friendly names and keep things as small as possible, so do
+    // your part in keeping this well-maintained!
+    this.state = {
+      channels: {}, // stores a list of channels.
+      players: {}, // players are users... !
+      services: {}, // services are networks
+      users: {} // users are network clients
+    };
 
     this['@world'] = new World(this['@configuration']['entropy']);
     this['@player'] = new Player();
@@ -65,13 +69,17 @@ class RPG extends Fabric {
     return this;
   }
 
+  static get Entity () {
+    return Entity;
+  }
+
+  static get Encounter () {
+    return Encounter;
+  }
+
   async tick () {
     console.log('[RPG]', 'Beginning tick...', Date.now());
     console.log('[RPG]', 'STATE (@entity)', this['@entity']);
-
-    let commit = this.commit();
-    // console.log('tick:', commit);
-    let origin = new Fabric.State(this.state);
 
     // Our first and primary order of business is to update the clock.  Once
     // we've computed the game state for the next round, we can share it with
@@ -80,10 +88,15 @@ class RPG extends Fabric {
     // Let's finish our work up front.
     this.state.clock++;
 
+    let origin = new Fabric.State(this['@entity']);
+
     // Snapshot of our state...
-    let data = Object.assign(this.state, this['@entity']);
+    let data = Object.assign({}, this.state, this['@entity']);
     let state = new Fabric.State(data);
     // let json = state.render();
+
+    // Update global for sanity checks...
+    this.state = data;
 
     this.log('[RPG:TICK]', `#${state.id}`, data);
 
@@ -195,26 +208,37 @@ class RPG extends Fabric {
   async save () {
     let result = null;
     let data = JSON.stringify(this.state);
+    let state = new Fabric.State(data);
+
+    console.log('[RPG]', 'attempting to save:', data);
+
     try {
-      let saved = await this._PUT('/memories', data);
-      result = saved;
+      let memory = await this._PUT('/memories', data);
+      let doc = await this._PUT(`/blobs/${state.id}`, state.render());
+      result = state.id;
     } catch (E) {
       this.error('cannot save:', E);
     }
+
     return result;
   }
 
   async restore () {
     let blob = await this._GET(`/memories`);
     let data = null;
+
+    console.log('[RPG]', 'attempting to restore:', blob);
+
     try {
       let result = JSON.parse(blob);
       if (result) {
+        this['@entity'] = result;
         this.state = result;
       }
     } catch (E) {
       console.error('Could not load restore:', E);
     }
+
     return data;
   }
 
