@@ -1,7 +1,8 @@
 'use strict';
 
 const {
-  TICK_INTERVAL
+  TICK_INTERVAL,
+  GENESIS_HASH
 } = require('../constants');
 
 // Fabric Core
@@ -55,6 +56,7 @@ class RPG extends Fabric {
 
     this['@world'] = new World(this['@configuration']['entropy']);
     this['@player'] = new Player();
+    this['@genesis'] = this['@configuration'].genesis || GENESIS_HASH;
     this['@data'] = Object.assign({
       globals: {
         tick: 0
@@ -87,8 +89,14 @@ class RPG extends Fabric {
     //
     // Let's finish our work up front.
     this.state.clock++;
+    this['@entity'].clock++;
 
+    // let commit = this.commit();
+    // console.log('tick:', commit);
+    // let ticks = this.get(`/ticks`) || [];
     let origin = new Fabric.State(this['@entity']);
+
+    // if (!ticks.length) ticks.push(origin.id);
 
     // Snapshot of our state...
     let data = Object.assign({}, this.state, this['@entity']);
@@ -96,6 +104,7 @@ class RPG extends Fabric {
     // let json = state.render();
 
     // Update global for sanity checks...
+    this.parent = origin.id;
     this.state = data;
 
     this.log('[RPG:TICK]', `#${state.id}`, data);
@@ -148,12 +157,18 @@ class RPG extends Fabric {
     let result = null;
     let state = new Fabric.State(data);
     let transform = [state.id, state.render()];
+    let prior = null;
+
+    try {
+      prior = this.get(`/players/${state.id}`);
+    } catch (E) {
+      console.warn('[RPG]', 'No previous player (registering new):', E);
+    }
 
     let profile = Object.assign({
-      id: `local/${state.id}`,
       type: 'Player',
       sharing: transform
-    }, data);
+    }, data, prior || {});
 
     try {
       await this.set(`/players/${state.id}`, profile);
@@ -203,6 +218,11 @@ class RPG extends Fabric {
   async build () {
     this['@world'].map._build();
     this['@world'].map._dump();
+  }
+
+  async dump () {
+    let id = await this.save();
+    require('fs').writeSync(`inputs/${id}`, JSON.stringify(this.state));
   }
 
   async save () {

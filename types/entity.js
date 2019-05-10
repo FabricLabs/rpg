@@ -1,12 +1,13 @@
 'use strict';
 
+const Events = require('events');
 const Fabric = require('@fabric/core');
 
 /**
  * Generic example.
  * @type {Object}
  */
-class Entity extends Fabric.State {
+class Entity extends Events.EventEmitter {
   /**
    * Generic template for virtual objects.
    * @param  {Object} [data={}] Pass an object to use.
