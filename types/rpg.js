@@ -79,22 +79,22 @@ class RPG extends Fabric {
     return Encounter;
   }
 
-  async tick () {
+  async tick (notify = true) {
     console.log('[RPG]', 'Beginning tick...', Date.now());
     console.log('[RPG]', 'STATE (@entity)', this['@entity']);
+
+    let origin = new Fabric.State(this['@entity']);
 
     // Our first and primary order of business is to update the clock.  Once
     // we've computed the game state for the next round, we can share it with
     // the world.
     //
     // Let's finish our work up front.
-    this.state.clock++;
     this['@entity'].clock++;
 
     // let commit = this.commit();
     // console.log('tick:', commit);
     // let ticks = this.get(`/ticks`) || [];
-    let origin = new Fabric.State(this['@entity']);
 
     // if (!ticks.length) ticks.push(origin.id);
 
@@ -113,7 +113,9 @@ class RPG extends Fabric {
     await this.save();
 
     // Looks like we're all done, so let's be courteous and notify subscribers.
-    this.emit('tick', state.id);
+    if (notify) {
+      this.emit('tick', state.id);
+    }
 
     return this;
   }
@@ -244,8 +246,14 @@ class RPG extends Fabric {
   }
 
   async restore () {
-    let blob = await this._GET(`/memories`);
+    let blob = null;
     let data = null;
+
+    try {
+      blob = await this._GET(`/memories`);
+    } catch (E) {
+      console.error('Could not GET', '/memories');
+    }
 
     console.log('[RPG]', 'attempting to restore:', blob);
 
