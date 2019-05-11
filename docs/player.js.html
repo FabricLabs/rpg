@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Source: entity.js &middot; Docs</title>
+    <title>Source: player.js &middot; Docs</title>
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -13,7 +13,7 @@
   </head>
   <body>
     <div id="main">
-      <h1 class="page-title">Source: entity.js</h1>
+      <h1 class="page-title">Source: player.js</h1>
       
 
 
@@ -25,60 +25,30 @@
 
 const Fabric = require('@fabric/core');
 
-/**
- * Generic example.
- * @type {Object}
- */
-class Entity extends Fabric.State {
+class Player {
   /**
-   * Generic template for virtual objects.
-   * @param  {Object} [data={}] Pass an object to use.
-   * @return {Entity}           Instance of the {@link Entity}.
+   * In-game representation of our humble hero, the {@link User}.
+   * @param  {Object} [settings={}] Settings to pass from the player's will.
+   * @return {Player}               Player-controllable instance of themselves.
    */
-  constructor (data = {}) {
-    super(data);
-
-    // allow this entity to be run without the new keyword
-    if (!(this instanceof Entity)) return new Entity(data);
-
-    // set internal properties
-    this.machine = new Fabric.Machine();
-
-    // configure defaults
-    this.data = Object.assign({
-
-    }, data);
-
-    // return instance
+  constructor (settings = {}) {
+    this.settings = Object.assign({}, settings);
+    this.position = null;
+    this.key = new Fabric.Key();
+    this.id = this.key.address;
     return this;
   }
 
-  /**
-   * Produces a string of JSON, representing the entity.
-   * @return {String} JSON-encoded object.
-   */
-  toJSON () {
-    return JSON.stringify(this.toObject());
+  _isOther () {
+    return this.other;
   }
 
-  /**
-   * Converts the Fabric-native instance to a pure JSON object.
-   * @return {Object} Basic JavaScript object.
-   */
-  toObject () {
-    return this.data;
-  }
-
-  /**
-   * As a {@link Buffer}.
-   * @return {Buffer} Slice of memory.
-   */
-  toRaw () {
-    return Buffer.from(this.toJSON(), 'utf8');
+  render () {
+    return `&lt;rpg-player>&lt;player-address>${this.key.address}&lt;/player-address>&lt;/rpg-player>`;
   }
 }
 
-module.exports = Entity;
+module.exports = Player;
 </code></pre>
         </article>
     </section>

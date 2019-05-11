@@ -1,5 +1,9 @@
 'use strict';
 
+const {
+  HTTP_HOST
+} = require('../constants');
+
 const EventEmitter = require('events').EventEmitter;
 const Agent = require('peerjs');
 const Peer = require('./peer');
@@ -17,8 +21,10 @@ class Swarm extends EventEmitter {
   identify (id) {
     this.id = id;
     this.agent = new Agent(id, {
-      host: 'rpg.verse.pub',
-      path: '/services/peering'
+      host: HTTP_HOST,
+      path: '/services/peering',
+      // port: '9999',
+      // secure: false
     });
 
     this.agent.on('open', this._onOpen.bind(this));

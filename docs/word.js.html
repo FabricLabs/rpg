@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Source: entity.js &middot; Docs</title>
+    <title>Source: word.js &middot; Docs</title>
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -13,7 +13,7 @@
   </head>
   <body>
     <div id="main">
-      <h1 class="page-title">Source: entity.js</h1>
+      <h1 class="page-title">Source: word.js</h1>
       
 
 
@@ -23,62 +23,27 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
-const Fabric = require('@fabric/core');
-
 /**
- * Generic example.
+ * The {@link Word} is a measurement of language, often used to quantify the
+ * length of a passage.
  * @type {Object}
  */
-class Entity extends Fabric.State {
+class Word {
   /**
-   * Generic template for virtual objects.
-   * @param  {Object} [data={}] Pass an object to use.
-   * @return {Entity}           Instance of the {@link Entity}.
+   * A {@link Word} is an arbitrary list of characters.
+   * @param  {Object} [settings={}] Configure the {@link Word} constructor.
+   * @return {Word}                 Instance of the word.
    */
-  constructor (data = {}) {
-    super(data);
-
-    // allow this entity to be run without the new keyword
-    if (!(this instanceof Entity)) return new Entity(data);
-
-    // set internal properties
-    this.machine = new Fabric.Machine();
-
-    // configure defaults
-    this.data = Object.assign({
-
-    }, data);
-
-    // return instance
+  constructor (settings = {}) {
+    this.settings = Object.assign({
+      type: 'UTF8Word'
+    }, settings);
+    this.type = this.settings.type;
     return this;
-  }
-
-  /**
-   * Produces a string of JSON, representing the entity.
-   * @return {String} JSON-encoded object.
-   */
-  toJSON () {
-    return JSON.stringify(this.toObject());
-  }
-
-  /**
-   * Converts the Fabric-native instance to a pure JSON object.
-   * @return {Object} Basic JavaScript object.
-   */
-  toObject () {
-    return this.data;
-  }
-
-  /**
-   * As a {@link Buffer}.
-   * @return {Buffer} Slice of memory.
-   */
-  toRaw () {
-    return Buffer.from(this.toJSON(), 'utf8');
   }
 }
 
-module.exports = Entity;
+module.exports = Word;
 </code></pre>
         </article>
     </section>
