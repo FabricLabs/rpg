@@ -1,4 +1,6 @@
 {
+  "name": "@rpg/core",
+  "synopsis": "Peer-to-peer game engine, built with Fabric.",
   "authority": "chat.roleplaygateway.com:9999",
   "entropy": "6170cc426cbe663cef4342dc73860f2ab26c0c0e411c390ca064208bada65e6e",
   "provide": ["rpg"],

@@ -4,12 +4,13 @@ const config = require('./config');
 
 const RPG = require('./types/rpg');
 const Gateway = require('./services/rpg');
-const Server = require('@fabric/http');
+const Server = require('@fabric/http/types/server');
 
 async function main () {
   let gateway = new Gateway();
   let server = new Server(config);
   let rpg = new RPG({
+    name: '@rpg/core',
     path: './stores/rpg'
   });
 
@@ -29,8 +30,7 @@ async function main () {
   // our original expectations.  This could be fast, say 60 "ticks" per second,
   // or slow, like IdleRPG's 10-minute rounds.
   rpg.on('tick', async function (id) {
-    let state = await rpg._GET(`/blobs/${id}`);
-    console.log(`got tick, ${id}:`, state);
+    console.log(`got tick, ${id}`);
   });
 
   // Generic message handler.

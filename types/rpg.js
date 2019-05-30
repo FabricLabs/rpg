@@ -1,5 +1,8 @@
+// # `@rpg/core`
+// Peer-to-peer game engine, powered by Fabric.
 'use strict';
 
+// Constants
 const {
   TICK_INTERVAL,
   GENESIS_HASH
@@ -7,6 +10,11 @@ const {
 
 // Fabric Core
 const Fabric = require('@fabric/core');
+
+// Dependencies
+const BN = require('bn.js');
+const One = new BN('1');
+const Zero = new BN('0');
 
 // ### Internal Types
 // Here we've created a few internal classes to keep IdleRPG well-organized.
@@ -17,6 +25,7 @@ const Player = require('./player');
 
 /**
  * Primary RPG builder.
+ * @property {State} state Holds state for the game.
  */
 class RPG extends Fabric {
   /**
@@ -27,15 +36,14 @@ class RPG extends Fabric {
   constructor (configuration) {
     super(configuration);
 
+    // Begin @internal typing
     this['@type'] = 'RPG';
     this['@configuration'] = Object.assign({
       name: 'RPG',
       path: './stores/rpg',
       authority: 'api.roleplaygateway.com',
       persistent: true,
-      globals: {
-        tick: 0
-      },
+      globals: { tick: 0 },
       canvas: {
         height: 300,
         width: 400
@@ -57,10 +65,14 @@ class RPG extends Fabric {
     this['@world'] = new World(this['@configuration']['entropy']);
     this['@player'] = new Player();
     this['@genesis'] = this['@configuration'].genesis || GENESIS_HASH;
+    this['@entity'] = Object.assign({
+      clock: 0,
+      entropy: this['@configuration']['entropy']
+    }, this.state);
+
+    // old vestiges of times long since past
     this['@data'] = Object.assign({
-      globals: {
-        tick: 0
-      }
+      globals: { tick: 0 }
     }, this['@configuration']);
 
     this.timer = null;
@@ -79,18 +91,27 @@ class RPG extends Fabric {
     return Encounter;
   }
 
+  /**
+   * Increment the {@link Machine} by one clock cycle.
+   * @param  {Boolean} [notify=true] When `true` will emit {@link Meessage} events.
+   * @return {Promise}               Resolves with {@link State} `@id` (for recordkeeping).
+   */
   async tick (notify = true) {
     console.log('[RPG]', 'Beginning tick...', Date.now());
     console.log('[RPG]', 'STATE (@entity)', this['@entity']);
 
     let origin = new Fabric.State(this['@entity']);
+    let observer = new Fabric.Observer(origin['@data']);
 
     // Our first and primary order of business is to update the clock.  Once
     // we've computed the game state for the next round, we can share it with
     // the world.
     //
     // Let's finish our work up front.
-    this['@entity'].clock++;
+    this['@entity'].clock = One.add(new BN(this['@entity'].clock)).toString();
+    this['@entity'].entropy = this.machine.sip();
+
+    console.log('[ENTROPY:CHECK]', 'clock:', this['@entity'].clock, 'entropy:', this['@entity'].entropy);
 
     // let commit = this.commit();
     // console.log('tick:', commit);
@@ -224,7 +245,19 @@ class RPG extends Fabric {
 
   async dump () {
     let id = await this.save();
-    require('fs').writeSync(`inputs/${id}`, JSON.stringify(this.state));
+    let dump = JSON.stringify(this.state);
+    console.log('memory dump:', dump);
+    return dump;
+  }
+
+  /**
+   * Compute the game state.
+   * @param  {Mixed}  [input=null] Player input, if any.
+   * @return {Promise}             Resolves with result.
+   */
+  async compute (input = null) {
+    let object = new Fabric.State(input);
+    return object.id;
   }
 
   async save () {
@@ -232,7 +265,7 @@ class RPG extends Fabric {
     let data = JSON.stringify(this.state);
     let state = new Fabric.State(data);
 
-    console.log('[RPG]', 'attempting to save:', data);
+    console.log('[RPG]', 'saving:', data);
 
     try {
       let memory = await this._PUT('/memories', data);
@@ -267,6 +300,8 @@ class RPG extends Fabric {
       console.error('Could not load restore:', E);
     }
 
+    this.commit();
+
     return data;
   }
 
@@ -274,14 +309,12 @@ class RPG extends Fabric {
     await super.start();
 
     // TODO: clean up the clock
-    this.state.clock = this['@configuration'].globals.tick;
-    this.state.entropy = {};
-    this.state.players = {};
-    this.state.peers = {};
+    this.state.clock = Zero;
 
     await this.restore();
+    // TODO: import latest from Gateway
     // await this._syncFromGateway();
-    await this['@world'].start();
+    // await this['@world'].start();
 
     // TODO: document the process
     this.timer = setInterval(this.tick.bind(this), this['@configuration'].interval);

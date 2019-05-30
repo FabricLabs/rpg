@@ -16,42 +16,53 @@ class Agent {
     this.ticks = 0;
   }
 
-  async move (direction) {
+  async move (direction, type = 'Mob') {
     let agent = this;
-
     let result = await this.remote._POST(`/movements`, {
-      direction: direction,
-      mobID: agent.id
+      actor: { id: agent.id, type: type },
+      object: { direction },
+      target: '/movements'
     });
-
-    console.log('result of movement:', result);
 
     return result;
   }
 
   async compute () {
     ++this.ticks;
-    console.log(`[AGENT:${this.id}]`, `beginning tick:`, this.ticks, 'mood:', this.current.mood);
+    console.log(`[AGENT:${this.id}]`, `beginning tick:`, this.ticks, 'current:', this.current);
 
-    if (this.current.mood && this.current.mood === 'aggressive') {
-      let place = await this.getCurrentLocation();
+    switch (this.settings.type) {
+      default:
+        console.log('Unhandled type:', this.settings.type);
+        break;
+      case 'Shuttle':
+        if (this.current.mode && this.current.mode === 'active') {
+          // let movement = await this.move('in', 'Shuttle');
+          // console.log('movement:', movement);
+        }
+        break;
+      case 'Mob':
+        if (this.current.mood && this.current.mood === 'aggressive') {
+          let place = await this.getCurrentLocation();
 
-      if (place.active.length) {
-        console.log('found character!', place.active[0]);
-        // TODO: attack!
-      } else {
-        console.log('No nearby characters found.  Moving...');
+          if (place.active.length) {
+            console.log('found character!', place.active[0]);
+            // TODO: attack!
+          } else {
+            console.log('No nearby characters found.  Moving...');
 
-        let exits = await this.getExits();
-        let choice = this.randomFrom(exits);
+            let exits = await this.getExits();
+            let choice = this.randomFrom(exits);
 
-        console.log('options:', exits);
-        console.log('choice:', choice);
+            console.log('options:', exits);
+            console.log('choice:', choice);
 
-        let movement = await this.move(choice.direction);
+            let movement = await this.move(choice.direction, this.type);
 
-        console.log('movement:', movement);
-      }
+            console.log('movement:', movement);
+          }
+        }
+        break;
     }
   }
 
@@ -66,8 +77,19 @@ class Agent {
   }
 
   async getState () {
-    let mob = await this.remote._GET(`/mobs/${this.id}`);
-    return mob;
+    let state = null;
+    switch (this.settings.type) {
+      default:
+        console.log('unhandled type:', this.settings.type);
+        break;
+      case 'Shuttle':
+        state = await this.remote._GET(`/shuttles/${this.id}`);
+        break;
+      case 'Mob':
+        state = await this.remote._GET(`/mobs/${this.id}`);
+        break;
+    }
+    return state;
   }
 
   async getCurrentLocation () {

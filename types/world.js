@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('../config');
 const Fabric = require('@fabric/core');
 
 const Map = require('./map');
@@ -17,8 +18,11 @@ class World {
    * @return {World}               Instance of the World.
    */
   constructor (settings = {}) {
-    this.settings = Object.assign({}, settings);
-    this.map = new Map(settings);
+    this.settings = Object.assign({
+      seed: 1,
+      entropy: config.entropy
+    }, settings);
+    this.map = new Map(this.settings);
     this.agent = new Player();
     this.origin = new Point();
     this.status = null;
