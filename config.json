@@ -12,40 +12,46 @@
   "seed": "alpha beta kappa gamma delta omega",
   "resources": {
     "Character": {
+      "name": "Character",
       "components": {
-        "list": "/characters",
-        "view": "/characters/:id"
+        "list": "rpg-character-list",
+        "view": "rpg-character-view"
       }
     },
     "Map": {
+      "name": "Map",
       "components": {
-        "list": "/maps",
-        "view": "/maps/:id"
+        "list": "rpg-map-list",
+        "view": "rpg-map-view"
       }
     },
     "Tile": {
+      "name": "Tile",
       "components": {
-        "list": "/tiles",
-        "view": "/tiles/:id"
+        "list": "rpg-tile-list",
+        "view": "rpg-tile-view"
       }
     },
     "Peer": {
+      "name": "Peer",
       "components": {
-        "list": "/peers",
-        "view": "/peers/:id"
+        "list": "rpg-peer-list",
+        "view": "rpg-peer-view"
       }
     },
     "Place": {
+      "name": "Place",
       "components": {
-        "list": "/places",
-        "view": "/places/:id"
+        "list": "rpg-place-list",
+        "view": "rpg-place-view"
       }
     },
     "Player": {
+      "name": "Player",
       "author": "Fabric Labs",
       "components": {
-        "list": "/players",
-        "view": "/players/:id"
+        "list": "rpg-player-list",
+        "view": "rpg-player-view"
       },
       "description": "Basic user component.",
       "site": "https://fabric.pub/"

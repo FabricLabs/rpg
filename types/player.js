@@ -1,6 +1,7 @@
 'use strict';
 
 const Fabric = require('@fabric/core');
+const Avatar = require('@fabric/http/types/avatar');
 const Entity = require('./entity');
 
 class Player extends Entity {
@@ -16,9 +17,14 @@ class Player extends Entity {
       created: Date.now()
     }, settings);
 
+    this.name = null;
     this.position = null;
     this.presence = 'offline';
-    this.name = null;
+    this.avatar = new Avatar({
+      height: 256,
+      width: 256,
+      alpha: null
+    });
 
     this.key = new Fabric.Key();
     this.id = this.key.address;
@@ -27,7 +33,11 @@ class Player extends Entity {
   }
 
   async _revealToWorld () {
+    await this.avatar._drawAvatar();
+    await this.avatar.render();
     await this._presenceToReady();
+    console.log('rendered avatar:', this.avatar.render());
+    console.log('rendered avatar toDataURI:', this.avatar.toDataURI());
     return this;
   }
 

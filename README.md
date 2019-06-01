@@ -30,3 +30,8 @@ yarn link @fabric/http
 # Good luck, have fun!
 #                                              ~ E
 ```
+
+### API
+See output of `npm run docs` for an HTTP-serving URL with well-organized
+documentation.  All source code is included, so feel free to submit proposals
+for potential changes.

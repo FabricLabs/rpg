@@ -18,7 +18,9 @@ const Zero = new BN('0');
 
 // ### Internal Types
 // Here we've created a few internal classes to keep IdleRPG well-organized.
+const Avatar = require('@fabric/http/types/avatar');
 const Encounter = require('./encounter');
+// const Modulator = require('./modulator');
 const Entity = require('./entity');
 const World = require('./world');
 const Player = require('./player');
@@ -27,7 +29,7 @@ const Player = require('./player');
  * Primary RPG builder.
  * @property {State} state Holds state for the game.
  */
-class RPG extends Fabric {
+class RPG extends Fabric.Service {
   /**
    * Build an RPG with the {@link Fabric} tools.
    * @param  {Object} configuration Settings to configure the RPG with.
@@ -45,8 +47,8 @@ class RPG extends Fabric {
       persistent: true,
       globals: { tick: 0 },
       canvas: {
-        height: 300,
-        width: 400
+        height: 256,
+        width: 256
       },
       interval: TICK_INTERVAL
     }, configuration);
@@ -56,15 +58,19 @@ class RPG extends Fabric {
     // We use human-friendly names and keep things as small as possible, so do
     // your part in keeping this well-maintained!
     this.state = {
+      identities: {}, // shared identities (public)
       channels: {}, // stores a list of channels.
       players: {}, // players are users... !
       services: {}, // services are networks
-      users: {} // users are network clients
+      users: {}, // users are network clients,
+      tip: null
     };
 
-    this['@world'] = new World(this['@configuration']['entropy']);
+    this['@avatar'] = new Avatar({ seed: this['@configuration']['entropy'] });
+    this['@world'] = new World({ seed: this['@configuration']['entropy'] });
     this['@player'] = new Player();
     this['@genesis'] = this['@configuration'].genesis || GENESIS_HASH;
+    // this['@modulator'] = new Modulator();
     this['@entity'] = Object.assign({
       clock: 0,
       entropy: this['@configuration']['entropy']
@@ -76,6 +82,8 @@ class RPG extends Fabric {
     }, this['@configuration']);
 
     this.timer = null;
+    this.avatar = this['@avatar'];
+    this.machine = new Fabric.Machine();
     this.remote = new Fabric.Remote({
       host: this['@configuration'].authority
     });
@@ -89,6 +97,11 @@ class RPG extends Fabric {
 
   static get Encounter () {
     return Encounter;
+  }
+
+  get identities () {
+    // TODO: ensure all private data remains private (prove!)
+    return this.state.identities;
   }
 
   /**
@@ -142,8 +155,23 @@ class RPG extends Fabric {
   }
 
   async _POST (path, data) {
-    let id = await super._POST(path, data);
-    let obj = await super._GET(id);
+    console.log('posting:', path, data);
+    let result = null;
+
+    try {
+      let id = await super._POST(path, data);
+      console.log('path (id?) from post:', id);
+      result = id;
+    } catch (E) {
+      console.log('RPG COULD NOT CREATE:', E);
+    }
+
+    try {
+      let obj = await this._GET(result);
+      console.log('posted:', result, path, data);
+    } catch (E) {
+      console.error('RPG COULD NOT POST:', path, data, E);
+    }
 
     // assign state
     // this.state['players'][obj.id] = obj;
@@ -151,7 +179,7 @@ class RPG extends Fabric {
     // commit
     this.commit();
 
-    return id;
+    return result;
   }
 
   /* async _registerActor (data) {
@@ -175,6 +203,37 @@ class RPG extends Fabric {
 
     return result;
   } */
+
+  async _createIdentity () {
+    let item = null;
+    let result = null;
+
+    // TODO: async generation
+    let key = new Fabric.Key();
+    let struct = {
+      name: prompt('What shall be your name?'),
+      address: key.address,
+      private: key.private.toString('hex'),
+      public: key.public
+    };
+
+    try {
+      item = await this._POST(`/identities`, struct);
+      console.log('create identity posted:', item);
+      result = await this._GET(item);
+    } catch (E) {
+      console.error('broken:', E);
+    }
+
+    this.identities[struct.address] = struct;
+    this.identity = struct;
+
+    // TODO: remove public key from character, use only address (or direct hash)
+    return {
+      address: struct.address,
+      public: struct.public
+    };
+  }
 
   async _registerPlayer (data) {
     let result = null;
@@ -268,8 +327,9 @@ class RPG extends Fabric {
     console.log('[RPG]', 'saving:', data);
 
     try {
-      let memory = await this._PUT('/memories', data);
-      let doc = await this._PUT(`/blobs/${state.id}`, state.render());
+      // let memory = await this._PUT('/memories', data);
+      // let doc = await this.store.set(`/memories/${state.id}`, state.render());
+      let doc = await this.store.set(`/tip`, state.render());
       result = state.id;
     } catch (E) {
       this.error('cannot save:', E);
@@ -283,9 +343,9 @@ class RPG extends Fabric {
     let data = null;
 
     try {
-      blob = await this._GET(`/memories`);
+      blob = await this._GET(`/tip`);
     } catch (E) {
-      console.error('Could not GET', '/memories');
+      console.error('Could not GET old state', E);
     }
 
     console.log('[RPG]', 'attempting to restore:', blob);

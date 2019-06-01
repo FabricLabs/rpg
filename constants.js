@@ -3,7 +3,7 @@
 // prime constants
 const GENESIS_HASH = 'f8c3bf62a9aa3e6fc1619c250e48abe7519373d3edf41be62eb5dc45199af2ef';
 const HTTP_HOST = 'api.roleplaygateway.com';
-const TICK_INTERVAL = 1000;
+const TICK_INTERVAL = 10 * 60 * 1000; // 10 minutes * 60 seconds * 1000 millis
 const FRAMES_PER_BLOCK = 60 * 60 * 10 * 1000;
 
 const HEADER_LENGTH = 64;

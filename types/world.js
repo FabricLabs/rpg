@@ -22,11 +22,14 @@ class World {
       seed: 1,
       entropy: config.entropy
     }, settings);
+
     this.map = new Map(this.settings);
     this.agent = new Player();
     this.origin = new Point();
+
     this.status = null;
     this.timer = null;
+
     return this;
   }
 
