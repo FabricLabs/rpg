@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Source: word.js &middot; Docs</title>
+    <title>Source: sprite.js &middot; Docs</title>
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -13,7 +13,7 @@
   </head>
   <body>
     <div id="main">
-      <h1 class="page-title">Source: word.js</h1>
+      <h1 class="page-title">Source: sprite.js</h1>
       
 
 
@@ -23,27 +23,67 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
+const {
+  SPRITE_SIZE_IN_BYTES
+} = require('../constants');
+
+const Entity = require('./entity');
+
 /**
- * The {@link Word} is a measurement of language, often used to quantify the
- * length of a passage.
+ * Generic example.
  * @type {Object}
  */
-class Word {
+class Sprite extends Entity {
   /**
-   * A {@link Word} is an arbitrary list of characters.
-   * @param  {Object} [settings={}] Configure the {@link Word} constructor.
-   * @return {Word}                 Instance of the word.
+   * Generic template for virtual objects.
+   * @param  {Object} [data={}] Pass an object to use.
+   * @return {Entity}           Instance of the {@link Entity}.
    */
-  constructor (settings = {}) {
+  constructor (data = {}) {
+    super(data);
+
+    // allow this entity to be run without the new keyword
+    if (!(this instanceof Sprite)) return new Sprite(data);
+
     this.settings = Object.assign({
-      type: 'UTF8Word'
-    }, settings);
-    this.type = this.settings.type;
+      frames: 32
+    }, data);
+
+    // set internal properties
+    this.sheet = Buffer.alloc(SPRITE_SIZE_IN_BYTES);
+    this.frame = Buffer.alloc(SPRITE_SIZE_IN_BYTES / this.settings.frames);
+
+    // configure defaults
+    this.data = Object.assign({
+      frame: this.frame.toString('hex')
+    }, data);
+
+    this.state = Object.assign({
+      frame: this.data.frame,
+      frames: {}
+    }, {});
+
+    this.commit();
+
+    // return instance
     return this;
+  }
+
+  _loadSheet (path) {
+    // TODO: load sheet here (@melnx)
+    this.sheet.write(null);
+  }
+
+  tick () {
+    
+  }
+
+  render () {
+    return `&lt;fabric-sprite>${JSON.stringify(this.data)}&lt;/fabric-sprite>`;
   }
 }
 
-module.exports = Word;
+module.exports = Sprite;
 </code></pre>
         </article>
     </section>
