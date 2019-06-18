@@ -1,5 +1,7 @@
 'use strict';
 
+const crypto = require('crypto');
+
 const Events = require('events');
 const Fabric = require('@fabric/core');
 
@@ -23,12 +25,26 @@ class Entity extends Events.EventEmitter {
     this.machine = new Fabric.Machine();
 
     // configure defaults
-    this.data = Object.assign({
+    this.actor = Object.assign({}, this._downsample(data));
+    this.data = Object.assign({}, data);
 
-    }, data);
+    // remove EventEmitter cruft
+    Object.defineProperty(this, '_events', { enumerable: false });
+    Object.defineProperty(this, '_eventsCount', { enumerable: false });
+    Object.defineProperty(this, '_maxListeners', { enumerable: false });
+
+    // remove mutable variables
+    Object.defineProperty(this, 'actor', { enumerable: false });
+    Object.defineProperty(this, 'machine', { enumerable: false });
 
     // return instance
     return this;
+  }
+
+  get id () {
+    let data = this.toJSON();
+    let hash = crypto.createHash('sha256').update(data).digest('hex');
+    return hash;
   }
 
   /**
@@ -36,15 +52,37 @@ class Entity extends Events.EventEmitter {
    * @return {String} JSON-encoded object.
    */
   toJSON () {
-    return JSON.stringify(this.toObject());
+    let result = null;
+
+    switch (this.actor['@type']) {
+      default:
+        result = JSON.stringify(this.toObject());
+        break;
+      case 'String':
+        result = JSON.stringify(this.toString());
+        break;
+    }
+
+    return result;
   }
 
-  /**
-   * Converts the Fabric-native instance to a pure JSON object.
-   * @return {Object} Basic JavaScript object.
-   */
+  toString () {
+    let result = null;
+
+    switch (this.actor['@type']) {
+      default:
+        result = this.toJSON();
+        break;
+      case 'String':
+        result = this.actor['@data'].map(x => String.fromCharCode(x)).join('');
+        break;
+    }
+
+    return result;
+  }
+
   toObject () {
-    return this.data;
+    return this.actor['@data'];
   }
 
   /**
@@ -53,6 +91,36 @@ class Entity extends Events.EventEmitter {
    */
   toRaw () {
     return Buffer.from(this.toJSON(), 'utf8');
+  }
+
+  _downsample (input) {
+    let result = {};
+
+    if (!input) input = this.data;
+
+    if (typeof input === 'string') {
+      result = {
+        '@type': 'String',
+        '@data': input.split('').map(x => x.charCodeAt(0))
+      };
+    } else if (input instanceof Array) {
+      result = {
+        '@type': 'Array',
+        '@data': input
+      };
+    } else if (input instanceof Buffer) {
+      result = {
+        '@type': 'Buffer',
+        '@data': JSON.parse(JSON.stringify(input))[0]
+      };
+    } else {
+      result = {
+        '@type': 'Entity',
+        '@data': JSON.parse(JSON.stringify(input))
+      };
+    }
+
+    return result;
   }
 }
 

@@ -22,6 +22,7 @@ const Avatar = require('@fabric/http/types/avatar');
 const Encounter = require('./encounter');
 // const Modulator = require('./modulator');
 const Entity = require('./entity');
+const Tile = require('./tile');
 const World = require('./world');
 const Player = require('./player');
 
@@ -71,10 +72,13 @@ class RPG extends Fabric.Service {
     this['@player'] = new Player();
     this['@genesis'] = this['@configuration'].genesis || GENESIS_HASH;
     // this['@modulator'] = new Modulator();
-    this['@entity'] = Object.assign({
-      clock: 0,
-      entropy: this['@configuration']['entropy']
-    }, this.state);
+    this['@entity'] = {
+      '@type': 'State',
+      '@data': Object.assign({
+        clock: 0,
+        entropy: this['@configuration']['entropy']
+      }, this.state)
+    };
 
     // old vestiges of times long since past
     this['@data'] = Object.assign({
@@ -84,8 +88,18 @@ class RPG extends Fabric.Service {
     this.timer = null;
     this.avatar = this['@avatar'];
     this.machine = new Fabric.Machine();
+
+    // Set up remote Authority (RPG)
     this.remote = new Fabric.Remote({
-      host: this['@configuration'].authority
+      secure: this['@configuration'].secure,
+      authority: this['@configuration'].authority,
+      host: this['@configuration'].authority,
+      port: this['@configuration'].port
+    });
+
+    // Store secrets separately
+    this.secrets = new Fabric.Store({
+      path: 'stores/secrets'
     });
 
     return this;
@@ -97,6 +111,10 @@ class RPG extends Fabric.Service {
 
   static get Encounter () {
     return Encounter;
+  }
+
+  static get Tile () {
+    return Tile;
   }
 
   get identities () {
@@ -144,7 +162,11 @@ class RPG extends Fabric.Service {
     this.log('[RPG:TICK]', `#${state.id}`, data);
 
     // Save the game state to disk.
-    await this.save();
+    try {
+      await this.save();
+    } catch (E) {
+      console.error('Could not save:', E);
+    }
 
     // Looks like we're all done, so let's be courteous and notify subscribers.
     if (notify) {
@@ -156,53 +178,26 @@ class RPG extends Fabric.Service {
 
   async _POST (path, data) {
     console.log('posting:', path, data);
+
     let result = null;
 
     try {
       let id = await super._POST(path, data);
-      console.log('path (id?) from post:', id);
       result = id;
     } catch (E) {
       console.log('RPG COULD NOT CREATE:', E);
     }
 
     try {
-      let obj = await this._GET(result);
-      console.log('posted:', result, path, data);
+      result = await super._GET(result);
     } catch (E) {
       console.error('RPG COULD NOT POST:', path, data, E);
     }
 
-    // assign state
-    // this.state['players'][obj.id] = obj;
-
-    // commit
     this.commit();
 
     return result;
   }
-
-  /* async _registerActor (data) {
-    await super._registerActor(data);
-
-    let result = null;
-    let state = new Fabric.State(data);
-    let transform = [state.id, state.render()];
-
-    let actor = Object.assign({
-      id: `local/${state.id}`,
-      type: data.type || 'Actor',
-      sharing: transform
-    }, data);
-
-    try {
-      result = await this._POST(`/actors`, actor);
-    } catch (E) {
-      return this.error('Cannot register place:', E);
-    }
-
-    return result;
-  } */
 
   async _createIdentity () {
     let item = null;
@@ -218,21 +213,23 @@ class RPG extends Fabric.Service {
     };
 
     try {
-      item = await this._POST(`/identities`, struct);
-      console.log('create identity posted:', item);
-      result = await this._GET(item);
+      item = await this.secrets._POST(`/identities`, struct);
     } catch (E) {
       console.error('broken:', E);
     }
 
-    this.identities[struct.address] = struct;
-    this.identity = struct;
+    if (item) {
+      this.identities[struct.address] = struct;
+      this.identity = new Identity(struct);
+      this.menu._attachIdentity(struct);
+      result = {
+        address: struct.address,
+        public: struct.public
+      };
+    }
 
     // TODO: remove public key from character, use only address (or direct hash)
-    return {
-      address: struct.address,
-      public: struct.public
-    };
+    return result;
   }
 
   async _registerPlayer (data) {
@@ -258,6 +255,43 @@ class RPG extends Fabric.Service {
     } catch (E) {
       return console.error('Cannot register player:', E);
     }
+
+    return result;
+  }
+
+  async _announcePlayer (identity) {
+    let result = null;
+    let player = Object.assign({
+      address: identity.address,
+      name: identity.name
+    });
+
+    try {
+      let peer = await this._POST(`/peers`, { address: player.address });
+    } catch (E) {
+      console.log('Could not register peer:', E);
+    }
+
+    try {
+      let link = await this._POST(`/players`, player);
+      console.log('posted player:', link);
+      result = await this._GET(link);
+    } catch (E) {
+      console.log('Could not register player:', E);
+    }
+
+    // TODO: unify remote into flow (automate on all events)
+    let remote = await this.remote._POST('/peers', { address: player.address });
+    let instance = await this.remote._POST(`/players`, player);
+
+    // broadcast to network
+    this.emit('player', player);
+
+    // console.log('peer:', peer);
+    // console.log('link:', link);
+    console.log('player:', player);
+    console.log('result:', result);
+    // console.log('broadcast:', broadcast);
 
     return result;
   }
@@ -322,15 +356,15 @@ class RPG extends Fabric.Service {
   async save () {
     let result = null;
     let data = JSON.stringify(this.state);
-    let state = new Fabric.State(data);
+    let id = Fabric.sha256(data);
 
-    console.log('[RPG]', 'saving:', data);
+    console.log('saving:', id, data);
 
     try {
-      // let memory = await this._PUT('/memories', data);
-      // let doc = await this.store.set(`/memories/${state.id}`, state.render());
-      let doc = await this.store.set(`/tip`, state.render());
-      result = state.id;
+      await this.store.db.put(`states/${id}`, data);
+      await this.store.db.put(`tip`, id);
+
+      result = id;
     } catch (E) {
       this.error('cannot save:', E);
     }
@@ -341,19 +375,23 @@ class RPG extends Fabric.Service {
   async restore () {
     let blob = null;
     let data = null;
+    let id = null;
 
     try {
-      blob = await this._GET(`/tip`);
+      id = await this.store.db.get(`tip`);
     } catch (E) {
       console.error('Could not GET old state', E);
     }
 
-    console.log('[RPG]', 'attempting to restore:', blob);
-
     try {
+      blob = await this.store.db.get(`states/${id}`);
+      console.log('[RPG]', 'attempting to restore:', id, blob);
       let result = JSON.parse(blob);
       if (result) {
-        this['@entity'] = result;
+        this['@entity'] = {
+          '@type': 'State',
+          '@data': result
+        };
         this.state = result;
       }
     } catch (E) {

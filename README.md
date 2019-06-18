@@ -1,4 +1,4 @@
-# `@fabric/rpg`
+# `@rpg/core`
 simple Fabric-hosted RPG
 
 ## Quick Start
