@@ -8,7 +8,7 @@ const {
 } = require('../constants');
 
 const Battle = require('./battle');
-const Entity = require('./entity');
+const Entity = require('@fabric/core/types/entity');
 
 const random = function (items) {
   return items[Math.floor(Math.random() * items.length)];

@@ -2,7 +2,7 @@
 
 const Fabric = require('@fabric/core');
 const Avatar = require('@fabric/http/types/avatar');
-const Entity = require('./entity');
+const Entity = require('@fabric/core/types/entity');
 
 class Player extends Entity {
   /**
@@ -27,7 +27,10 @@ class Player extends Entity {
     });
 
     this.key = new Fabric.Key();
-    this.id = this.key.address;
+    // TODO: check semantics of `dedupe` and `key` parameters, refactor out uses
+    // of `this.id = x` where `x` is setting a value which should only be
+    // computed upon read (i.e., once, at runtime).
+    this.address = this.key.address;
 
     return this;
   }
