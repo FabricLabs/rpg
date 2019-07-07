@@ -13,15 +13,17 @@ const Fabric = require('@fabric/core');
 
 // Dependencies
 const BN = require('bn.js');
+// TODO: remove these for constants elsewhere
 const One = new BN('1');
 const Zero = new BN('0');
 
 // ### Internal Types
 // Here we've created a few internal classes to keep IdleRPG well-organized.
 const Avatar = require('@fabric/http/types/avatar');
+const Entity = require('@fabric/core/types/entity');
+const Identity = require('@fabric/http/types/identity');
+
 const Encounter = require('./encounter');
-// const Modulator = require('./modulator');
-const Entity = require('./entity');
 const Tile = require('./tile');
 const World = require('./world');
 const Player = require('./player');
@@ -49,7 +51,8 @@ class RPG extends Fabric.Service {
       globals: { tick: 0 },
       canvas: {
         height: 256,
-        width: 256
+        width: 256,
+        depth: 32
       },
       interval: TICK_INTERVAL
     }, configuration);
@@ -59,19 +62,30 @@ class RPG extends Fabric.Service {
     // We use human-friendly names and keep things as small as possible, so do
     // your part in keeping this well-maintained!
     this.state = {
-      identities: {}, // shared identities (public)
       channels: {}, // stores a list of channels.
       players: {}, // players are users... !
       services: {}, // services are networks
-      users: {}, // users are network clients,
-      tip: null
+      tiles: {},
+      users: {}, // users are network clients
+      messages: {} // messages always present!!!
+      // exchange stuff
+      /* chains: {},
+      blocks: {},
+      depositors: {},
+      orders: {},
+      transactions: {} */
     };
 
+    // temporary handles for debugging
     this['@avatar'] = new Avatar({ seed: this['@configuration']['entropy'] });
     this['@world'] = new World({ seed: this['@configuration']['entropy'] });
     this['@player'] = new Player();
+
+    // set the genesis
     this['@genesis'] = this['@configuration'].genesis || GENESIS_HASH;
     // this['@modulator'] = new Modulator();
+
+    // careful with this!
     this['@entity'] = {
       '@type': 'State',
       '@data': Object.assign({
@@ -85,6 +99,11 @@ class RPG extends Fabric.Service {
       globals: { tick: 0 }
     }, this['@configuration']);
 
+    // internal utilities
+    // #### Secret Values
+    // Data stored within a contract may be encrypted, such that only its owners
+    // may decipher its contents.  Homomorphic operations may still be computed
+    // over these values, but the DLP holding will preserve this property.
     this.timer = null;
     this.avatar = this['@avatar'];
     this.machine = new Fabric.Machine();
@@ -101,6 +120,19 @@ class RPG extends Fabric.Service {
     this.secrets = new Fabric.Store({
       path: 'stores/secrets'
     });
+
+    // remove mutable variables
+    Object.defineProperty(this, 'timer', { enumerable: false });
+    Object.defineProperty(this, 'avatar', { enumerable: false });
+    Object.defineProperty(this, 'machine', { enumerable: false });
+    Object.defineProperty(this, 'remote', { enumerable: false });
+    Object.defineProperty(this, 'secrets', { enumerable: false });
+
+    // remove various cruft
+    Object.defineProperty(this, '@configuration', { enumerable: false });
+    Object.defineProperty(this, '@avatar', { enumerable: false });
+    Object.defineProperty(this, '@player', { enumerable: false });
+    Object.defineProperty(this, '@world', { enumerable: false });
 
     return this;
   }
@@ -131,8 +163,8 @@ class RPG extends Fabric.Service {
     console.log('[RPG]', 'Beginning tick...', Date.now());
     console.log('[RPG]', 'STATE (@entity)', this['@entity']);
 
-    let origin = new Fabric.State(this['@entity']);
-    let observer = new Fabric.Observer(origin['@data']);
+    let origin = new Fabric.Entity(this['@entity']);
+    let observer = new Fabric.Observer(origin.data);
 
     // Our first and primary order of business is to update the clock.  Once
     // we've computed the game state for the next round, we can share it with
@@ -152,7 +184,7 @@ class RPG extends Fabric.Service {
 
     // Snapshot of our state...
     let data = Object.assign({}, this.state, this['@entity']);
-    let state = new Fabric.State(data);
+    let state = new Fabric.Entity(data);
     // let json = state.render();
 
     // Update global for sanity checks...
@@ -188,13 +220,15 @@ class RPG extends Fabric.Service {
       console.log('RPG COULD NOT CREATE:', E);
     }
 
+    console.log('[RPG:CORE]', 'super posted id:', result);
+
     try {
       result = await super._GET(result);
     } catch (E) {
       console.error('RPG COULD NOT POST:', path, data, E);
     }
 
-    this.commit();
+    await this.commit();
 
     return result;
   }
@@ -234,8 +268,8 @@ class RPG extends Fabric.Service {
 
   async _registerPlayer (data) {
     let result = null;
-    let state = new Fabric.State(data);
-    let transform = [state.id, state.render()];
+    let state = new Fabric.Entity(data);
+    let transform = [state.id, state.toJSON()];
     let prior = null;
 
     try {
@@ -298,7 +332,7 @@ class RPG extends Fabric.Service {
 
   async _registerPlace (data) {
     let result = null;
-    let state = new Fabric.State(data);
+    let state = new Fabric.Entity(data);
     let transform = [state.id, state.render()];
 
     console.log('registering place:', data);
@@ -349,16 +383,16 @@ class RPG extends Fabric.Service {
    * @return {Promise}             Resolves with result.
    */
   async compute (input = null) {
-    let object = new Fabric.State(input);
+    let object = new Fabric.Entity(input);
     return object.id;
   }
 
   async save () {
     let result = null;
-    let data = JSON.stringify(this.state);
+    let data = JSON.stringify(this['@entity']['@data']);
     let id = Fabric.sha256(data);
 
-    console.log('saving:', id, data);
+    console.log('[RPG:CORE]', `saving memory ${id} with ${Object.keys(this['@entity']['@data'])} keys in local state:`, this['@entity']['@data']);
 
     try {
       await this.store.db.put(`states/${id}`, data);
@@ -398,7 +432,7 @@ class RPG extends Fabric.Service {
       console.error('Could not load restore:', E);
     }
 
-    this.commit();
+    await this.commit();
 
     return data;
   }

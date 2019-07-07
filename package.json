@@ -6,10 +6,11 @@
   "scripts": {
     "agents": "node scripts/agents.js",
     "build:scripts": "webpack scripts/rpg.js",
+    "build:ui": "cd components/semantic && gulp build && cp dist/semantic.js ../../assets/scripts/semantic.js && cp dist/semantic.css ../../assets/styles/semantic.css && cd ../..",
     "build": "npm run compile",
     "compile": "node scripts/build.js && npm run build:scripts",
     "coverage": "nyc report --reporter html npm test",
-    "dev": "webpack-dev-server",
+    "dev": "webpack-dev-server assets",
     "docs": "npm run build && jsdoc -c jsdoc.json types README.md -d docs && ecstatic docs",
     "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
     "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
@@ -22,9 +23,10 @@
     "url": "git+https://github.com/FabricLabs/rpg.git"
   },
   "keywords": [
-    "rpg",
+    "bitcoin",
     "fabric",
-    "game"
+    "game",
+    "rpg"
   ],
   "author": "Fabric Labs",
   "contributors": [
@@ -45,7 +47,7 @@
     "dotparser": "^0.4.0",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
-    "level": "^5.0.1",
+    "fomantic-ui": "^2.7.6",
     "peer": "^0.2.10",
     "peerjs": "^0.3.18",
     "pixel-editor": "^0.2.0",
