@@ -13,7 +13,7 @@ module.exports = {
   target: 'web',
   output: {
     path: path.resolve(__dirname, 'assets/scripts'),
-    filename: 'index.min.js'
+    filename: 'rpg.min.js'
   },
   plugins: [
     new webpack.DefinePlugin({

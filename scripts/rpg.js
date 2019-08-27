@@ -15,11 +15,36 @@ const Service = require('@fabric/core/types/service');
 
 // Components
 // const BrowserContent = require('@fabric/http/components/browser-content');
-const FabricChannelList = require('@fabric/http/components/channel-list');
-const FabricChannelView = require('@fabric/http/components/channel-view');
-// const FabricPeerList = require('@fabric/http/components/peer-list');
+const CircuitList = require('@fabric/http/components/circuit-list');
+const CircuitView = require('@fabric/http/components/circuit-view');
+const Wallet = require('@fabric/http/components/wallet');
+const WalletCard = require('@fabric/http/components/wallet-card');
+const ChannelList = require('@fabric/http/components/channel-list');
+const ChannelView = require('@fabric/http/components/channel-view');
+const TransactionList = require('@fabric/http/components/transaction-list');
+const TransactionView = require('@fabric/http/components/transaction-view');
+
+// Candidates for Fabric and/or Maki
+// mostly from @portal/bridge and TO BE OPEN SOURCED
+const DepositList = require('@portal/bridge/components/deposit-list');
+const DepositView = require('@portal/bridge/components/deposit-view');
+const DepositorList = require('@portal/bridge/components/depositor-list');
+const DepositorView = require('@portal/bridge/components/depositor-view');
+const OrderList = require('@portal/bridge/components/order-list');
+const OrderView = require('@portal/bridge/components/order-view');
+const SwapList = require('@portal/bridge/components/swap-list');
+const SwapView = require('@portal/bridge/components/swap-view');
+
+// Secured Candidates
+const WalletList = require('@fabric/http/components/wallet-list');
+const WalletView = require('@fabric/http/components/wallet-view');
+const PeerList = require('@fabric/http/components/peer-list');
+const PeerView = require('@fabric/http/components/peer-view');
+
+// Web Components
 const Prompt = require('@fabric/http/components/prompt');
 const Modal = require('@fabric/http/components/modal');
+const Sidebar = require('@fabric/http/components/sidebar');
 const Introduction = require('../components/introduction');
 
 // const FrontPage = require('../components/introduction');
@@ -36,15 +61,18 @@ const MapList = require('../components/map-list');
 const MapView = require('../components/map-view');
 const TileList = require('../components/tile-list');
 const TileView = require('../components/tile-view');
-const PeerList = require('../components/peer-list');
-const PeerView = require('../components/peer-view');
 const PlaceList = require('../components/place-list');
 const PlaceView = require('../components/place-view');
 const PlayerList = require('../components/player-list');
 const PlayerView = require('../components/player-view');
+const TradeList = require('../components/trade-list');
+const TradeView = require('../components/trade-view');
 const WorldList = require('../components/world-list');
 const WorldView = require('../components/world-view');
 const WorldTable = require('../components/world-table');
+
+const ChainList = require('@portal/bridge/components/chain-list');
+const ChainView = require('@portal/bridge/components/chain-view');
 
 async function main () {
   // type definitions
@@ -71,9 +99,25 @@ async function main () {
   window.app._defineElement('rpg-introduction', Introduction);
   window.app._defineElement('maki-modal', Modal);
   window.app._defineElement('maki-prompt', Prompt);
-  window.app._defineElement('fabric-channel-list', FabricChannelList);
-  window.app._defineElement('fabric-channel-view', FabricChannelView);
-  // window.app._defineElement('fabric-peer-list', FabricPeerList);
+  window.app._defineElement('maki-sidebar', Sidebar);
+
+  // Fabric Components
+  window.app._defineElement('fabric-circuit-list', CircuitList);
+  window.app._defineElement('fabric-circuit-view', CircuitView);
+  window.app._defineElement('fabric-channel-list', ChannelList);
+  window.app._defineElement('fabric-channel-view', ChannelView);
+  window.app._defineElement('fabric-peer-list', PeerList);
+  window.app._defineElement('fabric-peer-view', PeerView);
+
+  // Candidates
+  window.app._defineElement('maki-transaction-list', TransactionList);
+  window.app._defineElement('maki-transaction-view', TransactionView);
+
+  // Fabric Wallet
+  window.app._defineElement('fabric-wallet', Wallet);
+  window.app._defineElement('fabric-wallet-list', WalletList);
+  window.app._defineElement('fabric-wallet-view', WalletView);
+  window.app._defineElement('fabric-wallet-card', WalletCard);
 
   // various subpages
   window.app._defineElement('rpg-asset-list', AssetList);
@@ -86,35 +130,31 @@ async function main () {
   window.app._defineElement('rpg-map-view', MapView);
   window.app._defineElement('rpg-tile-list', TileList);
   window.app._defineElement('rpg-tile-view', TileView);
-  window.app._defineElement('rpg-peer-list', PeerList);
-  window.app._defineElement('rpg-peer-view', PeerView);
   window.app._defineElement('rpg-place-list', PlaceList);
   window.app._defineElement('rpg-place-view', PlaceView);
   window.app._defineElement('rpg-player-list', PlayerList);
   window.app._defineElement('rpg-player-view', PlayerView);
+  window.app._defineElement('rpg-trade-list', TradeList);
+  window.app._defineElement('rpg-trade-view', TradeView);
   window.app._defineElement('rpg-world-list', WorldList);
   window.app._defineElement('rpg-world-view', WorldView);
   window.app._defineElement('rpg-world-table', WorldTable);
 
   // Exchange Demo
-  /*
-  window.app._defineElement('exchange-introduction', ExchangeIntroduction);
-  window.app._defineElement('exchange-menu', ExchangeMenu);
-  window.app._defineElement('portal-block-list', BlockList);
-  window.app._defineElement('portal-block-view', BlockView);
-  window.app._defineElement('portal-chain-list', ChainList);
-  window.app._defineElement('portal-chain-view', ChainView);
-  window.app._defineElement('portal-depositor-list', DepositorList);
-  window.app._defineElement('portal-depositor-view', DepositorView);
-  window.app._defineElement('portal-transaction-list', TransactionList);
-  window.app._defineElement('portal-transaction-view', TransactionView);
-  window.app._defineElement('portal-order-list', OrderList);
-  window.app._defineElement('portal-order-view', OrderView);
-  window.app._defineElement('fabric-wallet', Wallet);
-  window.app._defineElement('fabric-wallet-list', WalletList);
-  window.app._defineElement('fabric-wallet-view', WalletView);
-  window.app._defineElement('fabric-wallet-card', WalletCard);
-  */
+  // window.app._defineElement('exchange-introduction', ExchangeIntroduction);
+  // window.app._defineElement('exchange-menu', ExchangeMenu);
+  // window.app._defineElement('portal-block-list', BlockList);
+  // window.app._defineElement('portal-block-view', BlockView);
+  window.app._defineElement('exchange-chain-list', ChainList);
+  window.app._defineElement('exchange-chain-view', ChainView);
+  window.app._defineElement('exchange-deposit-list', DepositList);
+  window.app._defineElement('exchange-deposit-view', DepositView);
+  window.app._defineElement('exchange-depositor-list', DepositorList);
+  window.app._defineElement('exchange-depositor-view', DepositorView);
+  window.app._defineElement('exchange-order-list', OrderList);
+  window.app._defineElement('exchange-order-view', OrderView);
+  window.app._defineElement('exchange-swap-list', SwapList);
+  window.app._defineElement('exchange-swap-view', SwapView);
 
   // bind event listeners manually
   // TODO: write documentation using this example

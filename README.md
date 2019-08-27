@@ -31,6 +31,8 @@ yarn link @fabric/http
 #                                              ~ E
 ```
 
+Remember to run `yarn build:ui` at least once for local environments.
+
 ### API
 See output of `npm run docs` for an HTTP-serving URL with well-organized
 documentation.  All source code is included, so feel free to submit proposals
