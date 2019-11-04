@@ -99,7 +99,7 @@ async function main () {
   window.app._defineElement('rpg-introduction', Introduction);
   window.app._defineElement('maki-modal', Modal);
   window.app._defineElement('maki-prompt', Prompt);
-  window.app._defineElement('maki-sidebar', Sidebar);
+  // window.app._defineElement('maki-sidebar', Sidebar);
 
   // Fabric Components
   window.app._defineElement('fabric-circuit-list', CircuitList);

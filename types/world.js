@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../config');
-const Fabric = require('@fabric/core');
+const State = require('@fabric/core/types/state');
 
 const Map = require('./map');
 const Point = require('./point');
@@ -38,7 +38,7 @@ class World {
    * @return {Mixed} Unknown output.  Are you sure?
    */
   commit () {
-    let state = new Fabric.State({
+    let state = new State({
       entropy: 'none',
       map: this.map
     });

@@ -12,7 +12,6 @@ async function main () {
   });
 
   compiler.compileTo('assets/index.html');
-  compiler.compileTo('assets/spa.html');
 
   process.exit();
 }

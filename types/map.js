@@ -5,7 +5,7 @@ const {
   MAP_TILE_SIZE
 } = require('../constants.js');
 
-const Fabric = require('@fabric/core');
+const Key = require('@fabric/core/types/key');
 const Tile = require('./tile');
 
 class Map extends Tile {
@@ -35,7 +35,7 @@ class Map extends Tile {
     ));
 
     // TODO: replace with random from Fabric.Machine
-    this.key = new Fabric.Key();
+    this.key = new Key();
     console.log(`[MAP]`, 'fabric seed:', this.key.id);
     this.seed = this.key.id.toString('hex');
     console.log(`[MAP]`, 'local seed:', typeof this.seed, this.seed.length, this.seed);

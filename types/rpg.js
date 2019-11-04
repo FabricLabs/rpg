@@ -8,9 +8,6 @@ const {
   GENESIS_HASH
 } = require('../constants');
 
-// Fabric Core
-const Fabric = require('@fabric/core');
-
 // Dependencies
 const BN = require('bn.js');
 // TODO: remove these for constants elsewhere
@@ -21,6 +18,12 @@ const Zero = new BN('0');
 // Here we've created a few internal classes to keep IdleRPG well-organized.
 const Avatar = require('@fabric/http/types/avatar');
 const Entity = require('@fabric/core/types/entity');
+const Hash256 = require('@fabric/core/types/hash256');
+const Machine = require('@fabric/core/types/machine');
+const Observer = require('@fabric/core/types/observer');
+const Remote = require('@fabric/core/types/remote');
+const Store = require('@fabric/core/types/store');
+const Service = require('@fabric/core/types/service');
 const Identity = require('@fabric/http/types/identity');
 
 const Encounter = require('./encounter');
@@ -32,7 +35,7 @@ const Player = require('./player');
  * Primary RPG builder.
  * @property {State} state Holds state for the game.
  */
-class RPG extends Fabric.Service {
+class RPG extends Service {
   /**
    * Build an RPG with the {@link Fabric} tools.
    * @param  {Object} configuration Settings to configure the RPG with.
@@ -106,10 +109,10 @@ class RPG extends Fabric.Service {
     // over these values, but the DLP holding will preserve this property.
     this.timer = null;
     this.avatar = this['@avatar'];
-    this.machine = new Fabric.Machine();
+    this.machine = new Machine();
 
     // Set up remote Authority (RPG)
-    this.remote = new Fabric.Remote({
+    this.remote = new Remote({
       secure: this['@configuration'].secure,
       authority: this['@configuration'].authority,
       host: this['@configuration'].authority,
@@ -117,7 +120,7 @@ class RPG extends Fabric.Service {
     });
 
     // Store secrets separately
-    this.secrets = new Fabric.Store({
+    this.secrets = new Store({
       path: 'stores/secrets'
     });
 
@@ -163,8 +166,8 @@ class RPG extends Fabric.Service {
     console.log('[RPG]', 'Beginning tick...', Date.now());
     console.log('[RPG]', 'STATE (@entity)', this['@entity']);
 
-    let origin = new Fabric.Entity(this['@entity']);
-    let observer = new Fabric.Observer(origin.data);
+    let origin = new Entity(this['@entity']);
+    let observer = new Observer(origin.data);
 
     // Our first and primary order of business is to update the clock.  Once
     // we've computed the game state for the next round, we can share it with
@@ -184,7 +187,7 @@ class RPG extends Fabric.Service {
 
     // Snapshot of our state...
     let data = Object.assign({}, this.state, this['@entity']);
-    let state = new Fabric.Entity(data);
+    let state = new Entity(data);
     // let json = state.render();
 
     // Update global for sanity checks...
@@ -238,7 +241,7 @@ class RPG extends Fabric.Service {
     let result = null;
 
     // TODO: async generation
-    let key = new Fabric.Key();
+    let key = new Key();
     let struct = {
       name: prompt('What shall be your name?'),
       address: key.address,
@@ -268,7 +271,7 @@ class RPG extends Fabric.Service {
 
   async _registerPlayer (data) {
     let result = null;
-    let state = new Fabric.Entity(data);
+    let state = new Entity(data);
     let transform = [state.id, state.toJSON()];
     let prior = null;
 
@@ -332,7 +335,7 @@ class RPG extends Fabric.Service {
 
   async _registerPlace (data) {
     let result = null;
-    let state = new Fabric.Entity(data);
+    let state = new Entity(data);
     let transform = [state.id, state.render()];
 
     console.log('registering place:', data);
@@ -383,14 +386,14 @@ class RPG extends Fabric.Service {
    * @return {Promise}             Resolves with result.
    */
   async compute (input = null) {
-    let object = new Fabric.Entity(input);
+    let object = new Entity(input);
     return object.id;
   }
 
   async save () {
     let result = null;
     let data = JSON.stringify(this['@entity']['@data']);
-    let id = Fabric.sha256(data);
+    let id = Hash256.digest(data);
 
     console.log('[RPG:CORE]', `saving memory ${id} with ${Object.keys(this['@entity']['@data'])} keys in local state:`, this['@entity']['@data']);
 

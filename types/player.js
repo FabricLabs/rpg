@@ -1,8 +1,8 @@
 'use strict';
 
-const Fabric = require('@fabric/core');
 const Avatar = require('@fabric/http/types/avatar');
 const Entity = require('@fabric/core/types/entity');
+const Key = require('@fabric/core/types/key');
 
 class Player extends Entity {
   /**
@@ -26,7 +26,7 @@ class Player extends Entity {
       alpha: null
     });
 
-    this.key = new Fabric.Key();
+    this.key = new Key();
     // TODO: check semantics of `dedupe` and `key` parameters, refactor out uses
     // of `this.id = x` where `x` is setting a value which should only be
     // computed upon read (i.e., once, at runtime).
