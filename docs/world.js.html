@@ -23,6 +23,7 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
+const config = require('../config');
 const Fabric = require('@fabric/core');
 
 const Map = require('./map');
@@ -40,12 +41,18 @@ class World {
    * @return {World}               Instance of the World.
    */
   constructor (settings = {}) {
-    this.settings = Object.assign({}, settings);
-    this.map = new Map(settings);
+    this.settings = Object.assign({
+      seed: 1,
+      entropy: config.entropy
+    }, settings);
+
+    this.map = new Map(this.settings);
     this.agent = new Player();
     this.origin = new Point();
+
     this.status = null;
     this.timer = null;
+
     return this;
   }
 
@@ -101,7 +108,7 @@ module.exports = World;
 
 
     </div>
-    <nav><h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Map.html">Map</a></li><li><a href="Player.html">Player</a></li><li><a href="RPG.html">RPG</a></li><li><a href="Word.html">Word</a></li><li><a href="World.html">World</a></li></ul></nav>
+    <nav><h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Map.html">Map</a></li><li><a href="Player.html">Player</a></li><li><a href="RPG.html">RPG</a></li><li><a href="Sprite.html">Sprite</a></li><li><a href="Word.html">Word</a></li><li><a href="World.html">World</a></li></ul></nav>
     <br class="clear" />
     <footer>
         <a href="https://github.com/FabricLabs/rpg">git://</a> &middot; <a href="https://chat.roleplaygateway.com/#/room/#rpg:roleplaygateway.com">Community</a>
