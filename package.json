@@ -34,6 +34,7 @@
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
     "@fabric/core": "FabricLabs/fabric#pruning",
+    "phaser": "2.6.2",
     "ws": "^6.1.2"
   },
   "devDependencies": {
