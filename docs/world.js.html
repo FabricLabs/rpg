@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Source: world.js &middot; Docs</title>
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  </head>
+  <body>
+    <div id="main">
+      <h1 class="page-title">Source: world.js</h1>
+      
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+const config = require('../config');
+const Fabric = require('@fabric/core');
+
+const Map = require('./map');
+const Point = require('./point');
+const Player = require('./player');
+
+/**
+ * The {@link World} is our primary tool for interacting with game worlds.
+ * @property {Map} map Instance of the World's {@link Map}.
+ */
+class World {
+  /**
+   * Create a {@link World} instance.
+   * @param  {Object} [settings={}] Configuration object.
+   * @return {World}               Instance of the World.
+   */
+  constructor (settings = {}) {
+    this.settings = Object.assign({
+      seed: 1,
+      entropy: config.entropy
+    }, settings);
+
+    this.map = new Map(this.settings);
+    this.agent = new Player();
+    this.origin = new Point();
+
+    this.status = null;
+    this.timer = null;
+
+    return this;
+  }
+
+  /**
+   * Permanently commit to what you know about the {@link World}.
+   * @return {Mixed} Unknown output.  Are you sure?
+   */
+  commit () {
+    let state = new Fabric.State({
+      entropy: 'none',
+      map: this.map
+    });
+    return state.id;
+  }
+
+  async _resync () {
+    console.log('[WORLD]', 'resync:', Date.now());
+    clearTimeout(this.timer);
+  }
+
+  async spawn () {
+    this.status = 'spawning';
+    this.commit();
+    this.status = 'genesis';
+  }
+
+  async start () {
+    this.status = 'starting';
+    this.timer = setTimeout(this._resync.bind(this), 1000);
+
+    this.map.on('build', function (data) {
+      console.log('map is done building:', data);
+      let header = data[0];
+      let body = data[1];
+
+      console.log('header:', header);
+      console.log('version:', header.slice(0, 4));
+      console.log('magic:', header.slice(4, 12));
+      console.log('magic:', header.slice(4, 12).toString('hex'));
+      console.log('world:', body);
+    });
+
+    this.status = 'started';
+  }
+}
+
+module.exports = World;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    </div>
+    <nav><h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Map.html">Map</a></li><li><a href="Player.html">Player</a></li><li><a href="RPG.html">RPG</a></li><li><a href="Sprite.html">Sprite</a></li><li><a href="Word.html">Word</a></li><li><a href="World.html">World</a></li></ul></nav>
+    <br class="clear" />
+    <footer>
+        <a href="https://github.com/FabricLabs/rpg">git://</a> &middot; <a href="https://chat.roleplaygateway.com/#/room/#rpg:roleplaygateway.com">Community</a>
+    </footer>
+    <script> prettyPrint(); </script>
+    <script src="scripts/linenumber.js"></script>
+  </body>
+</html>

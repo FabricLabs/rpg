@@ -7,13 +7,17 @@ const Application = require('./application');
 async function main () {
   let rpg = window.application = new Application(config);
 
+  rpg.on('error', function (err) {
+    console.error(err);
+  });
+
   rpg.envelop('*[data-bind=fabric]');
   rpg.render();
 
   await rpg.start();
 
   // TODO: move to envelop()
-  document.querySelector('*[data-action=generate-identity]').addEventListener('click', rpg._createCharacter.bind(rpg));
+  document.querySelector('*[data-action=generate-identity]').addEventListener('click', rpg._createIdentity.bind(rpg));
   document.querySelector('*[data-action=toggle-fullscreen]').addEventListener('click', rpg._toggleFullscreen.bind(rpg));
   // document.querySelector('*[data-action=request-name]').addEventListener('click', rpg._requestName.bind(rpg));
 
@@ -32,8 +36,8 @@ async function UI () {
   let copycat_mode = false;
   let default_walk_speed = 5;
   let default_jump_speed = 25;
-  let map_size = 30;
-  let tile_size = 50;
+  let map_size = 32;
+  let worldSize = 64;
   let tile_index = {};
 
   //keyboard stuff
@@ -198,7 +202,6 @@ async function UI () {
   let gravity = .98;
   let bricks = [];
   let players = [];
-  let network_players = {};
   let missiles = [];
   let player = null;
   let background = null;
@@ -228,7 +231,7 @@ async function UI () {
     setTimeout(networkFrame, 1000/10);
   }
 
-  function logicFrame () {
+  async function logicFrame () {
     // update players position,
     // listen for collisions etc
     let player = players[0];
@@ -242,8 +245,8 @@ async function UI () {
       z: 1
     });
 
-    Object.keys(network_players).forEach(function (k) {
-      let p = network_players[k];
+    Object.keys(window.application.networkPlayers).forEach(function (k) {
+      let p = window.application.networkPlayers[k];
       //p.x += p.dx;
       //p.y += p.dy;
       runPhysics(p);
@@ -271,10 +274,32 @@ async function UI () {
       }
     }
 
+    // TODO: commit to game state (hash) 60x per second
+    // in practice, the below line updates (broadcasts) a new player position
+    // at the expected interval of 60/s
+    /* await window.application.stash._PATCH(`/players/${window.application.swarm.agent.id}`, {
+      id: window.application.swarm.agent.id,
+      position: {
+        x: player.x,
+        y: player.y,
+        z: player.z
+      }
+    }); */
+
+    let identity = window.application.swarm.agent.id;
+    if (identity && false) {
+      await window.application._applyChanges([
+        {
+          op: 'replace',
+          path: `/players/0/position`,
+          value: player.position
+        }
+      ]);
+    }
+
     // process the game logic at a target of 60fps
     setTimeout(logicFrame, 1000/60);
   }
-
 
   function loadMap () {
     //starting area
@@ -282,38 +307,38 @@ async function UI () {
     for(let i=0; i<30; i++){
         bricks.push(new Sprite(brick, 512, 512, 50, 50, i*50, 600));
     }*/
-    let grass = images.getImage('grass.jpg');
+    let grass = images.getImage('grass-32x32.png');
 
     for (let j = 0; j< map_size; j++) {
       for (let i = 0; i < map_size; i++) {
-        let tile = new Sprite(grass, 100, 100, 50, 50, i * 50, j * 50)
+        let tile = new Sprite(grass, 32, 32, 32, 32, i * 32, j * 32)
         tile.bg = true;
         bricks.push(tile);
       }
     }
 
-    let rocks = images.getImage('rocks.jpg');
+    let rocks = images.getImage('dark-earth-01.png');
 
     for (let j = 0; j< map_size; j++) {
-      bricks.push(new Sprite(rocks, 400, 400, tile_size, tile_size, j * tile_size, -tile_size));
-      bricks.push(new Sprite(rocks, 400, 400, tile_size, tile_size, j * tile_size, map_size * tile_size));
-      bricks.push(new Sprite(rocks, 400, 400, tile_size, tile_size, -tile_size, j * tile_size));
-      bricks.push(new Sprite(rocks, 400, 400, tile_size, tile_size, map_size * tile_size, j * tile_size));
+      bricks.push(new Sprite(rocks, 32, 32, 32, 32, j * worldSize, -worldSize));
+      bricks.push(new Sprite(rocks, 32, 32, 32, 32, j * worldSize, map_size * worldSize));
+      bricks.push(new Sprite(rocks, 32, 32, 32, 32, -worldSize, j * worldSize));
+      bricks.push(new Sprite(rocks, 32, 32, 32, 32, map_size * worldSize, j * worldSize));
     }
 
-    let wall = images.getImage('brick.png');
+    let wall = images.getImage('earth-01.png');
 
-    for (let i = 2; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 2 * 50)); }
-    for (let i = 2; i < 15; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, i * 50, 12 * 50)); }
-    for (let i = 2; i < 20; i++) { bricks.push(new Sprite(wall, 200, 200, 50, 50, 18 * 50, i * 50)); }
+    for (let i = 2; i < 20; i++) { bricks.push(new Sprite(wall, 32, 32, 32, 32, i * 50, 2 * 50)); }
+    for (let i = 2; i < 15; i++) { bricks.push(new Sprite(wall, 32, 32, 32, 32, i * 50, 12 * 50)); }
+    for (let i = 2; i < 20; i++) { bricks.push(new Sprite(wall, 32, 32, 32, 32, 18 * 50, i * 50)); }
   }
 
 
 
   function loadPlayers () {
-    let mario = images.getImage('mario.png');
+    let avatar = images.getImage('avatar-sheet.png');
 
-    player = new Sprite(mario, 480, 640, 48, 64, 380, 380);
+    player = new Sprite(avatar, 19, 26, 19, 26, 380, 380);
     player.dx = 0;
     player.dy = 0;
     player.walkspeed = default_walk_speed;
@@ -331,10 +356,10 @@ async function UI () {
       players.push(player2);
     }
 
-    let goomba = images.getImage('goomba.png');
+    let slime = images.getImage('slime-blue.png');
 
     for(let i = 0; i<7; i++) {
-      let player3 = new Sprite(goomba, 900, 900, 48, 64, i * 200, i * 200 + 100);
+      let player3 = new Sprite(slime, 32, 32, 64, 64, i * 200, i * 200 + 100);
 
       player3.dx = Math.floor( application.machine.generator.next.percent() * 3 + 2 );
       player3.dy = Math.floor( application.machine.generator.next.percent() * 3 + 2);
@@ -516,8 +541,8 @@ async function UI () {
   }
 
   function drawPlayers () {
-    Object.keys(network_players).forEach(function (k) {
-      let p = network_players[k];
+    Object.keys(window.application.networkPlayers).forEach(function (k) {
+      let p = window.application.networkPlayers[k];
       p.draw(p.x - camera.x, p.y - camera.y);
     });
 
@@ -558,7 +583,7 @@ async function UI () {
     ctx.fillText(player.hp + " HP", 40 + 10 * 20, 40);
   }
 
-  function drawFrame () {
+  async function drawFrame () {
     let canvas = document.querySelector('rpg-application canvas');
     let context = canvas.getContext('2d');
 
@@ -577,7 +602,7 @@ async function UI () {
   }
 
   drawFrame();
-  logicFrame();
+  await logicFrame();
   networkFrame();
 
   function dataCallback(data){
@@ -601,8 +626,6 @@ async function UI () {
       np.y = data.value.y;
     }
   }
-
-  rpg._onData(dataCallback)
 
   return this;
 }

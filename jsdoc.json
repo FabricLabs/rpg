@@ -1,0 +1,10 @@
+{
+  "name": "@fabric/rpg",
+  "chat": "https://chat.roleplaygateway.com/#/room/#rpg:roleplaygateway.com",
+  "source": "https://github.com/FabricLabs/rpg",
+  "templates": {
+    "default": {
+      "layoutFile": "assets/docs.tmpl"
+    }
+  }
+}
