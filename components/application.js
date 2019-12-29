@@ -1,20 +1,25 @@
 'use strict';
 
-const Fabric = require('@fabric/core');
+const App = require('@fabric/http/types/app');
+const Key = require('@fabric/core/types/key');
+const Remote = require('@fabric/core/types/remote');
+const State = require('@fabric/core/types/state');
+
+// Internal types
 const RPG = require('../types/rpg');
 const Map = require('../types/map');
 
 const Audio = require('./audio');
 const Authority = require('./authority');
-const Canvas = require('./canvas');
-const History = require('./history');
-const Swarm = require('./swarm');
+// const Canvas = require('./canvas');
+// const History = require('./history');
+// const Swarm = require('./swarm');
 
 /**
  * Primary Application Definition
  * @property {Object} rpg Instance of the RPG engine.
  */
-class Application extends Fabric.App {
+class Application extends App {
   /**
    * Create an instance of the RPG client.
    * @param  {Object} [configuration={}] Key/value map of configuration options.
@@ -39,7 +44,7 @@ class Application extends Fabric.App {
 
     this.rpg = new RPG(configuration);
     this.swarm = new Swarm();
-    this.remote = new Fabric.Remote({
+    this.remote = new Remote({
       host: this['@data'].authority,
       secure: (this['@data'].secure !== false)
     });
@@ -112,7 +117,7 @@ class Application extends Fabric.App {
     let result = null;
 
     // TODO: async generation
-    let key = new Fabric.Key();
+    let key = new Key();
     let struct = {
       name: prompt('What shall be your name?'),
       address: key.address,
@@ -154,7 +159,8 @@ class Application extends Fabric.App {
     return this;
   }
 
-  async _restoreIdentity () {
+  // Disabled in favor of HTTP.App
+  /* async _restoreIdentity () {
     let identities = null;
 
     try {
@@ -168,7 +174,7 @@ class Application extends Fabric.App {
     } else {
       return identities[0];
     }
-  }
+  } */
 
   async _handleMessage (msg) {
     if (!msg.data) return console.error(`Malformed message:`, msg);
@@ -314,9 +320,9 @@ class Application extends Fabric.App {
 
     // let drawn = canvas.draw();
     let content = canvas.render();
-    let state = new Fabric.State(content);
+    let state = new State(content);
     let rendered = `<rpg-application integrity="sha256:${state.id}">${canvas.render()}</rpg-application><rpg-debugger data-bind="${state.id}" />`;
-    let sample = new Fabric.State(rendered);
+    let sample = new State(rendered);
 
     if (this.element) {
       this.element.setAttribute('integrity', `sha256:${sample.id}`);
@@ -363,7 +369,7 @@ class Application extends Fabric.App {
       // this.authority.on('changes', this._handleChanges.bind(this));
       this.authority._connect();
     } catch (E) {
-      this.error('Could not establish connection to authority:', E);
+      console.error('Could not establish connection to authority:', E);
     }
 
     this.log('[APP]', 'Started!');

@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('../config');
+const config = require('../settings/default');
 
 const SPA = require('@fabric/http/types/spa');
 const Compiler = require('@fabric/http/types/compiler');

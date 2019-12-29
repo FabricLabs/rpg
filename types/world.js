@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('../config');
+const config = require('../settings/default');
 const State = require('@fabric/core/types/state');
 
 const Map = require('./map');

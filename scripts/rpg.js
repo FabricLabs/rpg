@@ -1,7 +1,12 @@
 'use strict';
 
-const { TICK_INTERVAL } = require('../constants');
-const config = require('../config');
+// ## CONSTANTS
+const {
+  TICK_INTERVAL
+} = require('../constants');
+
+// Local configuration
+const config = require('../settings/default');
 
 // Core RPG lib
 const Engine = require('../types/rpg');
@@ -26,14 +31,14 @@ const TransactionView = require('@fabric/http/components/transaction-view');
 
 // Candidates for Fabric and/or Maki
 // mostly from @portal/bridge and TO BE OPEN SOURCED
-const DepositList = require('@portal/bridge/components/deposit-list');
-const DepositView = require('@portal/bridge/components/deposit-view');
-const DepositorList = require('@portal/bridge/components/depositor-list');
-const DepositorView = require('@portal/bridge/components/depositor-view');
-const OrderList = require('@portal/bridge/components/order-list');
-const OrderView = require('@portal/bridge/components/order-view');
-const SwapList = require('@portal/bridge/components/swap-list');
-const SwapView = require('@portal/bridge/components/swap-view');
+// const DepositList = require('@portal/bridge/components/deposit-list');
+// const DepositView = require('@portal/bridge/components/deposit-view');
+// const DepositorList = require('@portal/bridge/components/depositor-list');
+// const DepositorView = require('@portal/bridge/components/depositor-view');
+// const OrderList = require('@portal/bridge/components/order-list');
+// const OrderView = require('@portal/bridge/components/order-view');
+// const SwapList = require('@portal/bridge/components/swap-list');
+// const SwapView = require('@portal/bridge/components/swap-view');
 
 // Secured Candidates
 const WalletList = require('@fabric/http/components/wallet-list');
@@ -71,8 +76,8 @@ const WorldList = require('../components/world-list');
 const WorldView = require('../components/world-view');
 const WorldTable = require('../components/world-table');
 
-const ChainList = require('@portal/bridge/components/chain-list');
-const ChainView = require('@portal/bridge/components/chain-view');
+// const ChainList = require('@portal/bridge/components/chain-list');
+// const ChainView = require('@portal/bridge/components/chain-view');
 
 async function main () {
   // type definitions

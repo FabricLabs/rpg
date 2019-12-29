@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('./config');
+const config = require('./settings/default');
 
 const RPG = require('./types/rpg');
 const Gateway = require('./services/rpg');
