@@ -14,7 +14,7 @@
     "docs": "npm run build && jsdoc -c jsdoc.json types README.md -d docs && ecstatic docs",
     "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
     "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
-    "start": "npm run compile && node rpg.js",
+    "start": "npm run compile && node scripts/node.js",
     "static": "npm run build && ecstatic assets",
     "test": "nyc mocha tests"
   },
@@ -41,7 +41,6 @@
   "dependencies": {
     "@fabric/core": "FabricLabs/fabric#pruning",
     "@fabric/http": "FabricLabs/web#fabric-0.1.0-develop",
-    "bcoin": "^1.0.2",
     "body-parser": "^1.18.3",
     "canvas": "^2.4.1",
     "dotparser": "^0.4.0",

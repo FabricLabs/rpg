@@ -1,9 +1,13 @@
 'use strict';
 
-const config = require('./settings/default');
+// Default configuration
+const config = require('../settings/default');
 
-const RPG = require('./types/rpg');
-const Gateway = require('./services/rpg');
+// Core elements
+const RPG = require('../types/rpg');
+const Gateway = require('../services/rpg');
+
+// Module to run the Server
 const Server = require('@fabric/http/types/server');
 
 async function main () {
@@ -19,7 +23,7 @@ async function main () {
   // events from the server (our trusted oracle) as well
   // as the local RPG instance.  Both will stay in sync!
   server.on('info', function (msg) {
-    console.log('server info:', msg);
+    console.log('[RPG:2.0]', 'Server emitted "info" event:', msg);
   });
 
   rpg.on('info', function (msg) {

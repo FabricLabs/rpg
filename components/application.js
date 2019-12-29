@@ -98,16 +98,23 @@ class Application extends App {
     let instance = await this.remote._POST(`/players`, player);
 
     // broadcast to network
-    let broadcast = await this.swarm._broadcast({
-      '@type': 'Player',
-      '@data': player
-    });
+    if (this.swarm) {
+      let broadcast = await this.swarm._broadcast({
+        '@type': 'Player',
+        '@data': player
+      });
+    }
 
     console.log('peer:', peer);
     console.log('link:', link);
     console.log('player:', player);
     console.log('result:', result);
-    console.log('broadcast:', broadcast);
+
+    // TODO: filter this to exclude historical peers
+    this.emit('player', {
+      '@type': 'Player',
+      '@data': result
+    });
 
     return result;
   }
@@ -362,7 +369,7 @@ class Application extends App {
 
     // lastly, connect to an authority
     try {
-      this.authority = new Authority(this['@data']);
+      this.authority = new Authority(this.settings);
       this.authority.on('connection:ready', this._handleAuthorityReady.bind(this));
       // TODO: enable message handler for production
       // this.authority.on('message', this._handleMessage.bind(this));

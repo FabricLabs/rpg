@@ -22,8 +22,8 @@ const Service = require('@fabric/core/types/service');
 // const BrowserContent = require('@fabric/http/components/browser-content');
 const CircuitList = require('@fabric/http/components/circuit-list');
 const CircuitView = require('@fabric/http/components/circuit-view');
-const Wallet = require('@fabric/http/components/wallet');
-const WalletCard = require('@fabric/http/components/wallet-card');
+// const Wallet = require('@fabric/http/components/wallet');
+// const WalletCard = require('@fabric/http/components/wallet-card');
 const ChannelList = require('@fabric/http/components/channel-list');
 const ChannelView = require('@fabric/http/components/channel-view');
 const TransactionList = require('@fabric/http/components/transaction-list');
@@ -41,8 +41,8 @@ const TransactionView = require('@fabric/http/components/transaction-view');
 // const SwapView = require('@portal/bridge/components/swap-view');
 
 // Secured Candidates
-const WalletList = require('@fabric/http/components/wallet-list');
-const WalletView = require('@fabric/http/components/wallet-view');
+// const WalletList = require('@fabric/http/components/wallet-list');
+// const WalletView = require('@fabric/http/components/wallet-view');
 const PeerList = require('@fabric/http/components/peer-list');
 const PeerView = require('@fabric/http/components/peer-view');
 
@@ -119,10 +119,10 @@ async function main () {
   window.app._defineElement('maki-transaction-view', TransactionView);
 
   // Fabric Wallet
-  window.app._defineElement('fabric-wallet', Wallet);
-  window.app._defineElement('fabric-wallet-list', WalletList);
-  window.app._defineElement('fabric-wallet-view', WalletView);
-  window.app._defineElement('fabric-wallet-card', WalletCard);
+  // window.app._defineElement('fabric-wallet', Wallet);
+  // window.app._defineElement('fabric-wallet-list', WalletList);
+  // window.app._defineElement('fabric-wallet-view', WalletView);
+  // window.app._defineElement('fabric-wallet-card', WalletCard);
 
   // various subpages
   window.app._defineElement('rpg-asset-list', AssetList);
@@ -150,16 +150,16 @@ async function main () {
   // window.app._defineElement('exchange-menu', ExchangeMenu);
   // window.app._defineElement('portal-block-list', BlockList);
   // window.app._defineElement('portal-block-view', BlockView);
-  window.app._defineElement('exchange-chain-list', ChainList);
-  window.app._defineElement('exchange-chain-view', ChainView);
-  window.app._defineElement('exchange-deposit-list', DepositList);
-  window.app._defineElement('exchange-deposit-view', DepositView);
-  window.app._defineElement('exchange-depositor-list', DepositorList);
-  window.app._defineElement('exchange-depositor-view', DepositorView);
-  window.app._defineElement('exchange-order-list', OrderList);
-  window.app._defineElement('exchange-order-view', OrderView);
-  window.app._defineElement('exchange-swap-list', SwapList);
-  window.app._defineElement('exchange-swap-view', SwapView);
+  // window.app._defineElement('exchange-chain-list', ChainList);
+  // window.app._defineElement('exchange-chain-view', ChainView);
+  // window.app._defineElement('exchange-deposit-list', DepositList);
+  // window.app._defineElement('exchange-deposit-view', DepositView);
+  // window.app._defineElement('exchange-depositor-list', DepositorList);
+  // window.app._defineElement('exchange-depositor-view', DepositorView);
+  // window.app._defineElement('exchange-order-list', OrderList);
+  // window.app._defineElement('exchange-order-view', OrderView);
+  // window.app._defineElement('exchange-swap-list', SwapList);
+  // window.app._defineElement('exchange-swap-view', SwapView);
 
   // bind event listeners manually
   // TODO: write documentation using this example
@@ -315,4 +315,6 @@ async function main () {
   console.log('[RPG:CORE]', 'ready!');
 }
 
-main();
+main().catch((E) => {
+  console.error('RPG threw Exception', E);
+});

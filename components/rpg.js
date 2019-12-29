@@ -3,7 +3,17 @@
 // Core application
 const App = require('./application');
 
+/**
+ * Core Class for RPG-style games.
+ * @property {Object} settings List of current settings.
+ */
 class RPG extends App {
+  /**
+   * Create an instance of the {@link RPG}.
+   * @param {Object} [settings] Configuration options:
+   * @param {String} [settings.name] Name of the {@link Game} as a human-friendly string.
+   * @param {String} [settings.handle] Name of the {@link Entity} in the DOM model.
+   */
   constructor (settings = {}) {
     super(settings);
 
@@ -16,7 +26,7 @@ class RPG extends App {
   }
 
   render () {
-    console.log('types:', this.types);
+    console.log('[RPG:APP]', 'Rendering...', 'types:', this.types);
 
     return `<rpg-app route="${this.route}">
   <fabric-grid>
