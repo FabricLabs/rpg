@@ -1,6 +1,7 @@
 'use strict';
 
-const App = require('@fabric/http/types/app');
+// const Fabric = require('@fabric/core');
+const SPA = require('@fabric/http/types/app');
 const Key = require('@fabric/core/types/key');
 const Remote = require('@fabric/core/types/remote');
 const State = require('@fabric/core/types/state');
@@ -11,7 +12,7 @@ const Map = require('../types/map');
 
 const Audio = require('./audio');
 const Authority = require('./authority');
-// const Canvas = require('./canvas');
+const Canvas = require('./canvas');
 // const History = require('./history');
 // const Swarm = require('./swarm');
 
@@ -19,7 +20,7 @@ const Authority = require('./authority');
  * Primary Application Definition
  * @property {Object} rpg Instance of the RPG engine.
  */
-class Application extends App {
+class Application extends SPA {
   /**
    * Create an instance of the RPG client.
    * @param  {Object} [configuration={}] Key/value map of configuration options.
@@ -76,11 +77,17 @@ class Application extends App {
     console.log('authority ready!  announcing player:', this.identity);
     await this._announcePlayer(this.identity);
 
-    let peers = await this.remote._GET('/peers');
+    try {
+      let peers = await this.remote._GET('/peers');
 
-    for (let i = 0; i < peers.length; i++) {
-      this.swarm.connect(peers[i].address);
+      for (let i = 0; i < peers.length; i++) {
+        this.swarm.connect(peers[i].address);
+      }
+    } catch (E) {
+      console.error('[RPG:APPLICATION]', 'Could not connect to peers:', peers);
     }
+
+    return this;
   }
 
   async _announcePlayer (identity) {

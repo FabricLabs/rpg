@@ -1,13 +1,15 @@
 'use strict';
 
 // Core application
-const App = require('./application');
+const Application = require('./application');
+
+// Game Engine
 
 /**
  * Core Class for RPG-style games.
  * @property {Object} settings List of current settings.
  */
-class RPG extends App {
+class RPG extends Application {
   /**
    * Create an instance of the {@link RPG}.
    * @param {Object} [settings] Configuration options:
@@ -25,21 +27,29 @@ class RPG extends App {
     return this;
   }
 
+  _getInnerHTML () {
+    console.log('[RPG:APP]', 'Getting innerHTML...', 'types:', this.types);
+    const html = `<rpg-app route="${this.route}">
+    <fabric-grid>
+      <fabric-grid-row id="details">
+        <h1>${this.settings.name}</h1>
+        <fabric-channel></fabric-channel>
+      </fabric-grid-row>
+      <fabric-grid-row id="types">${this.types.render()}</fabric-grid-row>
+      <fabric-grid-row id="circuit">${this.circuit.render()}</fabric-grid-row>
+      <fabric-grid-row id="graph"></fabric-grid-row>
+    </fabric-grid>
+    <script type="text/javascript" src="/scripts/index.min.js"></script>
+  </rpg-app>`;
+
+    console.trace('[RPG:APP]', 'Retrieved innerHTML...', html);
+    return html;
+  }
+
   render () {
     console.log('[RPG:APP]', 'Rendering...', 'types:', this.types);
-
-    return `<rpg-app route="${this.route}">
-  <fabric-grid>
-    <fabric-grid-row id="details">
-      <h1>${this.settings.name}</h1>
-      <fabric-channel></fabric-channel>
-    </fabric-grid-row>
-    <fabric-grid-row id="types">${this.types.render()}</fabric-grid-row>
-    <fabric-grid-row id="circuit">${this.circuit.render()}</fabric-grid-row>
-    <fabric-grid-row id="graph"></fabric-grid-row>
-  </fabric-grid>
-  <script type="text/javascript" src="/scripts/index.min.js"></script>
-</rpg-app>`;
+    let html = this._getInnerHTML();
+    return html;
   }
 }
 
