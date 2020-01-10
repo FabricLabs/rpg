@@ -14,5 +14,5 @@
   { "name": "Cyclops", "attack": 10, "speed": 1 },
   { "name": "Slime", "attack": 3, "speed": 1 },
   { "name": "Bird", "attack": 1, "speed": 9 },
-  { "name": "Crocodile", "attack": 4, "speed": 6 },
+  { "name": "Crocodile", "attack": 4, "speed": 6 }
 ]
