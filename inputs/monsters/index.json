@@ -27,5 +27,5 @@
   { "name": "Wraith", "attack": 4, "speed": 9 },
   { "name": "Scorpion", "attack": 4, "speed": 5 },
   { "name": "Python", "attack": 6, "speed": 3 },
-  { "name": "Yeti", "attack": 7, "speed": 5 },
+  { "name": "Yeti", "attack": 7, "speed": 5 }
 ]
