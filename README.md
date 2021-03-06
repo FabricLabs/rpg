@@ -1,4 +1,4 @@
-# `@fabric/rpg`
+# `@rpg/core`
 simple Fabric-hosted RPG
 
 ## Quick Start
@@ -30,6 +30,8 @@ yarn link @fabric/http
 # Good luck, have fun!
 #                                              ~ E
 ```
+
+Remember to run `yarn build:ui` at least once for local environments.
 
 ### API
 See output of `npm run docs` for an HTTP-serving URL with well-organized

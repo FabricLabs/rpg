@@ -9,7 +9,7 @@ const Agent = require('../types/agent');
 
 async function main () {
   let api = new Fabric.Remote({ host: 'api.roleplaygateway.com' });
-  let mobs = await api._GET('/mobs');
+  let mobs = await api._GET('/mobs') || [];
   let shuttles = await api._GET('/shuttles');
   let agents = [];
 

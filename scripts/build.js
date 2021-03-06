@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('../config');
+const config = require('../settings/default');
 
 const SPA = require('@fabric/http/types/spa');
 const Compiler = require('@fabric/http/types/compiler');
@@ -12,7 +12,6 @@ async function main () {
   });
 
   compiler.compileTo('assets/index.html');
-  compiler.compileTo('assets/spa.html');
 
   process.exit();
 }
