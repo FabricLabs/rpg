@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#pruning",
+    "@fabric/core": "FabricLabs/fabric#service-listings",
     "@fabric/http": "FabricLabs/web#fabric-0.1.0-develop",
     "body-parser": "^1.18.3",
     "canvas": "^2.4.1",
