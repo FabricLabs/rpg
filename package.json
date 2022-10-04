@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#service-listings",
+    "@fabric/core": "FabricLabs/fabric#feature/federation",
     "@fabric/http": "FabricLabs/web#fabric-0.1.0-develop",
     "body-parser": "^1.18.3",
     "canvas": "^2.4.1",
@@ -59,7 +59,7 @@
     "ecstatic": "^3.3.0",
     "jsdoc": "FabricLabs/jsdoc",
     "mocha": "^5.2.0",
-    "nyc": "^13.1.0",
+    "nyc": "^13.3.0",
     "source-map": "^0.7.3",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.3.2",

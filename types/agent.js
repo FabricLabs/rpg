@@ -5,12 +5,12 @@ const {
   TICK_INTERVAL
 } = require('../constants');
 
-const Fabric = require('@fabric/core');
+const Remote = require('@fabric/http/types/remote');
 
 class Agent {
   constructor (settings = {}) {
     this.settings = Object.assign({}, settings);
-    this.remote = new Fabric.Remote({ host: HTTP_HOST });
+    this.remote = new Remote({ host: HTTP_HOST });
     this.current = null;
     this.heartbeat = null;
     this.ticks = 0;
