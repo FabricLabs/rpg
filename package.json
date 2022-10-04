@@ -39,10 +39,9 @@
   },
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#feature/federation",
-    "@fabric/http": "FabricLabs/web#fabric-0.1.0-develop",
+    "@fabric/core": "FabricLabs/fabric#master",
+    "@fabric/http": "FabricLabs/fabric-http#master",
     "body-parser": "^1.18.3",
-    "canvas": "^2.4.1",
     "dotparser": "^0.4.0",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
