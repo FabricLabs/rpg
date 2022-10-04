@@ -5,7 +5,7 @@ const config = {
   persistent: false
 };
 
-const RPG = require('../lib/rpg');
+const RPG = require('../types/rpg');
 
 describe('@fabric/rpg', function () {
   describe('RPG', function () {

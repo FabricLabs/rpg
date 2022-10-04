@@ -1,3 +1,11 @@
 {
-  "@entropy": "162831ce0282d825bf25a8abb56611fe97a4be4936bed8d9371ff9754fc9f2eb"
+  "@entropy": "162831ce0282d825bf25a8abb56611fe97a4be4936bed8d9371ff9754fc9f2eb",
+  "spawns": [
+    { "name": "Genesis", "weight": 1 }
+  ],
+  "entities": [
+    { "type": "slime", "location": { "x": 30, "y": -12, "z": 1 } },
+    { "type": "slime", "location": { "x": 7, "y": 24, "z": 1 } },
+    { "type": "slime", "location": { "x": -17, "y": 10, "z": 1 } }
+  ]
 }

@@ -1,7 +1,21 @@
 body {
   background-color: black;
+  color: #ccc;
 }
 
 .right.floated {
   float: right;
+}
+
+header {
+  color:white;
+}
+
+header nav {
+  text-align: right;
+}
+
+canvas#canvas, rpg-canvas canvas {
+  width: 1024px;
+  height: 1024px;
 }
