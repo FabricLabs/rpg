@@ -16,15 +16,16 @@ const Zero = new BN('0');
 
 // ### Internal Types
 // Here we've created a few internal classes to keep IdleRPG well-organized.
-const Avatar = require('@fabric/http/types/avatar');
 const Entity = require('@fabric/core/types/entity');
 const Hash256 = require('@fabric/core/types/hash256');
 const Machine = require('@fabric/core/types/machine');
 const Observer = require('@fabric/core/types/observer');
-const Remote = require('@fabric/core/types/remote');
 const Store = require('@fabric/core/types/store');
 const Service = require('@fabric/core/types/service');
+
+const Avatar = require('@fabric/http/types/avatar');
 const Identity = require('@fabric/http/types/identity');
+const Remote = require('@fabric/http/types/remote');
 
 const Encounter = require('./encounter');
 const Tile = require('./tile');
