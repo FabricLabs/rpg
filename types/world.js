@@ -1,6 +1,7 @@
 'use strict';
 
-const Fabric = require('@fabric/core');
+const config = require('../settings/default');
+const State = require('@fabric/core/types/state');
 
 const Map = require('./map');
 const Point = require('./point');
@@ -17,12 +18,18 @@ class World {
    * @return {World}               Instance of the World.
    */
   constructor (settings = {}) {
-    this.settings = Object.assign({}, settings);
-    this.map = new Map(settings);
+    this.settings = Object.assign({
+      seed: 1,
+      entropy: config.entropy
+    }, settings);
+
+    this.map = new Map(this.settings);
     this.agent = new Player();
     this.origin = new Point();
+
     this.status = null;
     this.timer = null;
+
     return this;
   }
 
@@ -31,7 +38,7 @@ class World {
    * @return {Mixed} Unknown output.  Are you sure?
    */
   commit () {
-    let state = new Fabric.State({
+    let state = new State({
       entropy: 'none',
       map: this.map
     });

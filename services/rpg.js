@@ -4,9 +4,10 @@ const {
   BIG_LIST_LIMIT
 } = require('../constants');
 
-const Fabric = require('@fabric/core');
+const Service = require('@fabric/core/types/service');
+const HTTPServer = require('@fabric/http/types/server');
 
-class RPG extends Fabric.Service {
+class RPG extends Service {
   constructor (settings = {}) {
     super(settings);
     this.settings = Object.assign({}, settings);
