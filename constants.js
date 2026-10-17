@@ -2,7 +2,10 @@
 
 // prime constants
 const GENESIS_HASH = 'f8c3bf62a9aa3e6fc1619c250e48abe7519373d3edf41be62eb5dc45199af2ef';
-const HTTP_HOST = 'api.roleplaygateway.com';
+const FABRIC_HUB = 'hub.fabric.pub:7777';
+const FABRIC_PORT = 7777;
+// Optional legacy HTTP gateway. Fabric playnet traffic does not use this host.
+const HTTP_HOST = process.env.GATEWAY_HOST || '';
 const TICK_INTERVAL = 10 * 60 * 1000; // 10 minutes * 60 seconds * 1000 millis
 const FRAMES_PER_BLOCK = 60 * 60 * 10 * 1000;
 
@@ -24,6 +27,8 @@ const SPRITE_SIZE_IN_BYTES = Math.pow(256, 3) / 8; // 3x 256-bit dimensions
 
 module.exports = {
   GENESIS_HASH,
+  FABRIC_HUB,
+  FABRIC_PORT,
   BIG_LIST_LIMIT,
   FRAMES_PER_BLOCK,
   HEADER_LENGTH,

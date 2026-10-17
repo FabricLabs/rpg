@@ -1,8 +1,8 @@
 {
   "name": "@rpg/core",
   "synopsis": "a powerful engine for running peer-to-peer games",
-  "interval": "60000",
-  "authority": "chat.roleplaygateway.com:9999",
+  "interval": 600000,
+  "hub": "hub.fabric.pub:7777",
   "entropy": "6170cc426cbe663cef4342dc73860f2ab26c0c0e411c390ca064208bada65e6e",
   "provide": ["rpg"],
   "networking": false,
@@ -10,7 +10,7 @@
   "height": 256,
   "width": 256,
   "depth": 256,
-  "path": "./stores/chat.roleplaygateway.com",
+  "path": "./stores/rpg",
   "seed": "alpha beta kappa gamma delta omega",
   "components": {
     "index": "rpg-index"

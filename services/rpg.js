@@ -1,43 +1,55 @@
 'use strict';
 
-const {
-  BIG_LIST_LIMIT
-} = require('../constants');
-
 const Service = require('@fabric/core/types/service');
-const HTTPServer = require('@fabric/http/types/server');
 
-class RPG extends Service {
+/**
+ * Optional HTTP gateway. Fabric playnet membership is {@link RPG} in
+ * `types/rpg.js`; this client only runs when `gateway` is a host name.
+ */
+class Gateway extends Service {
   constructor (settings = {}) {
-    super(settings);
-    this.settings = Object.assign({}, settings);
-    this.remote = new Fabric.Remote({ host: 'api.roleplaygateway.com' });
+    super(Object.assign({
+      networking: false,
+      persistent: false
+    }, settings));
+
+    this.gateway = settings.gateway || settings.host || process.env.GATEWAY_HOST || null;
+    this.remote = null;
     return this;
   }
 
+  async start () {
+    if (!this.gateway) return this;
+
+    const Remote = require('@fabric/core/types/remote');
+    this.remote = new Remote({
+      host: this.gateway,
+      secure: this.settings.secure !== false
+    });
+
+    return super.start();
+  }
+
   async _broadcast (msg) {
+    if (!this.remote) return null;
     this._lastMessage = msg;
-    let result = await this.remote._POST('/messages', msg);
-    console.log(`[SERVICE:RPG]`, `_broadcast(message)`, 'result:', result);
-    return result;
+    return this.remote._POST('/messages', msg);
   }
 
   async _listPlaces (count = 100) {
+    if (!this.remote) return [];
     return this.remote._GET('/places', { limit: count });
   }
 
   async _listUsers (count = 100) {
+    if (!this.remote) return [];
     return this.remote._GET('/authors', { limit: count });
   }
 
   async _sync () {
-    let users = await this._listUsers(BIG_LIST_LIMIT);
-    if (users) {
-      for (let i = 0; i < users.length; i++) {
-        await this._registerActor(users[i]);
-      }
-    }
+    const users = await this._listUsers();
+    return users || [];
   }
 }
 
-module.exports = RPG;
+module.exports = Gateway;

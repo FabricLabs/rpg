@@ -1,0 +1,203 @@
+{
+  "sheep": [
+    { "item": "wool", "min": 1, "max": 3, "chance": 100 },
+    { "item": "raw-meat", "min": 1, "max": 2, "chance": 85 },
+    { "item": "hide", "min": 0, "max": 1, "chance": 40 },
+    { "item": "bone", "min": 0, "max": 2, "chance": 35 }
+  ],
+  "chicken": [
+    { "item": "feather", "min": 1, "max": 4, "chance": 100 },
+    { "item": "raw-meat", "min": 1, "max": 1, "chance": 80 },
+    { "item": "egg", "min": 0, "max": 2, "chance": 45 },
+    { "item": "bone", "min": 0, "max": 1, "chance": 25 }
+  ],
+  "deer": [
+    { "item": "hide", "min": 1, "max": 2, "chance": 95 },
+    { "item": "raw-meat", "min": 2, "max": 4, "chance": 100 },
+    { "item": "bone", "min": 1, "max": 3, "chance": 70 }
+  ],
+  "lizard": [
+    { "item": "hide", "min": 1, "max": 1, "chance": 80 },
+    { "item": "raw-meat", "min": 1, "max": 2, "chance": 75 },
+    { "item": "bone", "min": 0, "max": 2, "chance": 40 }
+  ],
+  "spider": [
+    { "item": "fang", "min": 1, "max": 2, "chance": 90 },
+    { "item": "venom-sac", "min": 1, "max": 1, "chance": 70 },
+    { "item": "raw-meat", "min": 0, "max": 1, "chance": 30 }
+  ],
+  "slime": [
+    { "item": "slime-gel", "min": 1, "max": 3, "chance": 100 },
+    { "item": "potion", "min": 0, "max": 1, "chance": 15 }
+  ],
+  "bird": [
+    { "item": "feather", "min": 1, "max": 3, "chance": 100 },
+    { "item": "raw-meat", "min": 0, "max": 1, "chance": 55 },
+    { "item": "bone", "min": 0, "max": 1, "chance": 30 }
+  ],
+  "bat": [
+    { "item": "fang", "min": 0, "max": 1, "chance": 50 },
+    { "item": "raw-meat", "min": 0, "max": 1, "chance": 40 }
+  ],
+  "pet": [
+    { "item": "hide", "min": 0, "max": 1, "chance": 50 },
+    { "item": "raw-meat", "min": 1, "max": 2, "chance": 70 },
+    { "item": "bone", "min": 1, "max": 2, "chance": 60 }
+  ],
+  "golem": [
+    { "item": "clay", "min": 2, "max": 5, "chance": 100 },
+    { "item": "stone", "min": 0, "max": 2, "chance": 40 },
+    { "item": "iron-ore", "min": 0, "max": 1, "chance": 12 }
+  ],
+  "guard": [
+    { "item": "food", "min": 0, "max": 2, "chance": 40 },
+    { "item": "potion", "min": 0, "max": 1, "chance": 20 }
+  ],
+  "farmer": [
+    { "item": "food", "min": 1, "max": 3, "chance": 90 },
+    { "item": "wood", "min": 0, "max": 2, "chance": 35 },
+    { "item": "egg", "min": 0, "max": 2, "chance": 25 }
+  ],
+  "shepherd": [
+    { "item": "wool", "min": 1, "max": 4, "chance": 90 },
+    { "item": "food", "min": 0, "max": 2, "chance": 50 }
+  ],
+  "baker": [
+    { "item": "food", "min": 2, "max": 4, "chance": 100 }
+  ],
+  "healer": [
+    { "item": "potion", "min": 1, "max": 3, "chance": 100 },
+    { "item": "food", "min": 0, "max": 2, "chance": 40 }
+  ],
+  "blacksmith": [
+    { "item": "iron-ore", "min": 1, "max": 3, "chance": 90 },
+    { "item": "stone", "min": 0, "max": 2, "chance": 40 },
+    { "item": "club", "min": 0, "max": 1, "chance": 15, "material": "iron", "qmin": 40, "qmax": 75 }
+  ],
+  "merchant": [
+    { "item": "food", "min": 1, "max": 2, "chance": 70 },
+    { "item": "potion", "min": 0, "max": 2, "chance": 35 },
+    { "item": "copper-ring", "min": 0, "max": 1, "chance": 12, "material": "copper", "qmin": 40, "qmax": 70 },
+    { "item": "wool", "min": 0, "max": 2, "chance": 30 }
+  ],
+  "villager": [
+    { "item": "food", "min": 0, "max": 2, "chance": 60 },
+    { "item": "potion", "min": 0, "max": 1, "chance": 10 }
+  ],
+  "beast": [
+    { "item": "hide", "min": 1, "max": 2, "chance": 90 },
+    { "item": "raw-meat", "min": 1, "max": 3, "chance": 90 },
+    { "item": "fang", "min": 0, "max": 2, "chance": 50 },
+    { "item": "bone", "min": 0, "max": 2, "chance": 40 }
+  ],
+  "serpent": [
+    { "item": "venom-sac", "min": 1, "max": 1, "chance": 75 },
+    { "item": "hide", "min": 0, "max": 1, "chance": 50 },
+    { "item": "fang", "min": 0, "max": 1, "chance": 30 }
+  ],
+  "scorpion": [
+    { "item": "venom-sac", "min": 1, "max": 1, "chance": 80 },
+    { "item": "fang", "min": 0, "max": 1, "chance": 40 }
+  ],
+  "undead": [
+    { "item": "bone", "min": 1, "max": 3, "chance": 100 },
+    { "item": "potion", "min": 0, "max": 1, "chance": 10 },
+    { "item": "copper-ring", "min": 0, "max": 1, "chance": 6, "qmin": 40, "qmax": 70 }
+  ],
+  "bandit": [
+    { "item": "food", "min": 0, "max": 2, "chance": 60 },
+    { "item": "potion", "min": 0, "max": 1, "chance": 25 },
+    { "item": "copper-ring", "min": 0, "max": 1, "chance": 8, "qmin": 40, "qmax": 70 },
+    { "item": "bone-necklace", "min": 0, "max": 1, "chance": 8, "qmin": 40, "qmax": 70 }
+  ],
+  "troll": [
+    { "item": "hide", "min": 1, "max": 2, "chance": 80 },
+    { "item": "bone", "min": 1, "max": 3, "chance": 70 },
+    { "item": "raw-meat", "min": 1, "max": 2, "chance": 50 },
+    { "item": "iron-ore", "min": 0, "max": 1, "chance": 20 }
+  ],
+  "goblin": [
+    { "item": "food", "min": 0, "max": 2, "chance": 50 },
+    { "item": "copper-ore", "min": 0, "max": 2, "chance": 35 },
+    { "item": "torch", "min": 0, "max": 1, "chance": 10 },
+    { "item": "copper-ring", "min": 0, "max": 1, "chance": 5, "qmin": 30, "qmax": 60 }
+  ],
+  "kobold": [
+    { "item": "coal", "min": 1, "max": 2, "chance": 70 },
+    { "item": "copper-ore", "min": 0, "max": 2, "chance": 40 },
+    { "item": "tin-ore", "min": 0, "max": 1, "chance": 25 },
+    { "item": "torch", "min": 0, "max": 1, "chance": 15 }
+  ],
+  "orc": [
+    { "item": "raw-meat", "min": 0, "max": 2, "chance": 50 },
+    { "item": "food", "min": 0, "max": 1, "chance": 40 },
+    { "item": "iron-ore", "min": 0, "max": 1, "chance": 25 },
+    { "item": "bone-necklace", "min": 0, "max": 1, "chance": 8, "qmin": 40, "qmax": 70 }
+  ],
+  "scaled": [
+    { "item": "scale", "min": 1, "max": 2, "chance": 85 },
+    { "item": "raw-meat", "min": 0, "max": 2, "chance": 50 },
+    { "item": "fang", "min": 0, "max": 1, "chance": 30 }
+  ],
+  "insect": [
+    { "item": "chitin", "min": 1, "max": 2, "chance": 85 },
+    { "item": "raw-meat", "min": 0, "max": 1, "chance": 40 },
+    { "item": "venom-sac", "min": 0, "max": 1, "chance": 20 }
+  ],
+  "silk": [
+    { "item": "silk", "min": 1, "max": 3, "chance": 90 },
+    { "item": "fang", "min": 0, "max": 1, "chance": 50 },
+    { "item": "venom-sac", "min": 0, "max": 1, "chance": 40 }
+  ],
+  "spirit": [
+    { "item": "ectoplasm", "min": 1, "max": 2, "chance": 100 },
+    { "item": "potion", "min": 0, "max": 1, "chance": 15 }
+  ],
+  "ember": [
+    { "item": "ember-core", "min": 0, "max": 1, "chance": 60 },
+    { "item": "coal", "min": 1, "max": 2, "chance": 70 },
+    { "item": "stone", "min": 0, "max": 1, "chance": 30 }
+  ],
+  "frost": [
+    { "item": "frost-shard", "min": 1, "max": 2, "chance": 90 },
+    { "item": "stone", "min": 0, "max": 1, "chance": 30 }
+  ],
+  "yeti": [
+    { "item": "hide", "min": 1, "max": 2, "chance": 90 },
+    { "item": "raw-meat", "min": 1, "max": 2, "chance": 60 },
+    { "item": "frost-shard", "min": 0, "max": 1, "chance": 35 },
+    { "item": "bone", "min": 0, "max": 2, "chance": 40 }
+  ],
+  "plant": [
+    { "item": "wood", "min": 1, "max": 3, "chance": 90 },
+    { "item": "heartwood", "min": 0, "max": 1, "chance": 45 },
+    { "item": "stick", "min": 0, "max": 2, "chance": 50 }
+  ],
+  "fey": [
+    { "item": "horn", "min": 0, "max": 1, "chance": 35 },
+    { "item": "hide", "min": 0, "max": 1, "chance": 40 },
+    { "item": "potion", "min": 0, "max": 1, "chance": 30 }
+  ],
+  "harpy": [
+    { "item": "feather", "min": 2, "max": 4, "chance": 100 },
+    { "item": "bone", "min": 0, "max": 1, "chance": 30 },
+    { "item": "copper-ring", "min": 0, "max": 1, "chance": 4, "qmin": 30, "qmax": 70 }
+  ],
+  "griffin": [
+    { "item": "feather", "min": 2, "max": 4, "chance": 100 },
+    { "item": "hide", "min": 0, "max": 1, "chance": 60 },
+    { "item": "fang", "min": 0, "max": 1, "chance": 50 },
+    { "item": "raw-meat", "min": 1, "max": 2, "chance": 60 }
+  ],
+  "gargoyle": [
+    { "item": "stone", "min": 1, "max": 3, "chance": 100 },
+    { "item": "iron-ore", "min": 0, "max": 1, "chance": 10 }
+  ],
+  "hoard": [
+    { "item": "potion", "min": 1, "max": 2, "chance": 100 },
+    { "item": "iron-ore", "min": 1, "max": 3, "chance": 80 },
+    { "item": "sword", "min": 0, "max": 1, "chance": 35, "qmin": 60, "qmax": 90, "affixChance": 0.4 },
+    { "item": "iron-armor", "min": 0, "max": 1, "chance": 25, "qmin": 60, "qmax": 90, "affixChance": 0.4 },
+    { "item": "copper-ring", "min": 0, "max": 1, "chance": 30, "qmin": 50, "qmax": 90, "affixChance": 0.4 }
+  ]
+}

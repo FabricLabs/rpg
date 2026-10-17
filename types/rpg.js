@@ -1,468 +1,279 @@
-// # `@rpg/core`
-// Peer-to-peer game engine, powered by Fabric.
 'use strict';
 
-// Constants
 const {
   TICK_INTERVAL,
-  GENESIS_HASH
+  GENESIS_HASH,
+  FABRIC_PORT
 } = require('../constants');
 
-// Dependencies
-const BN = require('bn.js');
-// TODO: remove these for constants elsewhere
-const One = new BN('1');
-const Zero = new BN('0');
-
-// ### Internal Types
-// Here we've created a few internal classes to keep IdleRPG well-organized.
-const Entity = require('@fabric/core/types/entity');
-const Hash256 = require('@fabric/core/types/hash256');
-const Machine = require('@fabric/core/types/machine');
-const Observer = require('@fabric/core/types/observer');
-const Store = require('@fabric/core/types/store');
+const Actor = require('@fabric/core/types/actor');
 const Service = require('@fabric/core/types/service');
+const WorldClock = require('./clock');
 
-const Avatar = require('@fabric/http/types/avatar');
-const Identity = require('@fabric/http/types/identity');
-const Remote = require('@fabric/http/types/remote');
+const {
+  FabricNetwork,
+  applicationResourceContract,
+  contractPublishMessage,
+  contractUpdateMessage,
+  decodeFabricMessage
+} = require('./network');
 
-const Encounter = require('./encounter');
-const Tile = require('./tile');
-const World = require('./world');
-const Player = require('./player');
+const DEFAULT_RESOURCES = {
+  Player: {
+    name: 'Player',
+    description: 'A participant in the game.',
+    routes: { list: '/players', view: '/players/:id' }
+  },
+  Place: {
+    name: 'Place',
+    description: 'A location in the game.',
+    routes: { list: '/places', view: '/places/:id' }
+  },
+  Peer: {
+    name: 'Peer',
+    description: 'A Fabric network peer.',
+    routes: { list: '/peers', view: '/peers/:id' }
+  }
+};
+
+function ensureRoutes (resources) {
+  const catalog = {};
+  if (!resources || typeof resources !== 'object') return catalog;
+
+  for (const name of Object.keys(resources)) {
+    const resource = resources[name];
+    if (!resource || typeof resource !== 'object') continue;
+
+    const copy = Object.assign({}, resource);
+    const slug = `${String(name).toLowerCase()}s`;
+    if (!copy.routes || !copy.routes.list) {
+      copy.routes = { list: `/${slug}`, view: `/${slug}/:id` };
+    }
+    copy.name = copy.name || name;
+    catalog[name] = copy;
+  }
+
+  return catalog;
+}
 
 /**
- * Primary RPG builder.
- * @property {State} state Holds state for the game.
+ * Fabric game service. Local state is the source of truth; the 0.1.0
+ * playnet receives signed `CONTRACT_PUBLISH` / `CONTRACT_MESSAGE` frames
+ * when `networking` is enabled.
  */
 class RPG extends Service {
-  /**
-   * Build an RPG with the {@link Fabric} tools.
-   * @param  {Object} configuration Settings to configure the RPG with.
-   * @return {RPG} Instance of the RPG.
-   */
-  constructor (configuration) {
-    super(configuration);
-
-    // Begin @internal typing
-    this['@type'] = 'RPG';
-    this['@configuration'] = Object.assign({
-      name: 'RPG',
+  constructor (configuration = {}) {
+    const requested = Object.assign({
+      name: '@fabric/rpg',
       path: './stores/rpg',
-      authority: 'api.roleplaygateway.com',
-      persistent: true,
-      globals: { tick: 0 },
-      canvas: {
-        height: 256,
-        width: 256,
-        depth: 32
-      },
-      interval: TICK_INTERVAL
+      genesis: GENESIS_HASH,
+      networking: false,
+      listen: false,
+      persistent: false,
+      peers: [],
+      port: FABRIC_PORT,
+      interval: TICK_INTERVAL,
+      autotick: true,
+      state: {
+        clock: 0,
+        status: 'PAUSED',
+        players: {},
+        places: {},
+        peers: {}
+      }
     }, configuration);
 
-    // ### Our Game State
-    // The Game State holds all information necessary to reconstruct your game.
-    // We use human-friendly names and keep things as small as possible, so do
-    // your part in keeping this well-maintained!
-    this.state = {
-      channels: {}, // stores a list of channels.
-      players: {}, // players are users... !
-      services: {}, // services are networks
-      tiles: {},
-      users: {}, // users are network clients
-      messages: {} // messages always present!!!
-      // exchange stuff
-      /* chains: {},
-      blocks: {},
-      depositors: {},
-      orders: {},
-      transactions: {} */
-    };
+    const catalog = ensureRoutes(Object.assign({}, DEFAULT_RESOURCES, requested.resources));
 
-    // temporary handles for debugging
-    this['@avatar'] = new Avatar({ seed: this['@configuration']['entropy'] });
-    this['@world'] = new World({ seed: this['@configuration']['entropy'] });
-    this['@player'] = new Player();
+    // Service.networking starts an internal swarm. The playnet peer lives on
+    // FabricNetwork so this process can publish frames without listening.
+    super(Object.assign({}, requested, {
+      networking: false,
+      resources: {}
+    }));
 
-    // set the genesis
-    this['@genesis'] = this['@configuration'].genesis || GENESIS_HASH;
-    // this['@modulator'] = new Modulator();
+    this['@type'] = 'RPG';
+    this['@genesis'] = requested.genesis || GENESIS_HASH;
+    this.catalog = catalog;
+    this._joinNetwork = !!requested.networking;
 
-    // careful with this!
-    this['@entity'] = {
-      '@type': 'State',
-      '@data': Object.assign({
-        clock: 0,
-        entropy: this['@configuration']['entropy']
-      }, this.state)
-    };
-
-    // old vestiges of times long since past
-    this['@data'] = Object.assign({
-      globals: { tick: 0 }
-    }, this['@configuration']);
-
-    // internal utilities
-    // #### Secret Values
-    // Data stored within a contract may be encrypted, such that only its owners
-    // may decipher its contents.  Homomorphic operations may still be computed
-    // over these values, but the DLP holding will preserve this property.
-    this.timer = null;
-    this.avatar = this['@avatar'];
-    this.machine = new Machine();
-
-    // Set up remote Authority (RPG)
-    this.remote = new Remote({
-      secure: this['@configuration'].secure,
-      authority: this['@configuration'].authority,
-      host: this['@configuration'].authority,
-      port: this['@configuration'].port
+    this.network = new FabricNetwork({
+      alias: requested.name,
+      listen: !!requested.listen,
+      networking: this._joinNetwork,
+      peers: requested.peers,
+      port: requested.port
+    });
+    this.network.attach((document) => {
+      this.ingestDocument(document);
     });
 
-    // Store secrets separately
-    this.secrets = new Store({
-      path: 'stores/secrets'
-    });
+    this._arc = applicationResourceContract({
+      name: requested.name,
+      description: requested.synopsis || requested.description || 'Fabric RPG'
+    }, this.catalog);
+    this.contract = {
+      id: this._arc.contract.id,
+      definition: this._arc.contract.definition
+    };
 
-    // remove mutable variables
-    Object.defineProperty(this, 'timer', { enumerable: false });
-    Object.defineProperty(this, 'avatar', { enumerable: false });
-    Object.defineProperty(this, 'machine', { enumerable: false });
-    Object.defineProperty(this, 'remote', { enumerable: false });
-    Object.defineProperty(this, 'secrets', { enumerable: false });
-
-    // remove various cruft
-    Object.defineProperty(this, '@configuration', { enumerable: false });
-    Object.defineProperty(this, '@avatar', { enumerable: false });
-    Object.defineProperty(this, '@player', { enumerable: false });
-    Object.defineProperty(this, '@world', { enumerable: false });
+    this._autotick = !!requested.autotick;
+    this.worldClock = new WorldClock({ interval: requested.interval });
+    this.worldClock.on('tick', () => this.beat());
 
     return this;
   }
 
-  static get Entity () {
-    return Entity;
-  }
-
-  static get Encounter () {
-    return Encounter;
-  }
-
-  static get Tile () {
-    return Tile;
-  }
-
-  get identities () {
-    // TODO: ensure all private data remains private (prove!)
-    return this.state.identities;
-  }
-
-  /**
-   * Increment the {@link Machine} by one clock cycle.
-   * @param  {Boolean} [notify=true] When `true` will emit {@link Meessage} events.
-   * @return {Promise}               Resolves with {@link State} `@id` (for recordkeeping).
-   */
-  async tick (notify = true) {
-    console.log('[RPG]', 'Beginning tick...', Date.now());
-    console.log('[RPG]', 'STATE (@entity)', this['@entity']);
-
-    let origin = new Entity(this['@entity']);
-    let observer = new Observer(origin.data);
-
-    // Our first and primary order of business is to update the clock.  Once
-    // we've computed the game state for the next round, we can share it with
-    // the world.
-    //
-    // Let's finish our work up front.
-    this['@entity'].clock = One.add(new BN(this['@entity'].clock)).toString();
-    this['@entity'].entropy = this.machine.sip();
-
-    console.log('[ENTROPY:CHECK]', 'clock:', this['@entity'].clock, 'entropy:', this['@entity'].entropy);
-
-    // let commit = this.commit();
-    // console.log('tick:', commit);
-    // let ticks = this.get(`/ticks`) || [];
-
-    // if (!ticks.length) ticks.push(origin.id);
-
-    // Snapshot of our state...
-    let data = Object.assign({}, this.state, this['@entity']);
-    let state = new Entity(data);
-    // let json = state.render();
-
-    // Update global for sanity checks...
-    this.parent = origin.id;
-    this.state = data;
-
-    this.log('[RPG:TICK]', `#${state.id}`, data);
-
-    // Save the game state to disk.
-    try {
-      await this.save();
-    } catch (E) {
-      console.error('Could not save:', E);
-    }
-
-    // Looks like we're all done, so let's be courteous and notify subscribers.
-    if (notify) {
-      this.emit('tick', state.id);
-    }
-
-    return this;
-  }
-
-  async _POST (path, data) {
-    console.log('posting:', path, data);
-
-    let result = null;
-
-    try {
-      let id = await super._POST(path, data);
-      result = id;
-    } catch (E) {
-      console.log('RPG COULD NOT CREATE:', E);
-    }
-
-    console.log('[RPG:CORE]', 'super posted id:', result);
-
-    try {
-      result = await super._GET(result);
-    } catch (E) {
-      console.error('RPG COULD NOT POST:', path, data, E);
-    }
-
-    await this.commit();
-
-    return result;
-  }
-
-  async _createIdentity () {
-    let item = null;
-    let result = null;
-
-    // TODO: async generation
-    let key = new Key();
-    let struct = {
-      name: prompt('What shall be your name?'),
-      address: key.address,
-      private: key.private.toString('hex'),
-      public: key.public
-    };
-
-    try {
-      item = await this.secrets._POST(`/identities`, struct);
-    } catch (E) {
-      console.error('broken:', E);
-    }
-
-    if (item) {
-      this.identities[struct.address] = struct;
-      this.identity = new Identity(struct);
-      this.menu._attachIdentity(struct);
-      result = {
-        address: struct.address,
-        public: struct.public
-      };
-    }
-
-    // TODO: remove public key from character, use only address (or direct hash)
-    return result;
-  }
-
-  async _registerPlayer (data) {
-    let result = null;
-    let state = new Entity(data);
-    let transform = [state.id, state.toJSON()];
-    let prior = null;
-
-    try {
-      prior = this.get(`/players/${state.id}`);
-    } catch (E) {
-      console.warn('[RPG]', 'No previous player (registering new):', E);
-    }
-
-    let profile = Object.assign({
-      type: 'Player',
-      sharing: transform
-    }, data, prior || {});
-
-    try {
-      await this.set(`/players/${state.id}`, profile);
-      result = this.get(`/players/${state.id}`);
-    } catch (E) {
-      return console.error('Cannot register player:', E);
-    }
-
-    return result;
-  }
-
-  async _announcePlayer (identity) {
-    let result = null;
-    let player = Object.assign({
-      address: identity.address,
-      name: identity.name
-    });
-
-    try {
-      let peer = await this._POST(`/peers`, { address: player.address });
-    } catch (E) {
-      console.log('Could not register peer:', E);
-    }
-
-    try {
-      let link = await this._POST(`/players`, player);
-      console.log('posted player:', link);
-      result = await this._GET(link);
-    } catch (E) {
-      console.log('Could not register player:', E);
-    }
-
-    // TODO: unify remote into flow (automate on all events)
-    let remote = await this.remote._POST('/peers', { address: player.address });
-    let instance = await this.remote._POST(`/players`, player);
-
-    // broadcast to network
-    this.emit('player', player);
-
-    // console.log('peer:', peer);
-    // console.log('link:', link);
-    console.log('player:', player);
-    console.log('result:', result);
-    // console.log('broadcast:', broadcast);
-
-    return result;
-  }
-
-  async _registerPlace (data) {
-    let result = null;
-    let state = new Entity(data);
-    let transform = [state.id, state.render()];
-
-    console.log('registering place:', data);
-
-    let place = Object.assign({
-      id: `local/${state.id}`,
-      type: 'Place',
-      sharing: transform
-    }, data);
-
-    try {
-      await this.set(`/places/${state.id}`, place);
-      result = this.get(`/places/${state.id}`);
-    } catch (E) {
-      return console.error('Cannot register place:', E);
-    }
-
-    return result;
-  }
-
-  async _syncFromGateway () {
-    let places = await this.remote._GET('/places');
-
-    console.log('got places:', places);
-    // TODO: make async
-    for (let i = 0; i <= places.length; i++) {
-      await this._registerPlace(places[i]);
-    }
-
-    return this;
-  }
-
-  async build () {
-    this['@world'].map._build();
-    this['@world'].map._dump();
-  }
-
-  async dump () {
-    let id = await this.save();
-    let dump = JSON.stringify(this.state);
-    console.log('memory dump:', dump);
-    return dump;
-  }
-
-  /**
-   * Compute the game state.
-   * @param  {Mixed}  [input=null] Player input, if any.
-   * @return {Promise}             Resolves with result.
-   */
-  async compute (input = null) {
-    let object = new Entity(input);
-    return object.id;
-  }
-
-  async save () {
-    let result = null;
-    let data = JSON.stringify(this['@entity']['@data']);
-    let id = Hash256.digest(data);
-
-    console.log('[RPG:CORE]', `saving memory ${id} with ${Object.keys(this['@entity']['@data'])} keys in local state:`, this['@entity']['@data']);
-
-    try {
-      await this.store.db.put(`states/${id}`, data);
-      await this.store.db.put(`tip`, id);
-
-      result = id;
-    } catch (E) {
-      this.error('cannot save:', E);
-    }
-
-    return result;
-  }
-
-  async restore () {
-    let blob = null;
-    let data = null;
-    let id = null;
-
-    try {
-      id = await this.store.db.get(`tip`);
-    } catch (E) {
-      console.error('Could not GET old state', E);
-    }
-
-    try {
-      blob = await this.store.db.get(`states/${id}`);
-      console.log('[RPG]', 'attempting to restore:', id, blob);
-      let result = JSON.parse(blob);
-      if (result) {
-        this['@entity'] = {
-          '@type': 'State',
-          '@data': result
-        };
-        this.state = result;
-      }
-    } catch (E) {
-      console.error('Could not load restore:', E);
-    }
-
-    await this.commit();
-
-    return data;
+  toApplicationResourceContract () {
+    return this._arc;
   }
 
   async start () {
     await super.start();
 
-    // TODO: clean up the clock
-    this.state.clock = Zero;
+    await this.network.start(this.key);
 
-    await this.restore();
-    // TODO: import latest from Gateway
-    // await this._syncFromGateway();
-    // await this['@world'].start();
+    const published = contractPublishMessage(this.contract.definition, this.key);
+    this._lastPublish = published;
+    if (this._joinNetwork) this.network.broadcast(published);
 
-    // TODO: document the process
-    this.timer = setInterval(this.tick.bind(this), this['@configuration'].interval);
+    this._state.content.status = 'STARTED';
+    this.commit();
+    return this;
+  }
 
+  /**
+   * Service's heartbeat is the world tick: `WorldClock` drives `beat()`.
+   * With `autotick: false` the host calls `beat()` (or `worldClock.advance()`).
+   */
+  async _startHeart () {
+    if (this._heart) clearInterval(this._heart);
+    this._heart = null;
+    if (this._autotick) this.worldClock.start();
     return this;
   }
 
   async stop () {
-    clearInterval(this.timer);
+    this.worldClock.stop();
+    await this.network.stop();
     await super.stop();
     return this;
+  }
+
+  beat () {
+    this._clock = (this._clock | 0) + 1;
+    this._state.content.clock = this._clock;
+    this.worldClock.clock = this._clock;
+
+    const commitment = this.commit();
+    const message = this.publishState();
+
+    this.emit('tick', commitment);
+    this.emit('beat', message);
+    return this;
+  }
+
+  /**
+   * Signed state digest small enough for one playnet frame.
+   * @returns {Message}
+   */
+  publishState () {
+    const players = this._state.content.players || {};
+    const places = this._state.content.places || {};
+    const message = contractUpdateMessage(this.contract.id, {
+      type: 'RPGState',
+      clock: this._state.content.clock || 0,
+      players: Object.keys(players).length,
+      places: Object.keys(places).length
+    }, this.key);
+
+    this._lastPublish = message;
+    if (this._joinNetwork) this.network.broadcast(message);
+    return message;
+  }
+
+  registerPlayer (data = {}) {
+    return this._register('/players', data);
+  }
+
+  registerPlace (data = {}) {
+    return this._register('/places', data);
+  }
+
+  registerPeer (data = {}) {
+    return this._register('/peers', data);
+  }
+
+  _register (path, data) {
+    const actor = new Actor(data || {});
+    const collection = path.slice(1);
+
+    if (!this._state.content[collection] || typeof this._state.content[collection] !== 'object' || Array.isArray(this._state.content[collection])) {
+      this._state.content[collection] = {};
+    }
+
+    const prior = this._state.content[collection][actor.id] || {};
+    this._state.content[collection][actor.id] = Object.assign({}, prior, data, { id: actor.id });
+    this.commit();
+
+    return `${path}/${actor.id}`;
+  }
+
+  async _POST (path, data) {
+    if (path === '/players') return this.registerPlayer(data);
+    if (path === '/places') return this.registerPlace(data);
+    if (path === '/peers') return this.registerPeer(data);
+    return super._POST(path, data);
+  }
+
+  ingestMessage (message) {
+    return this.ingestDocument(decodeFabricMessage(message));
+  }
+
+  /**
+   * Apply a decoded playnet document aimed at this contract.
+   * Players and places are stored locally. `WorldState` is recorded so other
+   * game nodes and this service can share one contract stream.
+   * @param {{ type: String, fields: Object }|null} document
+   * @returns {String|Object|null}
+   */
+  ingestDocument (document) {
+    if (!document || !document.fields) return null;
+
+    const fields = document.fields;
+    if (fields.contract && fields.contract !== this.contract.id) return null;
+
+    let payload = fields.payload != null ? fields.payload : fields;
+    if (typeof payload === 'string') {
+      try {
+        payload = JSON.parse(payload);
+      } catch (exception) {
+        this.emit('warning', `Rejected Fabric payload: ${exception.message}`);
+        return null;
+      }
+    }
+
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
+
+    if (payload.type === 'Player') return this.registerPlayer(payload);
+    if (payload.type === 'Place') return this.registerPlace(payload);
+
+    if (payload.type === 'WorldState') {
+      this._state.content.world = {
+        clock: payload.clock,
+        commitment: payload.commitment || null,
+        players: payload.players,
+        places: payload.places
+      };
+      this.commit();
+      this.emit('world', this._state.content.world);
+      return this._state.content.world;
+    }
+
+    return null;
   }
 }
 
 module.exports = RPG;
+module.exports.Network = FabricNetwork;
+module.exports.WorldClock = WorldClock;

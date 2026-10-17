@@ -1,14 +1,18 @@
 'use strict';
 
-// Fabric Core & HTTP (for the Legacy Web)
-const Fabric = require('@fabric/core');
-// const Server = require('@fabric/http/types/server');
+const Remote = require('@fabric/core/types/remote');
 
 // internal types
 const Agent = require('../types/agent');
 
 async function main () {
-  let api = new Fabric.Remote({ host: 'api.roleplaygateway.com' });
+  const host = process.env.GATEWAY_HOST;
+  if (!host) {
+    console.log('[RPG:AGENTS] Set GATEWAY_HOST to sync agents from an HTTP gateway. The playnet node is `npm start`.');
+    return;
+  }
+
+  let api = new Remote({ host });
   let mobs = await api._GET('/mobs') || [];
   let shuttles = await api._GET('/shuttles');
   let agents = [];

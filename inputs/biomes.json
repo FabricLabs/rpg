@@ -1,0 +1,47 @@
+{
+  "temperate_forest": {
+    "name": "Temperate Forest",
+    "climate": { "temperature": 0.50, "moisture": 0.55, "elevation": 0.30 },
+    "spawns": { "sheep": 2, "chicken": 2, "deer": 2, "rabbit": 1, "elephant": 0.5, "spider": 1, "stray": 1, "crow": 2, "sparrow": 1, "wolf": 1, "boar": 1.5, "bear": 0.5, "fox": 1, "owl": 1, "pig": 0.5, "goblin": 1.5, "owlbear": 0.5, "treant": 0.5, "unicorn": 0.3, "phase-spider": 0.3 }
+  },
+  "grassland": {
+    "name": "Grassland",
+    "climate": { "temperature": 0.55, "moisture": 0.32, "elevation": 0.35 },
+    "spawns": { "sheep": 3, "chicken": 2, "deer": 2, "rabbit": 1, "elephant": 0.5, "spider": 1, "stray": 1, "sparrow": 3, "boar": 1, "wolf": 0.5, "fox": 1, "vulture": 0.5, "cow": 1, "pig": 0.5, "goblin": 1, "gnoll": 1, "orc": 0.5, "ankheg": 1, "cockatrice": 0.5, "harpy": 0.5 }
+  },
+  "boreal": {
+    "name": "Boreal",
+    "climate": { "temperature": 0.22, "moisture": 0.48, "elevation": 0.42 },
+    "spawns": { "sheep": 2, "deer": 2, "rabbit": 1, "elephant": 0.5, "spider": 1, "stray": 1, "crow": 3, "wolf": 2, "bear": 1, "fox": 1, "owl": 1, "orc": 1, "ogre": 0.5, "dire-wolf": 1, "owlbear": 0.5, "treant": 0.5 }
+  },
+  "desert": {
+    "name": "Desert",
+    "climate": { "temperature": 0.78, "moisture": 0.12, "elevation": 0.28 },
+    "spawns": { "lizard": 2, "chicken": 1, "stray": 1, "bat": 1, "crow": 2, "viper": 2, "scorpion": 2, "vulture": 2, "gnoll": 1.5, "basilisk": 1, "ankheg": 1, "manticore": 0.5, "wyvern": 0.3 }
+  },
+  "wetland": {
+    "name": "Wetland",
+    "climate": { "temperature": 0.48, "moisture": 0.88, "elevation": 0.18 },
+    "spawns": { "chicken": 2, "bat": 1, "slime": 1, "spider": 1, "gull": 4, "crocodile": 1, "toad": 2, "viper": 1, "lizardfolk": 2, "will-o-wisp": 1, "shambling-mound": 1, "mire-serpent": 0.5, "cockatrice": 0.5, "ghoul": 0.5 }
+  },
+  "alpine": {
+    "name": "Alpine",
+    "climate": { "temperature": 0.28, "moisture": 0.40, "elevation": 0.88 },
+    "spawns": { "sheep": 2, "deer": 1, "spider": 1, "bat": 1, "crow": 2, "goat": 3, "yak": 1, "wolf": 1, "bear": 0.5, "harpy": 1.5, "griffin": 1, "gargoyle": 1, "kobold": 1, "ogre": 0.5, "yeti": 0.5, "wyvern": 0.5, "manticore": 0.3 }
+  },
+  "tropical": {
+    "name": "Tropical",
+    "climate": { "temperature": 0.88, "moisture": 0.78, "elevation": 0.22 },
+    "spawns": { "chicken": 2, "lizard": 2, "spider": 1, "sparrow": 4, "monkey": 3, "jaguar": 1, "viper": 2, "crocodile": 0.5, "lizardfolk": 1.5, "goblin": 1, "phase-spider": 1, "mire-serpent": 0.5 }
+  },
+  "volcanic": {
+    "name": "Volcanic",
+    "climate": { "temperature": 0.70, "moisture": 0.25, "elevation": 0.45 },
+    "spawns": { "lizard": 2, "spider": 1, "slime": 1, "stray": 1, "bat": 1, "crow": 2, "salamander": 2, "cinder-beetle": 2, "scorpion": 1, "kobold": 2, "fire-elemental": 1.5, "hellhound": 1, "wyvern": 0.5, "gargoyle": 0.5 }
+  },
+  "tundra": {
+    "name": "Tundra",
+    "climate": { "temperature": 0.08, "moisture": 0.24, "elevation": 0.22 },
+    "spawns": { "sheep": 1, "deer": 1, "crow": 1, "yak": 2, "fox": 2, "wolf": 1.5, "yeti": 1.5, "ice-elemental": 1, "dire-wolf": 1.5, "ogre": 0.5 }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "prefixes": {
+    "keen": { "name": "Keen", "kinds": ["weapon"], "weight": 4, "damage": 1.2, "price": 1.5 },
+    "vicious": { "name": "Vicious", "kinds": ["weapon"], "weight": 2, "damage": 1.35, "price": 2 },
+    "sturdy": { "name": "Sturdy", "kinds": ["armor"], "weight": 4, "armor": 1.25, "price": 1.5 },
+    "warded": { "name": "Warded", "kinds": ["armor"], "weight": 2, "armor": 1.4, "price": 2 },
+    "masterwork": { "name": "Masterwork", "weight": 2, "damage": 1.15, "armor": 1.15, "durability": 1.5, "price": 2 },
+    "mighty": { "name": "Mighty", "weight": 3, "attributes": { "strength": 2 }, "price": 1.5 },
+    "nimble": { "name": "Nimble", "weight": 3, "attributes": { "dexterity": 2 }, "price": 1.5 },
+    "blessed": { "name": "Blessed", "weight": 1, "attributes": { "wisdom": 2, "luck": 2 }, "price": 2.5 }
+  },
+  "suffixes": {
+    "bear": { "name": "of the Bear", "weight": 3, "attributes": { "strength": 3 }, "price": 1.5 },
+    "fox": { "name": "of the Fox", "weight": 3, "attributes": { "dexterity": 3 }, "price": 1.5 },
+    "owl": { "name": "of the Owl", "weight": 3, "attributes": { "wisdom": 3 }, "price": 1.5 },
+    "fortune": { "name": "of Fortune", "weight": 2, "attributes": { "luck": 3 }, "price": 2 },
+    "slaying": { "name": "of Slaying", "kinds": ["weapon"], "weight": 2, "damage": 1.25, "price": 2 },
+    "warding": { "name": "of Warding", "kinds": ["armor"], "weight": 2, "armor": 1.25, "price": 2 },
+    "ages": { "name": "of Ages", "weight": 2, "durability": 2, "price": 1.5 },
+    "ancients": { "name": "of the Ancients", "weight": 1, "attributes": { "strength": 1, "dexterity": 1, "constitution": 1, "intelligence": 1, "wisdom": 1, "charisma": 1, "luck": 1 }, "price": 3 }
+  }
+}

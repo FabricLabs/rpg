@@ -1,0 +1,19 @@
+{
+  "none": { "name": "None", "damage": 1.0, "armor": 1.0, "durability": 1.0 },
+  "wood": { "name": "Wood", "damage": 0.85, "armor": 1.0, "durability": 0.8 },
+  "stone": { "name": "Stone", "damage": 1.05, "armor": 1.0, "durability": 1.1 },
+  "leather": { "name": "Leather", "damage": 1.0, "armor": 0.9, "durability": 0.85 },
+  "bone": { "name": "Bone", "damage": 0.95, "armor": 0.75, "durability": 0.7 },
+  "copper": { "name": "Copper", "damage": 1.1, "armor": 1.05, "durability": 1.0 },
+  "iron": { "name": "Iron", "damage": 1.35, "armor": 1.4, "durability": 1.45 },
+  "wool": { "name": "Wool", "damage": 1.0, "armor": 0.55, "durability": 1.0 },
+  "hide": { "name": "Hide", "damage": 1.0, "armor": 0.85, "durability": 0.8 },
+  "slime": { "name": "Slime", "damage": 1.0, "armor": 1.0, "durability": 0.5 },
+  "venom": { "name": "Venom", "damage": 1.2, "armor": 1.0, "durability": 1.0 },
+  "feather": { "name": "Feather", "damage": 1.0, "armor": 1.0, "durability": 1.0 },
+  "clay": { "name": "Clay", "damage": 1.0, "armor": 0.7, "durability": 0.6 },
+  "scale": { "name": "Scale", "damage": 1.0, "armor": 1.2, "durability": 1.15 },
+  "horn": { "name": "Horn", "damage": 1.15, "armor": 0.9, "durability": 1.0 },
+  "silk": { "name": "Silk", "damage": 1.0, "armor": 0.6, "durability": 0.9 },
+  "essence": { "name": "Essence", "damage": 1.1, "armor": 1.0, "durability": 0.8 }
+}

@@ -1,0 +1,96 @@
+{
+  "wanderer": {
+    "main-hand": { "chance": 90, "items": [{ "item": "club", "weight": 4 }, { "item": "spear", "weight": 2 }, { "item": "staff", "weight": 2 }, { "item": "dagger", "weight": 1 }] },
+    "body": { "chance": 75, "items": [{ "item": "leather-armor" }] },
+    "leggings": { "chance": 30, "items": [{ "item": "leather-leggings" }] },
+    "helmet": { "chance": 15, "items": [{ "item": "leather-helmet" }] }
+  },
+  "construct": {
+    "main-hand": { "chance": 100, "items": [{ "item": "club", "weight": 3 }, { "item": "club", "material": "stone", "weight": 2 }] },
+    "body": { "chance": 70, "items": [{ "item": "leather-armor" }] }
+  },
+  "undead": {
+    "main-hand": { "chance": 90, "items": [{ "item": "club", "weight": 3 }, { "item": "spear", "weight": 2 }, { "item": "dagger", "weight": 1 }, { "item": "sword", "weight": 1 }] },
+    "body": { "chance": 25, "items": [{ "item": "leather-armor", "weight": 3 }, { "item": "iron-armor", "weight": 1 }] },
+    "helmet": { "chance": 25, "items": [{ "item": "leather-helmet", "weight": 2 }, { "item": "iron-helmet", "weight": 1 }] },
+    "leggings": { "chance": 15, "items": [{ "item": "leather-leggings" }] },
+    "ring": { "chance": 4, "items": [{ "item": "copper-ring" }] },
+    "necklace": { "chance": 4, "items": [{ "item": "bone-necklace" }] }
+  },
+  "bandit": {
+    "main-hand": { "chance": 100, "items": [{ "item": "dagger", "weight": 5 }, { "item": "club", "weight": 2 }, { "item": "spear", "weight": 2 }, { "item": "sword", "weight": 1 }] },
+    "body": { "chance": 85, "items": [{ "item": "leather-armor" }] },
+    "leggings": { "chance": 40, "items": [{ "item": "leather-leggings" }] },
+    "helmet": { "chance": 25, "items": [{ "item": "leather-helmet" }] },
+    "gauntlets": { "chance": 30, "items": [{ "item": "leather-gauntlets" }] },
+    "ring": { "chance": 6, "items": [{ "item": "copper-ring" }] },
+    "necklace": { "chance": 6, "items": [{ "item": "bone-necklace" }] }
+  },
+  "troll": {
+    "main-hand": { "chance": 75, "items": [{ "item": "club", "qmin": 20, "qmax": 60 }] },
+    "necklace": { "chance": 25, "items": [{ "item": "bone-necklace" }] }
+  },
+  "tyrant": {
+    "helmet": { "chance": 100, "items": [{ "item": "iron-helmet", "qmin": 60, "qmax": 90 }] },
+    "main-hand": { "chance": 100, "items": [{ "item": "sword", "qmin": 60, "qmax": 90 }] },
+    "body": { "chance": 50, "items": [{ "item": "iron-armor", "qmin": 60, "qmax": 90 }] },
+    "gauntlets": { "chance": 30, "items": [{ "item": "iron-gauntlets", "qmin": 60, "qmax": 90 }] },
+    "leggings": { "chance": 30, "items": [{ "item": "iron-leggings", "qmin": 60, "qmax": 90 }] },
+    "necklace": { "chance": 50, "items": [{ "item": "bone-necklace", "qmin": 60, "qmax": 90 }] },
+    "ring": { "chance": 50, "items": [{ "item": "copper-ring", "qmin": 60, "qmax": 90 }] }
+  },
+  "goblin": {
+    "main-hand": { "chance": 90, "items": [{ "item": "dagger", "weight": 4, "qmin": 20, "qmax": 60 }, { "item": "club", "weight": 2, "qmin": 20, "qmax": 60 }, { "item": "spear", "weight": 2, "qmin": 20, "qmax": 60 }] },
+    "body": { "chance": 40, "items": [{ "item": "leather-armor", "qmin": 20, "qmax": 60 }] },
+    "helmet": { "chance": 15, "items": [{ "item": "leather-helmet", "qmin": 20, "qmax": 60 }] },
+    "ring": { "chance": 3, "items": [{ "item": "copper-ring" }] }
+  },
+  "kobold": {
+    "main-hand": { "chance": 85, "items": [{ "item": "spear", "weight": 4 }, { "item": "dagger", "weight": 2 }] },
+    "helmet": { "chance": 30, "items": [{ "item": "leather-helmet" }] },
+    "gauntlets": { "chance": 15, "items": [{ "item": "leather-gauntlets" }] }
+  },
+  "orc": {
+    "main-hand": { "chance": 95, "items": [{ "item": "club", "weight": 3 }, { "item": "spear", "weight": 2 }, { "item": "sword", "weight": 2 }, { "item": "club", "material": "iron", "weight": 1 }] },
+    "body": { "chance": 60, "items": [{ "item": "leather-armor", "weight": 3 }, { "item": "iron-armor", "weight": 1 }] },
+    "helmet": { "chance": 35, "items": [{ "item": "leather-helmet", "weight": 2 }, { "item": "iron-helmet", "weight": 1 }] },
+    "leggings": { "chance": 25, "items": [{ "item": "leather-leggings" }] },
+    "necklace": { "chance": 10, "items": [{ "item": "bone-necklace" }] }
+  },
+  "gnoll": {
+    "main-hand": { "chance": 85, "items": [{ "item": "spear", "weight": 3 }, { "item": "club", "weight": 2 }] },
+    "body": { "chance": 40, "items": [{ "item": "leather-armor" }] },
+    "necklace": { "chance": 20, "items": [{ "item": "bone-necklace" }] }
+  },
+  "lizardfolk": {
+    "main-hand": { "chance": 90, "items": [{ "item": "spear", "weight": 5 }, { "item": "club", "weight": 2 }] },
+    "body": { "chance": 20, "items": [{ "item": "leather-armor" }] },
+    "necklace": { "chance": 15, "items": [{ "item": "bone-necklace" }] }
+  },
+  "ogre": {
+    "main-hand": { "chance": 100, "items": [{ "item": "club", "weight": 2, "qmin": 15, "qmax": 55 }, { "item": "club", "material": "stone", "weight": 1, "qmin": 15, "qmax": 55 }] },
+    "body": { "chance": 40, "items": [{ "item": "leather-armor", "qmin": 15, "qmax": 55 }] }
+  },
+  "minotaur": {
+    "main-hand": { "chance": 100, "items": [{ "item": "club", "material": "iron", "qmin": 60, "qmax": 90 }] },
+    "body": { "chance": 50, "items": [{ "item": "leather-armor", "qmin": 60, "qmax": 90 }] },
+    "gauntlets": { "chance": 30, "items": [{ "item": "iron-gauntlets", "qmin": 60, "qmax": 90 }] },
+    "necklace": { "chance": 40, "items": [{ "item": "bone-necklace", "qmin": 60, "qmax": 90 }] }
+  },
+  "lich": {
+    "main-hand": { "chance": 100, "items": [{ "item": "staff", "qmin": 60, "qmax": 90 }] },
+    "ring": { "chance": 100, "items": [{ "item": "copper-ring", "qmin": 60, "qmax": 90 }] },
+    "necklace": { "chance": 100, "items": [{ "item": "bone-necklace", "qmin": 60, "qmax": 90 }] },
+    "helmet": { "chance": 30, "items": [{ "item": "iron-helmet", "qmin": 60, "qmax": 90 }] }
+  },
+  "livestock": {
+    "collar": { "chance": 30, "items": [{ "item": "bell-collar" }] }
+  },
+  "pet": {
+    "collar": { "chance": 20, "items": [{ "item": "bell-collar" }] }
+  },
+  "war-hound": {
+    "collar": { "chance": 100, "items": [{ "item": "spiked-collar" }] },
+    "barding": { "chance": 50, "items": [{ "item": "leather-barding", "weight": 4 }, { "item": "iron-barding", "weight": 1 }] }
+  }
+}
