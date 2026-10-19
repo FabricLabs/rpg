@@ -61,7 +61,6 @@
   },
   "devDependencies": {
     "body-parser": "=1.18.3",
-    "canvas": "=2.11.2",
     "codecov": "=3.2.0",
     "dotparser": "=0.4.0",
     "ecstatic": "=3.3.0",
