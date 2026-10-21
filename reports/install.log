@@ -25,17 +25,16 @@ npm warn deprecated fsevents@1.2.13: Upgrade to fsevents v2 to mitigate potentia
 npm warn deprecated fsevents@1.2.13: Upgrade to fsevents v2 to mitigate potential security issues
 npm warn deprecated argv@0.0.2: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 npm warn deprecated uuid@3.4.0: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
-npm warn deprecated crypto-js@4.2.0: Active development of CryptoJS has been discontinued. This library is no longer maintained.
 npm warn deprecated ecstatic@3.3.0: This package is unmaintained and deprecated. See the GH Issue 259.
 npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 npm warn deprecated popper.js@1.16.1: You can find the new Popper v2 at @popperjs/core, this package is dedicated to the legacy v1
 
-added 1395 packages, and audited 1396 packages in 53s
+added 1319 packages, and audited 1320 packages in 1m
 
-140 packages are looking for funding
+136 packages are looking for funding
   run `npm fund` for details
 
-71 vulnerabilities (11 low, 16 moderate, 42 high, 2 critical)
+62 vulnerabilities (12 low, 16 moderate, 32 high, 2 critical)
 
 To address issues that do not require attention, run:
   npm audit fix
@@ -50,8 +49,8 @@ Run `npm audit` for details.
 npm warn install-scripts 8 packages had install scripts blocked because they are not covered by allowScripts:
 npm warn install-scripts   @fabric/core@0.1.0-RC1 (install: node scripts/install-native.js)
 npm warn install-scripts   webpack-cli@3.3.2 (postinstall: node ./bin/opencollective.js)
-npm warn install-scripts   zeromq@6.5.0 (install: node ./script/install.js)
-npm warn install-scripts   puppeteer@24.37.5 (postinstall: node install.mjs)
+npm warn install-scripts   zeromq@6.8.0 (install: node ./script/install.js)
+npm warn install-scripts   puppeteer@25.15.0 (postinstall: node install.mjs)
 npm warn install-scripts   classic-level@3.0.0 (install: node-gyp-build)
 npm warn install-scripts   fsevents@2.3.3 (install: node-gyp rebuild)
 npm warn install-scripts   fsevents@1.2.13 (install: node install.js)
