@@ -21,19 +21,20 @@
   },
   "scripts": {
     "agents": "node scripts/agents.js",
-    "build:scripts": "webpack scripts/rpg.js",
+    "build:scripts": "webpack",
     "build:ui": "cd components/semantic && gulp build && cp dist/semantic.js ../../assets/scripts/semantic.js && cp dist/semantic.css ../../assets/styles/semantic.css && cd ../..",
     "build": "npm run compile",
     "compile": "node scripts/build.js #&& npm run build:scripts",
-    "coverage": "nyc report --reporter html npm test",
-    "dev": "webpack-dev-server assets",
-    "docs": "npm run build && jsdoc -c jsdoc.json types README.md -d docs && ecstatic docs",
-    "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
+    "coverage": "c8 npm test",
+    "dev": "webpack serve --static assets",
+    "docs": "npm run build && jsdoc -c jsdoc.json types README.md -d docs && http-server docs -p 8000",
+    "make:coverage": "npm run coverage && c8 report --reporter html",
+    "report:coverage": "npm run make:coverage && c8 report --reporter=text-lcov > reports/coverage.lcov",
     "report:install": "rm -rf node_modules && mkdir -p reports && rm -f package-lock.json && echo \"$ npm i --allow-git=all\" > reports/install.log && npm i --allow-git=all >> reports/install.log 2>&1",
-    "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
+    "review:coverage": "npm run make:coverage && http-server reports/code-coverage -p 8000",
     "start": "npm run compile && node scripts/node.js",
-    "static": "npm run build && ecstatic assets",
-    "test": "nyc mocha tests"
+    "static": "npm run build && http-server assets -p 8000",
+    "test": "mocha tests"
   },
   "repository": {
     "type": "git",
@@ -60,26 +61,21 @@
     "@fabric/http": "FabricLabs/fabric-http#feature/fomantic"
   },
   "devDependencies": {
-    "body-parser": "=1.18.3",
-    "codecov": "=3.2.0",
-    "dotparser": "=0.4.0",
-    "ecstatic": "=3.3.0",
-    "express": "=4.16.4",
-    "express-session": "=1.15.6",
-    "fomantic-ui-css": "=2.8.3",
-    "jsdoc": "FabricLabs/jsdoc",
-    "mocha": "10.0.0",
-    "nyc": "^18.0.0",
-    "phaser": "=2.6.2",
+    "buffer": "=6.0.3",
+    "c8": "=12.0.0",
+    "http-server": "=14.1.1",
+    "jsdoc": "=4.0.5",
+    "mocha": "=12.0.3",
+    "path-browserify": "=1.0.1",
     "pixel-editor": "=0.2.0",
-    "semantic-ui-react": "=0.88.2",
-    "source-map": "=0.7.3",
-    "webpack": "=4.27.1",
-    "webpack-cli": "=3.3.2",
-    "webpack-dev-server": "=3.1.10",
-    "ws": "=6.1.2"
+    "process": "=0.11.10",
+    "querystring-es3": "=0.2.1",
+    "stream-browserify": "=3.0.0",
+    "webpack": "=5.112.2",
+    "webpack-cli": "=5.1.4",
+    "webpack-dev-server": "=6.1.0"
   },
-  "nyc": {
+  "c8": {
     "include": [
       "components/*.js",
       "functions/*.js",
