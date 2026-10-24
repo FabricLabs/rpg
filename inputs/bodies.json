@@ -1,0 +1,47 @@
+{
+  "humanoid": {
+    "name": "Humanoid",
+    "description": "Stands on two legs with two free hands: armor from head to toe, a ring, a necklace, and a weapon",
+    "slots": ["body", "leggings", "helmet", "gauntlets", "ring", "necklace", "main-hand"]
+  },
+  "quadruped": {
+    "name": "Quadruped",
+    "description": "Four legs and no hands: a collar and barding, never a weapon",
+    "slots": ["collar", "barding"]
+  },
+  "avian": {
+    "name": "Avian",
+    "description": "Wings and talons, too light to carry gear",
+    "slots": []
+  },
+  "serpentine": {
+    "name": "Serpentine",
+    "description": "A limbless coil that nothing stays on",
+    "slots": []
+  },
+  "arachnid": {
+    "name": "Arachnid",
+    "description": "Eight legs under a hard shell",
+    "slots": []
+  },
+  "insect": {
+    "name": "Insect",
+    "description": "Six legs under a hard shell",
+    "slots": []
+  },
+  "amorphous": {
+    "name": "Amorphous",
+    "description": "No fixed shape; whatever it touches sinks in",
+    "slots": []
+  },
+  "draconic": {
+    "name": "Draconic",
+    "description": "Scales, wings, and claws; it hoards gear rather than wearing it",
+    "slots": []
+  },
+  "plant": {
+    "name": "Plant",
+    "description": "Rooted bark, vine, and leaf; nothing to buckle on",
+    "slots": []
+  }
+}

@@ -1,16 +1,38 @@
 {
   "name": "@fabric/rpg",
-  "version": "0.1.0-dev",
-  "description": "RPG is a template for building role-playing games.",
+  "version": "0.1.0-RC1",
+  "description": "Fabric 0.1.0 playnet game service. Local RPG state, signed contract messages, optional HTTP gateway.",
+  "engines": {
+    "node": "24.15.0"
+  },
   "main": "types/rpg.js",
+  "exports": {
+    ".": "./types/rpg.js",
+    "./constants": "./constants.js",
+    "./constants.js": "./constants.js",
+    "./functions/*.js": "./functions/*.js",
+    "./functions/*": "./functions/*.js",
+    "./inputs/*": "./inputs/*",
+    "./services/*.js": "./services/*.js",
+    "./services/*": "./services/*.js",
+    "./types/*.js": "./types/*.js",
+    "./types/*": "./types/*.js",
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "build": "webpack",
+    "agents": "node scripts/agents.js",
+    "build:scripts": "webpack scripts/rpg.js",
+    "build:ui": "cd components/semantic && gulp build && cp dist/semantic.js ../../assets/scripts/semantic.js && cp dist/semantic.css ../../assets/styles/semantic.css && cd ../..",
+    "build": "npm run compile",
+    "compile": "node scripts/build.js #&& npm run build:scripts",
     "coverage": "nyc report --reporter html npm test",
-    "dev": "webpack-dev-server",
-    "docs": "jsdoc -c jsdoc.json types README.md -d docs && ecstatic docs",
+    "dev": "webpack-dev-server assets",
+    "docs": "npm run build && jsdoc -c jsdoc.json types README.md -d docs && ecstatic docs",
     "report:coverage": "nyc report --reporter=text-lcov > reports/coverage.lcov && codecov",
+    "report:install": "rm -rf node_modules && mkdir -p reports && rm -f package-lock.json && echo \"$ npm i --allow-git=all\" > reports/install.log && npm i --allow-git=all >> reports/install.log 2>&1",
     "review:coverage": "npm run coverage && ecstatic reports/code-coverage",
-    "start": "npm run build && node rpg.js",
+    "start": "npm run compile && node scripts/node.js",
+    "static": "npm run build && ecstatic assets",
     "test": "nyc mocha tests"
   },
   "repository": {
@@ -18,9 +40,10 @@
     "url": "git+https://github.com/FabricLabs/rpg.git"
   },
   "keywords": [
-    "rpg",
+    "bitcoin",
     "fabric",
-    "game"
+    "game",
+    "rpg"
   ],
   "author": "Fabric Labs",
   "contributors": [
@@ -33,31 +56,33 @@
   },
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#pruning",
-    "@fabric/http": "FabricLabs/web#fabric-0.1.0",
-    "body-parser": "^1.18.3",
-    "dotparser": "^0.4.0",
-    "express": "^4.16.4",
-    "express-session": "^1.15.6",
-    "level-browserify": "^2.0.0",
-    "peer": "^0.2.10",
-    "peerjs": "^0.3.18",
-    "ws": "^6.1.2"
+    "@fabric/core": "FabricLabs/fabric#feature/channels",
+    "@fabric/http": "FabricLabs/fabric-http#feature/channels"
   },
   "devDependencies": {
-    "codecov": "^3.2.0",
-    "ecstatic": "^3.3.0",
+    "body-parser": "=1.18.3",
+    "codecov": "=3.2.0",
+    "dotparser": "=0.4.0",
+    "ecstatic": "=3.3.0",
+    "express": "=4.16.4",
+    "express-session": "=1.15.6",
+    "fomantic-ui-css": "=2.8.3",
     "jsdoc": "FabricLabs/jsdoc",
-    "mocha": "^5.2.0",
-    "nyc": "^13.1.0",
-    "source-map": "^0.7.3",
-    "webpack": "^4.27.1",
-    "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.10"
+    "mocha": "10.0.0",
+    "nyc": "^18.0.0",
+    "phaser": "=2.6.2",
+    "pixel-editor": "=0.2.0",
+    "semantic-ui-react": "=0.88.2",
+    "source-map": "=0.7.3",
+    "webpack": "=4.27.1",
+    "webpack-cli": "=3.3.2",
+    "webpack-dev-server": "=3.1.10",
+    "ws": "=6.1.2"
   },
   "nyc": {
     "include": [
       "components/*.js",
+      "functions/*.js",
       "types/*.js"
     ],
     "exclude": [
