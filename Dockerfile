@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:26.12.1
 WORKDIR /rpg
 
 # if package.json changes. Docker deploys auto-update

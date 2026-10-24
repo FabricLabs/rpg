@@ -1,14 +1,8 @@
 $ npm i --allow-git=all
-npm warn ERESOLVE overriding peer dependency
-npm warn EBADENGINE Unsupported engine {
-npm warn EBADENGINE   package: '@fabric/rpg@0.1.0-RC1',
-npm warn EBADENGINE   required: { node: '24.15.0' },
-npm warn EBADENGINE   current: { node: 'v26.12.1', npm: '12.2.1' }
-npm warn EBADENGINE }
 npm warn deprecated path-dirname@1.0.2: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-npm warn deprecated source-map-url@0.4.1: See https://github.com/lydell/source-map-url#deprecated
 npm warn deprecated move-concurrently@1.0.1: This package is no longer supported.
+npm warn deprecated source-map-url@0.4.1: See https://github.com/lydell/source-map-url#deprecated
 npm warn deprecated figgy-pudding@3.5.2: This module is no longer supported.
 npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
 npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
@@ -33,12 +27,12 @@ npm warn deprecated uuid@3.4.0: uuid@10 and below is no longer supported.  For E
 npm warn deprecated ecstatic@3.3.0: This package is unmaintained and deprecated. See the GH Issue 259.
 npm warn deprecated popper.js@1.16.1: You can find the new Popper v2 at @popperjs/core, this package is dedicated to the legacy v1
 
-added 1286 packages, and audited 1287 packages in 50s
+added 1288 packages, and audited 1289 packages in 1m
 
-131 packages are looking for funding
+137 packages are looking for funding
   run `npm fund` for details
 
-58 vulnerabilities (12 low, 12 moderate, 32 high, 2 critical)
+57 vulnerabilities (11 low, 12 moderate, 32 high, 2 critical)
 
 To address issues that do not require attention, run:
   npm audit fix
