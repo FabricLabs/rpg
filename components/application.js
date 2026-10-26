@@ -1,18 +1,26 @@
 'use strict';
 
-const Fabric = require('@fabric/core');
+// const Fabric = require('@fabric/core');
+const SPA = require('@fabric/http/types/app');
+const Key = require('@fabric/core/types/key');
+const State = require('@fabric/core/types/state');
+
+const Remote = require('@fabric/http/types/remote');
+
+// Internal types
 const RPG = require('../types/rpg');
 const Map = require('../types/map');
 
-const Authority = require('./authority');
+const Audio = require('./audio');
 const Canvas = require('./canvas');
-const Swarm = require('./swarm');
+// const History = require('./history');
+// const Swarm = require('./swarm');
 
 /**
  * Primary Application Definition
  * @property {Object} rpg Instance of the RPG engine.
  */
-class Application extends Fabric.App {
+class Application extends SPA {
   /**
    * Create an instance of the RPG client.
    * @param  {Object} [configuration={}] Key/value map of configuration options.
@@ -28,19 +36,25 @@ class Application extends Fabric.App {
     this.networkPlayers = {};
 
     this['@data'] = Object.assign({
-      authority: 'localhost:9999',
+      hub: 'hub.fabric.pub:7777',
       canvas: {
         height: 768,
         width: 1024
       }
     }, configuration);
 
-    this.rpg = new RPG(configuration);
-    this.swarm = new Swarm();
-    this.remote = new Fabric.Remote({
-      host: this['@data'].authority,
-      secure: (this['@data'].secure !== false)
-    });
+    this.rpg = new RPG(Object.assign({
+      networking: false,
+      persistent: false
+    }, configuration));
+    this.swarm = null;
+    this.remote = null;
+    if (configuration.gateway || configuration.authority) {
+      this.remote = new Remote({
+        host: configuration.gateway || configuration.authority,
+        secure: (this['@data'].secure !== false)
+      });
+    }
 
     this.trust(this.rpg);
 
@@ -54,26 +68,29 @@ class Application extends Fabric.App {
    * @return {Promise}             Resolves once the message has been broadcast.
    */
   async _deliver (destination, message) {
-    console.log('[APPLICATION]', 'delivering:', destination, message);
-    if (!this.swarm.connections[destination]) console.error('Not connected to peer:', destination);
-    let delivery = await this.swarm.connections[destination].send({
-      '@type': 'UntypedDocument',
-      '@destination': destination,
-      '@data': message
-    });
-    this.log('message delivered:', delivery);
-    return delivery;
+    const { contractUpdateMessage } = require('../types/network');
+    const frame = contractUpdateMessage(this.rpg.contract.id, {
+      type: 'Delivery',
+      destination,
+      message
+    }, this.rpg.key);
+    this.rpg.network.broadcast(frame);
+    return frame.id;
   }
 
   async _handleAuthorityReady () {
     console.log('authority ready!  announcing player:', this.identity);
     await this._announcePlayer(this.identity);
 
-    let peers = await this.remote._GET('/peers');
+    if (!this.remote) return this;
 
-    for (let i = 0; i < peers.length; i++) {
-      this.swarm.connect(peers[i].address);
+    try {
+      await this.remote._GET('/peers');
+    } catch (E) {
+      console.error('[RPG:APPLICATION]', 'Could not read peers:', E);
     }
+
+    return this;
   }
 
   async _announcePlayer (identity) {
@@ -90,17 +107,23 @@ class Application extends Fabric.App {
     let remote = await this.remote._POST('/peers', { address: player.address });
     let instance = await this.remote._POST(`/players`, player);
 
-    // broadcast to network
-    let broadcast = await this.swarm._broadcast({
-      '@type': 'Player',
-      '@data': player
+    this.rpg.ingestDocument({
+      fields: {
+        contract: this.rpg.contract.id,
+        payload: Object.assign({ type: 'Player' }, player)
+      }
     });
 
     console.log('peer:', peer);
     console.log('link:', link);
     console.log('player:', player);
     console.log('result:', result);
-    console.log('broadcast:', broadcast);
+
+    // TODO: filter this to exclude historical peers
+    this.emit('player', {
+      '@type': 'Player',
+      '@data': result
+    });
 
     return result;
   }
@@ -110,7 +133,7 @@ class Application extends Fabric.App {
     let result = null;
 
     // TODO: async generation
-    let key = new Fabric.Key();
+    let key = new Key();
     let struct = {
       name: prompt('What shall be your name?'),
       address: key.address,
@@ -152,7 +175,8 @@ class Application extends Fabric.App {
     return this;
   }
 
-  async _restoreIdentity () {
+  // Disabled in favor of HTTP.App
+  /* async _restoreIdentity () {
     let identities = null;
 
     try {
@@ -166,7 +190,7 @@ class Application extends Fabric.App {
     } else {
       return identities[0];
     }
-  }
+  } */
 
   async _handleMessage (msg) {
     if (!msg.data) return console.error(`Malformed message:`, msg);
@@ -274,7 +298,9 @@ class Application extends Fabric.App {
     let connection = { address: id };
     let posted = await this.stash._POST(`/connections`, connection);
     console.log('posted:', posted);
-    console.log('connections:', this.swarm.connections);
+    console.log('connections:', this.rpg && this.rpg.network && this.rpg.network.peer
+      ? this.rpg.network.peer.connections
+      : {});
   }
 
   async _updatePosition (x, y, z) {
@@ -312,9 +338,9 @@ class Application extends Fabric.App {
 
     // let drawn = canvas.draw();
     let content = canvas.render();
-    let state = new Fabric.State(content);
+    let state = new State(content);
     let rendered = `<rpg-application integrity="sha256:${state.id}">${canvas.render()}</rpg-application><rpg-debugger data-bind="${state.id}" />`;
-    let sample = new Fabric.State(rendered);
+    let sample = new State(rendered);
 
     if (this.element) {
       this.element.setAttribute('integrity', `sha256:${sample.id}`);
@@ -330,42 +356,10 @@ class Application extends Fabric.App {
     this.log('[APP]', 'Starting...');
 
     await super.start();
-
-    try {
-      await this.rpg.start();
-    } catch (E) {
-      this.error('Could not start RPG:', E);
-      return null;
-    }
-
-    this.identity = await this._restoreIdentity();
-
-    console.log('[APP:DEBUG]', 'identity (in start):', this.identity);
-    console.log('[SWARM]', 'binding events...');
-
-    this.swarm.on('peer', this._onPeer.bind(this));
-    this.swarm.on('ready', this._onSwarmReady.bind(this));
-    this.swarm.on('message', this._onMessage.bind(this));
-    this.swarm.on('connection', this._onConnection.bind(this));
-    // this.swarm.connect('test');
-
-    await this.swarm.identify(this.identity.address);
-    await this.swarm.start();
-
-    // lastly, connect to an authority
-    try {
-      this.authority = new Authority(this['@data']);
-      this.authority.on('connection:ready', this._handleAuthorityReady.bind(this));
-      // TODO: enable message handler for production
-      // this.authority.on('message', this._handleMessage.bind(this));
-      // this.authority.on('changes', this._handleChanges.bind(this));
-      this.authority._connect();
-    } catch (E) {
-      this.error('Could not establish connection to authority:', E);
-    }
+    await this.rpg.start();
 
     this.log('[APP]', 'Started!');
-    this.log('[APP]', 'State:', this.authority);
+    this.log('[APP]', 'Contract:', this.rpg.contract.id);
 
     return this;
   }

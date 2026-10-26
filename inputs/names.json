@@ -1,0 +1,14 @@
+{
+  "sites": {
+    "prefixes": ["Ash", "Reed", "Thorn", "Oak", "Iron", "Mist", "Gold", "Wolf", "River", "Stone", "Hill", "Marsh", "Pine", "Amber", "Crow"],
+    "suffixes": ["ford", "haven", "dale", "wick", "stead", "bury", "moor", "gate", "fall", "holm"],
+    "ruins": ["Broken Spire", "Ashen Court", "Silent Keep", "Old Watch"],
+    "lairs": ["Deep Maw", "Webbed Hollow", "Scorched Den", "Bone Pit"],
+    "shrines": ["Waystone", "Soul Cairn", "Quiet Altar", "Dawn Shrine"]
+  },
+  "deities": ["Lumen", "Vesper", "Kael", "Mira", "Thornfather", "The Still Voice", "Ashmother", "Tide"],
+  "artifacts": {
+    "names": ["Relic", "Crown", "Blade", "Chalice", "Mask", "Tome"],
+    "themes": ["ember", "tide", "oath", "memory", "fang", "glass"]
+  }
+}

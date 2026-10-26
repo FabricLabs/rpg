@@ -1,0 +1,898 @@
+{
+  "sheep": {
+    "name": "Wild Sheep",
+    "description": "A wild sheep of the open country",
+    "type": "sheep",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["grazer"],
+    "attributes": { "strength": 3, "dexterity": 2, "intelligence": 4, "wisdom": 3, "constitution": 14, "charisma": 5, "luck": 5 },
+    "loot": "sheep"
+  },
+  "chicken": {
+    "name": "Wild Chicken",
+    "description": "A wild chicken scratching the soil",
+    "type": "chicken",
+    "body": "avian",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 1, "dexterity": 6, "intelligence": 4, "wisdom": 4, "constitution": 6, "charisma": 5, "luck": 5 },
+    "loot": "chicken"
+  },
+  "cow": {
+    "name": "Cow",
+    "description": "A heavy grazing cow",
+    "type": "cow",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["grazer"],
+    "attributes": { "strength": 9, "dexterity": 2, "intelligence": 4, "wisdom": 3, "constitution": 16, "charisma": 5, "luck": 5 },
+    "loot": "deer",
+    "equipment": "livestock",
+    "drops": [
+      { "item": "raw-meat", "count": 2 }
+    ]
+  },
+  "pig": {
+    "name": "Pig",
+    "description": "A rooting pig",
+    "type": "pig",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": [],
+    "attributes": { "strength": 4, "dexterity": 3, "intelligence": 4, "wisdom": 3, "constitution": 12, "charisma": 5, "luck": 5 },
+    "loot": "sheep",
+    "equipment": "livestock",
+    "drops": [
+      { "item": "raw-meat", "count": 1 }
+    ]
+  },
+  "rabbit": {
+    "name": "Wild Rabbit",
+    "description": "A wild rabbit of the meadows",
+    "type": "deer",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 1, "dexterity": 9, "intelligence": 4, "wisdom": 8, "constitution": 6, "charisma": 5, "luck": 5 },
+    "loot": "deer"
+  },
+  "deer": {
+    "name": "Wild Deer",
+    "description": "A wild deer of the wooded country",
+    "type": "deer",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["timid", "grazer"],
+    "attributes": { "strength": 4, "dexterity": 7, "intelligence": 4, "wisdom": 8, "constitution": 11, "charisma": 5, "luck": 5 },
+    "loot": "deer"
+  },
+  "elephant": {
+    "name": "Wild Elephant",
+    "description": "A great wild elephant of the open plains",
+    "type": "deer",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["grazer", "territorial"],
+    "attributes": { "strength": 15, "dexterity": 2, "intelligence": 4, "wisdom": 8, "constitution": 22, "charisma": 5, "luck": 5 },
+    "loot": "deer",
+    "drops": [
+      { "item": "hide", "count": 2 },
+      { "item": "raw-meat", "count": 3 },
+      { "item": "bone", "count": 2 }
+    ]
+  },
+  "lizard": {
+    "name": "Wild Lizard",
+    "description": "A wild monitor lizard",
+    "type": "lizard",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["solitary"],
+    "attributes": { "strength": 5, "dexterity": 5, "intelligence": 4, "wisdom": 5, "constitution": 10, "charisma": 5, "luck": 5 },
+    "loot": "lizard"
+  },
+  "spider": {
+    "name": "Wild Spider",
+    "description": "A wild hunting spider",
+    "type": "spider",
+    "body": "arachnid",
+    "hostile": true,
+    "flags": ["predator"],
+    "attributes": { "strength": 6, "dexterity": 9, "intelligence": 4, "wisdom": 4, "constitution": 8, "charisma": 5, "luck": 5 },
+    "loot": "spider"
+  },
+  "slime": {
+    "name": "Wild Slime",
+    "description": "A wild slime oozing across the ground",
+    "type": "slime",
+    "body": "amorphous",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 4, "dexterity": 1, "intelligence": 4, "wisdom": 2, "constitution": 16, "charisma": 5, "luck": 5 },
+    "loot": "slime"
+  },
+  "bat": {
+    "name": "Wild Bat",
+    "description": "A wild bat of shadowed ledges",
+    "type": "bat",
+    "body": "avian",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 1, "dexterity": 7, "intelligence": 4, "wisdom": 5, "constitution": 12, "charisma": 5, "luck": 5 },
+    "loot": "bat"
+  },
+  "stray": {
+    "name": "Wild Stray",
+    "description": "A restless creature of the open wilds",
+    "type": "wanderer",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 8, "dexterity": 4, "intelligence": 4, "wisdom": 4, "constitution": 10, "charisma": 5, "luck": 5 },
+    "loot": "golem",
+    "equipment": "wanderer",
+    "variants": [
+      { "name": "Wild Stray", "description": "A restless creature of the open wilds" },
+      { "name": "Wild Stalker", "description": "A lean figure pacing the grassland" },
+      { "name": "Wild Rover", "description": "A wandering beast with no home" },
+      { "name": "Wild Drifter", "description": "A drifting presence on the plains" },
+      { "name": "Wild Nomad", "description": "A nomad of the wilderness" }
+    ]
+  },
+  "sparrow": {
+    "name": "Wild Sparrow",
+    "description": "A fidgety brown bird",
+    "type": "bird",
+    "body": "avian",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 1, "dexterity": 6, "intelligence": 4, "wisdom": 5, "constitution": 6, "charisma": 5, "luck": 5 },
+    "loot": "bird"
+  },
+  "crow": {
+    "name": "Wild Crow",
+    "description": "A watchful black bird",
+    "type": "bird",
+    "body": "avian",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 3, "dexterity": 7, "intelligence": 4, "wisdom": 6, "constitution": 8, "charisma": 5, "luck": 5 },
+    "loot": "bird"
+  },
+  "gull": {
+    "name": "Wild Gull",
+    "description": "A long-winged white bird",
+    "type": "bird",
+    "body": "avian",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 5, "dexterity": 8, "intelligence": 4, "wisdom": 7, "constitution": 10, "charisma": 5, "luck": 5 },
+    "loot": "bird"
+  },
+  "mud-golem": {
+    "name": "Mud Golem",
+    "description": "A lumbering construct of wet clay",
+    "type": "wanderer",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 14, "dexterity": 2, "intelligence": 4, "wisdom": 4, "constitution": 16, "charisma": 5, "luck": 5 },
+    "loot": "golem",
+    "equipment": "construct",
+    "anywhere": 2
+  },
+  "goleling": {
+    "name": "Goleling",
+    "description": "A winged construct of packed earth",
+    "type": "wanderer",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 14, "dexterity": 4, "intelligence": 4, "wisdom": 4, "constitution": 16, "charisma": 5, "luck": 5 },
+    "loot": "golem",
+    "equipment": "construct",
+    "anywhere": 2
+  },
+  "flesh-walker": {
+    "name": "Flesh Walker",
+    "description": "A shambling husk of bone and sinew",
+    "type": "wanderer",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 12, "dexterity": 3, "intelligence": 4, "wisdom": 4, "constitution": 12, "charisma": 5, "luck": 5 },
+    "loot": "golem",
+    "equipment": "undead",
+    "anywhere": 2
+  },
+  "wolf": {
+    "name": "Grey Wolf",
+    "description": "A lean grey wolf that hunts in packs",
+    "type": "wolf",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["predator", "pack"],
+    "attributes": { "strength": 7, "dexterity": 8, "intelligence": 4, "wisdom": 6, "constitution": 10, "charisma": 5, "luck": 5 },
+    "loot": "beast"
+  },
+  "boar": {
+    "name": "Wild Boar",
+    "description": "A bristling boar with sharp tusks",
+    "type": "boar",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["territorial"],
+    "attributes": { "strength": 8, "dexterity": 4, "intelligence": 4, "wisdom": 4, "constitution": 13, "charisma": 5, "luck": 5 },
+    "loot": "beast"
+  },
+  "bear": {
+    "name": "Brown Bear",
+    "description": "A heavy bear roaming the deep woods",
+    "type": "bear",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["territorial"],
+    "attributes": { "strength": 15, "dexterity": 4, "intelligence": 4, "wisdom": 5, "constitution": 18, "charisma": 5, "luck": 5 },
+    "loot": "beast",
+    "drops": [
+      { "item": "hide", "count": 1 }
+    ],
+    "variants": [
+      { "name": "Brown Bear", "description": "A heavy bear roaming the deep woods" },
+      { "name": "Black Bear", "description": "A black bear foraging among the trees" }
+    ]
+  },
+  "fox": {
+    "name": "Red Fox",
+    "description": "A quick red fox",
+    "type": "fox",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 2, "dexterity": 9, "intelligence": 4, "wisdom": 7, "constitution": 6, "charisma": 5, "luck": 5 },
+    "loot": "deer",
+    "variants": [
+      { "name": "Red Fox", "description": "A quick red fox" },
+      { "name": "Snow Fox", "description": "A white fox nearly invisible against the snow" }
+    ]
+  },
+  "goat": {
+    "name": "Mountain Goat",
+    "description": "A sure-footed goat of the high crags",
+    "type": "goat",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["grazer", "timid"],
+    "attributes": { "strength": 4, "dexterity": 9, "intelligence": 4, "wisdom": 6, "constitution": 10, "charisma": 5, "luck": 5 },
+    "loot": "deer"
+  },
+  "yak": {
+    "name": "Shaggy Yak",
+    "description": "A shaggy yak built for the cold",
+    "type": "yak",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["grazer"],
+    "attributes": { "strength": 10, "dexterity": 2, "intelligence": 4, "wisdom": 3, "constitution": 18, "charisma": 5, "luck": 5 },
+    "loot": "sheep",
+    "equipment": "livestock"
+  },
+  "owl": {
+    "name": "Horned Owl",
+    "description": "A silent hunter of the night woods",
+    "type": "bird",
+    "body": "avian",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 2, "dexterity": 7, "intelligence": 4, "wisdom": 9, "constitution": 6, "charisma": 5, "luck": 5 },
+    "loot": "bird"
+  },
+  "vulture": {
+    "name": "Vulture",
+    "description": "A bald bird circling the dunes",
+    "type": "bird",
+    "body": "avian",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 4, "dexterity": 6, "intelligence": 4, "wisdom": 6, "constitution": 9, "charisma": 5, "luck": 5 },
+    "loot": "bird"
+  },
+  "monkey": {
+    "name": "Monkey",
+    "description": "A chattering monkey swinging through the canopy",
+    "type": "monkey",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 3, "dexterity": 10, "intelligence": 4, "wisdom": 6, "constitution": 7, "charisma": 5, "luck": 7 },
+    "loot": "pet",
+    "equipment": "pet"
+  },
+  "viper": {
+    "name": "Viper",
+    "description": "A coiled viper with a venomous bite",
+    "type": "serpent",
+    "body": "serpentine",
+    "hostile": true,
+    "flags": ["predator"],
+    "attributes": { "strength": 4, "dexterity": 10, "intelligence": 4, "wisdom": 4, "constitution": 6, "charisma": 5, "luck": 5 },
+    "loot": "serpent"
+  },
+  "toad": {
+    "name": "Bog Toad",
+    "description": "A bloated toad with a poisonous hide",
+    "type": "toad",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 2, "dexterity": 4, "intelligence": 4, "wisdom": 4, "constitution": 8, "charisma": 5, "luck": 5 },
+    "loot": "serpent"
+  },
+  "crocodile": {
+    "name": "Crocodile",
+    "description": "An armored ambusher lurking in still water",
+    "type": "lizard",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["predator", "solitary"],
+    "attributes": { "strength": 12, "dexterity": 3, "intelligence": 4, "wisdom": 4, "constitution": 16, "charisma": 5, "luck": 5 },
+    "loot": "lizard",
+    "drops": [
+      { "item": "hide", "count": 1 }
+    ]
+  },
+  "scorpion": {
+    "name": "Giant Scorpion",
+    "description": "A scorpion the size of a dog",
+    "type": "scorpion",
+    "body": "arachnid",
+    "hostile": true,
+    "flags": ["predator"],
+    "attributes": { "strength": 7, "dexterity": 6, "intelligence": 4, "wisdom": 4, "constitution": 12, "charisma": 5, "luck": 5 },
+    "loot": "scorpion"
+  },
+  "jaguar": {
+    "name": "Jaguar",
+    "description": "A spotted cat that strikes from the canopy",
+    "type": "cat",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["predator", "solitary"],
+    "attributes": { "strength": 10, "dexterity": 11, "intelligence": 4, "wisdom": 6, "constitution": 10, "charisma": 5, "luck": 5 },
+    "loot": "beast"
+  },
+  "salamander": {
+    "name": "Fire Salamander",
+    "description": "A glowing salamander basking on hot rock",
+    "type": "lizard",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 6, "dexterity": 6, "intelligence": 4, "wisdom": 4, "constitution": 10, "charisma": 5, "luck": 5 },
+    "loot": "lizard",
+    "drops": [
+      { "item": "coal", "count": 1 }
+    ]
+  },
+  "cinder-beetle": {
+    "name": "Cinder Beetle",
+    "description": "A beetle with a shell of cooling slag",
+    "type": "insect",
+    "body": "insect",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 7, "dexterity": 3, "intelligence": 4, "wisdom": 4, "constitution": 15, "charisma": 5, "luck": 5 },
+    "loot": "golem"
+  },
+  "skeleton": {
+    "name": "Skeleton",
+    "description": "Old bones that refuse to rest",
+    "type": "undead",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 8, "dexterity": 5, "intelligence": 4, "wisdom": 4, "constitution": 10, "charisma": 5, "luck": 5 },
+    "loot": "undead",
+    "equipment": "undead",
+    "variants": [
+      { "name": "Skeleton", "description": "Old bones that refuse to rest" },
+      { "name": "Skeletal Warrior", "description": "A skeleton still gripping its old weapon" }
+    ],
+    "anywhere": 2
+  },
+  "bandit": {
+    "name": "Bandit",
+    "description": "A desperate outlaw working the roads",
+    "type": "humanoid",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 9, "dexterity": 8, "intelligence": 4, "wisdom": 4, "constitution": 10, "charisma": 5, "luck": 6 },
+    "loot": "bandit",
+    "equipment": "bandit",
+    "variants": [
+      { "name": "Bandit", "description": "A desperate outlaw working the roads" },
+      { "name": "Cutpurse", "description": "A quick-fingered thief with a hidden blade" },
+      { "name": "Highwayman", "description": "A masked rider demanding tolls" }
+    ],
+    "anywhere": 2
+  },
+  "war-hound": {
+    "name": "War Hound",
+    "description": "A scarred hound in a spiked collar, loosed by raiders",
+    "type": "dog",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["predator", "pack"],
+    "attributes": { "strength": 9, "dexterity": 8, "intelligence": 4, "wisdom": 5, "constitution": 11, "charisma": 5, "luck": 5 },
+    "loot": "beast",
+    "equipment": "war-hound",
+    "anywhere": 1
+  },
+  "troll": {
+    "name": "Hill Troll",
+    "description": "A hulking troll that shrugs off its wounds",
+    "type": "troll",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["territorial"],
+    "attributes": { "strength": 18, "dexterity": 3, "intelligence": 4, "wisdom": 4, "constitution": 22, "charisma": 5, "luck": 5 },
+    "loot": "troll",
+    "equipment": "troll",
+    "anywhere": 1
+  },
+  "goblin": {
+    "name": "Goblin",
+    "description": "A sharp-toothed goblin with a stolen blade",
+    "type": "goblin",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["pack"],
+    "attributes": { "strength": 6, "dexterity": 9, "intelligence": 5, "wisdom": 3, "constitution": 8, "charisma": 3, "luck": 6 },
+    "loot": "goblin",
+    "equipment": "goblin",
+    "variants": [
+      { "name": "Goblin", "description": "A sharp-toothed goblin with a stolen blade" },
+      { "name": "Goblin Sneak", "description": "A goblin creeping low through the brush" },
+      { "name": "Goblin Scavenger", "description": "A goblin picking through what others left behind" }
+    ]
+  },
+  "kobold": {
+    "name": "Kobold",
+    "description": "A small scaled miner guarding its tunnels",
+    "type": "kobold",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["pack"],
+    "attributes": { "strength": 5, "dexterity": 8, "intelligence": 5, "wisdom": 4, "constitution": 8, "charisma": 3, "luck": 5 },
+    "loot": "kobold",
+    "equipment": "kobold",
+    "variants": [
+      { "name": "Kobold", "description": "A small scaled miner guarding its tunnels" },
+      { "name": "Kobold Trapper", "description": "A kobold crouched beside a hidden snare" }
+    ]
+  },
+  "orc": {
+    "name": "Orc Raider",
+    "minLevel": 10,
+    "description": "A tusked raider in scavenged armor",
+    "type": "orc",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["pack", "territorial"],
+    "attributes": { "strength": 12, "dexterity": 6, "intelligence": 4, "wisdom": 4, "constitution": 13, "charisma": 4, "luck": 5 },
+    "loot": "orc",
+    "equipment": "orc",
+    "variants": [
+      { "name": "Orc Raider", "description": "A tusked raider in scavenged armor" },
+      { "name": "Orc Brute", "description": "A broad orc that fights with whatever is nearest" },
+      { "name": "Orc Warrior", "description": "A scarred orc who has won many fights" }
+    ]
+  },
+  "gnoll": {
+    "name": "Gnoll",
+    "minLevel": 8,
+    "description": "A hyena-headed hunter that laughs as it closes in",
+    "type": "gnoll",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["predator", "pack"],
+    "attributes": { "strength": 10, "dexterity": 8, "intelligence": 4, "wisdom": 5, "constitution": 10, "charisma": 3, "luck": 5 },
+    "loot": "beast",
+    "equipment": "gnoll"
+  },
+  "lizardfolk": {
+    "name": "Lizardfolk Hunter",
+    "minLevel": 6,
+    "description": "A scaled hunter stalking the shallows with a spear",
+    "type": "lizardfolk",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["territorial"],
+    "attributes": { "strength": 9, "dexterity": 7, "intelligence": 4, "wisdom": 6, "constitution": 12, "charisma": 4, "luck": 5 },
+    "loot": "scaled",
+    "equipment": "lizardfolk"
+  },
+  "ogre": {
+    "name": "Ogre",
+    "minLevel": 15,
+    "description": "A towering brute dragging a club the size of a tree",
+    "type": "giant",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["territorial", "solitary"],
+    "attributes": { "strength": 17, "dexterity": 2, "intelligence": 3, "wisdom": 3, "constitution": 20, "charisma": 3, "luck": 5 },
+    "loot": "troll",
+    "equipment": "ogre"
+  },
+  "yeti": {
+    "name": "Yeti",
+    "minLevel": 15,
+    "description": "A white-furred giant that walks the blizzards",
+    "type": "yeti",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["territorial", "solitary"],
+    "attributes": { "strength": 15, "dexterity": 5, "intelligence": 4, "wisdom": 6, "constitution": 18, "charisma": 4, "luck": 5 },
+    "loot": "yeti"
+  },
+  "ghoul": {
+    "name": "Ghoul",
+    "minLevel": 5,
+    "description": "A hunched corpse-eater with grave-dirt claws",
+    "type": "undead",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["predator"],
+    "attributes": { "strength": 10, "dexterity": 7, "intelligence": 4, "wisdom": 4, "constitution": 11, "charisma": 2, "luck": 5 },
+    "loot": "undead",
+    "anywhere": 1
+  },
+  "gargoyle": {
+    "name": "Gargoyle",
+    "minLevel": 8,
+    "description": "A winged statue that wakes when watched too long",
+    "type": "construct",
+    "body": "humanoid",
+    "hostile": true,
+    "flags": ["territorial"],
+    "attributes": { "strength": 12, "dexterity": 6, "intelligence": 4, "wisdom": 6, "constitution": 16, "charisma": 3, "luck": 5 },
+    "loot": "gargoyle"
+  },
+  "wraith": {
+    "name": "Wraith",
+    "minLevel": 5,
+    "description": "A cold shadow that remembers being someone",
+    "type": "undead",
+    "body": "amorphous",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 8, "dexterity": 9, "intelligence": 6, "wisdom": 6, "constitution": 10, "charisma": 3, "luck": 5 },
+    "loot": "spirit",
+    "variants": [
+      { "name": "Wraith", "description": "A cold shadow that remembers being someone" },
+      { "name": "Specter", "description": "A pale figure that drifts through walls" }
+    ],
+    "anywhere": 1
+  },
+  "will-o-wisp": {
+    "name": "Will-o'-Wisp",
+    "description": "A drifting light that leads travelers into the mire",
+    "type": "spirit",
+    "body": "amorphous",
+    "hostile": true,
+    "flags": ["timid"],
+    "attributes": { "strength": 2, "dexterity": 12, "intelligence": 6, "wisdom": 8, "constitution": 6, "charisma": 6, "luck": 8 },
+    "loot": "spirit"
+  },
+  "fire-elemental": {
+    "name": "Fire Elemental",
+    "minLevel": 5,
+    "description": "A living blaze that leaves glass where it walks",
+    "type": "elemental",
+    "body": "amorphous",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 12, "dexterity": 7, "intelligence": 4, "wisdom": 4, "constitution": 14, "charisma": 4, "luck": 5 },
+    "loot": "ember"
+  },
+  "ice-elemental": {
+    "name": "Ice Elemental",
+    "minLevel": 5,
+    "description": "A grinding knot of ice and frozen wind",
+    "type": "elemental",
+    "body": "amorphous",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 10, "dexterity": 6, "intelligence": 4, "wisdom": 4, "constitution": 16, "charisma": 4, "luck": 5 },
+    "loot": "frost"
+  },
+  "harpy": {
+    "name": "Harpy",
+    "description": "A shrieking winged hag that steals what glitters",
+    "type": "harpy",
+    "body": "avian",
+    "hostile": true,
+    "flags": ["pack"],
+    "attributes": { "strength": 6, "dexterity": 10, "intelligence": 5, "wisdom": 5, "constitution": 8, "charisma": 3, "luck": 6 },
+    "loot": "harpy"
+  },
+  "griffin": {
+    "name": "Griffin",
+    "minLevel": 12,
+    "description": "An eagle-headed lion guarding its cliffside eyrie",
+    "type": "griffin",
+    "body": "avian",
+    "hostile": true,
+    "flags": ["predator", "territorial"],
+    "attributes": { "strength": 13, "dexterity": 10, "intelligence": 4, "wisdom": 7, "constitution": 14, "charisma": 6, "luck": 5 },
+    "loot": "griffin"
+  },
+  "cockatrice": {
+    "name": "Cockatrice",
+    "description": "A serpent-tailed rooster whose glare stiffens flesh",
+    "type": "bird",
+    "body": "avian",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 4, "dexterity": 7, "intelligence": 4, "wisdom": 4, "constitution": 8, "charisma": 3, "luck": 5 },
+    "loot": "chicken",
+    "drops": [
+      { "item": "scale", "count": 1 }
+    ]
+  },
+  "dire-wolf": {
+    "name": "Dire Wolf",
+    "minLevel": 8,
+    "description": "A wolf as tall as a pony, leading its pack through the snow",
+    "type": "wolf",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["predator", "pack"],
+    "attributes": { "strength": 11, "dexterity": 9, "intelligence": 4, "wisdom": 6, "constitution": 13, "charisma": 5, "luck": 5 },
+    "loot": "beast",
+    "drops": [
+      { "item": "hide", "count": 1 }
+    ],
+    "variants": [
+      { "name": "Dire Wolf", "description": "A wolf as tall as a pony, leading its pack through the snow" },
+      { "name": "Winter Wolf", "description": "A white wolf whose breath frosts the air" }
+    ]
+  },
+  "hellhound": {
+    "name": "Hellhound",
+    "minLevel": 8,
+    "description": "A smoldering hound with ember eyes",
+    "type": "dog",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["predator", "pack"],
+    "attributes": { "strength": 11, "dexterity": 9, "intelligence": 4, "wisdom": 5, "constitution": 11, "charisma": 4, "luck": 5 },
+    "loot": "ember",
+    "drops": [
+      { "item": "fang", "count": 1 }
+    ]
+  },
+  "basilisk": {
+    "name": "Basilisk",
+    "minLevel": 12,
+    "description": "A many-legged lizard whose gaze turns the careless to stone",
+    "type": "lizard",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["predator", "solitary"],
+    "attributes": { "strength": 12, "dexterity": 4, "intelligence": 4, "wisdom": 5, "constitution": 16, "charisma": 3, "luck": 5 },
+    "loot": "scaled",
+    "drops": [
+      { "item": "fang", "count": 1 }
+    ]
+  },
+  "manticore": {
+    "name": "Manticore",
+    "minLevel": 15,
+    "description": "A maned lion with a spiked scorpion tail",
+    "type": "manticore",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["predator", "solitary"],
+    "attributes": { "strength": 14, "dexterity": 8, "intelligence": 5, "wisdom": 5, "constitution": 14, "charisma": 3, "luck": 5 },
+    "loot": "beast",
+    "drops": [
+      { "item": "venom-sac", "count": 1 }
+    ]
+  },
+  "owlbear": {
+    "name": "Owlbear",
+    "minLevel": 12,
+    "description": "A feathered bear with a hooked beak and a terrible temper",
+    "type": "bear",
+    "body": "quadruped",
+    "hostile": true,
+    "flags": ["territorial"],
+    "attributes": { "strength": 15, "dexterity": 5, "intelligence": 3, "wisdom": 5, "constitution": 17, "charisma": 3, "luck": 5 },
+    "loot": "beast",
+    "drops": [
+      { "item": "feather", "count": 2 }
+    ]
+  },
+  "unicorn": {
+    "name": "Unicorn",
+    "description": "A white horse with a spiral horn, glimpsed between the trees",
+    "type": "horse",
+    "body": "quadruped",
+    "hostile": false,
+    "flags": ["timid"],
+    "attributes": { "strength": 8, "dexterity": 11, "intelligence": 6, "wisdom": 10, "constitution": 12, "charisma": 12, "luck": 9 },
+    "loot": "fey"
+  },
+  "mire-serpent": {
+    "name": "Mire Serpent",
+    "minLevel": 10,
+    "description": "A long serpent coiling under the black water",
+    "type": "serpent",
+    "body": "serpentine",
+    "hostile": true,
+    "flags": ["predator", "solitary"],
+    "attributes": { "strength": 13, "dexterity": 7, "intelligence": 4, "wisdom": 4, "constitution": 15, "charisma": 3, "luck": 5 },
+    "loot": "scaled"
+  },
+  "phase-spider": {
+    "name": "Phase Spider",
+    "description": "A spider that blinks out of sight and back behind you",
+    "type": "spider",
+    "body": "arachnid",
+    "hostile": true,
+    "flags": ["predator"],
+    "attributes": { "strength": 8, "dexterity": 12, "intelligence": 5, "wisdom": 5, "constitution": 9, "charisma": 3, "luck": 6 },
+    "loot": "silk"
+  },
+  "ankheg": {
+    "name": "Ankheg",
+    "minLevel": 5,
+    "description": "A burrowing insect that bursts from the soil beneath its prey",
+    "type": "insect",
+    "body": "insect",
+    "hostile": true,
+    "flags": ["predator"],
+    "attributes": { "strength": 11, "dexterity": 5, "intelligence": 3, "wisdom": 4, "constitution": 15, "charisma": 3, "luck": 5 },
+    "loot": "insect"
+  },
+  "wyvern": {
+    "name": "Wyvern",
+    "minLevel": 18,
+    "description": "A two-legged drake with a venomous tail, hunting from above",
+    "type": "drake",
+    "body": "draconic",
+    "hostile": true,
+    "flags": ["predator", "solitary"],
+    "attributes": { "strength": 15, "dexterity": 9, "intelligence": 4, "wisdom": 5, "constitution": 15, "charisma": 4, "luck": 5 },
+    "loot": "scaled",
+    "drops": [
+      { "item": "venom-sac", "count": 1 }
+    ]
+  },
+  "treant": {
+    "name": "Treant",
+    "minLevel": 15,
+    "description": "An ancient tree that walks to defend its grove",
+    "type": "plant",
+    "body": "plant",
+    "hostile": false,
+    "flags": ["territorial"],
+    "attributes": { "strength": 16, "dexterity": 2, "intelligence": 5, "wisdom": 10, "constitution": 22, "charisma": 5, "luck": 5 },
+    "loot": "plant"
+  },
+  "shambling-mound": {
+    "name": "Shambling Mound",
+    "minLevel": 10,
+    "description": "A heap of rotting vines that swallows what it catches",
+    "type": "plant",
+    "body": "plant",
+    "hostile": true,
+    "flags": [],
+    "attributes": { "strength": 12, "dexterity": 2, "intelligence": 3, "wisdom": 4, "constitution": 18, "charisma": 2, "luck": 5 },
+    "loot": "plant",
+    "drops": [
+      { "item": "slime-gel", "count": 1 }
+    ]
+  },
+  "scorched-wyrm": {
+    "name": "Scorched Wyrm",
+    "description": "A young drake nesting on a bed of ash",
+    "type": "drake",
+    "body": "draconic",
+    "hostile": true,
+    "unique": true,
+    "lair": true,
+    "flags": ["predator"],
+    "attributes": { "strength": 18, "dexterity": 8, "intelligence": 4, "wisdom": 4, "constitution": 20, "charisma": 5, "luck": 6 },
+    "loot": "hoard",
+    "drops": [
+      { "item": "fang", "count": 2 },
+      { "item": "hide", "count": 2 }
+    ]
+  },
+  "bone-tyrant": {
+    "name": "Bone Tyrant",
+    "description": "A crowned skeleton ruling its pit",
+    "type": "undead",
+    "body": "humanoid",
+    "hostile": true,
+    "unique": true,
+    "lair": true,
+    "flags": [],
+    "attributes": { "strength": 16, "dexterity": 6, "intelligence": 4, "wisdom": 8, "constitution": 18, "charisma": 5, "luck": 5 },
+    "loot": "hoard",
+    "equipment": "tyrant",
+    "drops": [
+      { "item": "bone", "count": 3 }
+    ]
+  },
+  "forgotten-maw": {
+    "name": "Forgotten Maw",
+    "description": "A unique beast bound to this lair's legends",
+    "type": "spider",
+    "body": "arachnid",
+    "hostile": true,
+    "unique": true,
+    "lair": true,
+    "flags": ["predator"],
+    "attributes": { "strength": 14, "dexterity": 9, "intelligence": 4, "wisdom": 4, "constitution": 18, "charisma": 5, "luck": 5 },
+    "loot": "hoard",
+    "drops": [
+      { "item": "fang", "count": 2 },
+      { "item": "venom-sac", "count": 1 }
+    ]
+  },
+  "minotaur": {
+    "name": "Labyrinth Minotaur",
+    "description": "A bull-headed giant that knows every turn of its maze",
+    "type": "minotaur",
+    "body": "humanoid",
+    "hostile": true,
+    "unique": true,
+    "lair": true,
+    "flags": ["territorial"],
+    "attributes": { "strength": 18, "dexterity": 6, "intelligence": 4, "wisdom": 5, "constitution": 20, "charisma": 4, "luck": 5 },
+    "loot": "hoard",
+    "equipment": "minotaur",
+    "drops": [
+      { "item": "horn", "count": 2 },
+      { "item": "hide", "count": 1 }
+    ]
+  },
+  "lich": {
+    "name": "Hollow Lich",
+    "description": "A sorcerer who traded death for a crypt of whispers",
+    "type": "undead",
+    "body": "humanoid",
+    "hostile": true,
+    "unique": true,
+    "lair": true,
+    "flags": [],
+    "attributes": { "strength": 12, "dexterity": 8, "intelligence": 14, "wisdom": 12, "constitution": 18, "charisma": 6, "luck": 6 },
+    "loot": "hoard",
+    "equipment": "lich",
+    "drops": [
+      { "item": "ectoplasm", "count": 2 },
+      { "item": "bone", "count": 2 }
+    ]
+  },
+  "hydra": {
+    "name": "Marsh Hydra",
+    "description": "A many-headed serpent; cut one head and two answer",
+    "type": "serpent",
+    "body": "serpentine",
+    "hostile": true,
+    "unique": true,
+    "lair": true,
+    "flags": ["predator"],
+    "attributes": { "strength": 17, "dexterity": 7, "intelligence": 4, "wisdom": 4, "constitution": 20, "charisma": 3, "luck": 5 },
+    "loot": "hoard",
+    "drops": [
+      { "item": "scale", "count": 3 },
+      { "item": "fang", "count": 3 }
+    ]
+  }
+}
