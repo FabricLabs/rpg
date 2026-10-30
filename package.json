@@ -57,8 +57,8 @@
   },
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#feature/locks",
-    "@fabric/http": "FabricLabs/fabric-http#feature/fomantic"
+    "@fabric/core": "FabricLabs/fabric#feature/passport",
+    "@fabric/http": "FabricLabs/fabric-http#feature/passport"
   },
   "devDependencies": {
     "buffer": "=6.0.3",

@@ -1,15 +1,16 @@
 $ npm i --allow-git=all
+npm warn skipping integrity check for git dependency ssh://git@github.com/FabricLabs/fabric.git
 npm warn deprecated whatwg-encoding@2.0.0: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
-added 721 packages, and audited 722 packages in 32s
+added 721 packages, and audited 722 packages in 2m
 
-177 packages are looking for funding
+178 packages are looking for funding
   run `npm fund` for details
 
 found 0 vulnerabilities
 npm warn install-scripts 4 packages had install scripts blocked because they are not covered by allowScripts:
-npm warn install-scripts   @fabric/core@0.1.0 (install: node scripts/install-native.js)
 npm warn install-scripts   zeromq@6.8.0 (install: node ./script/install.js)
+npm warn install-scripts   @fabric/core@0.1.0 (install: node scripts/install-native.js)
 npm warn install-scripts   puppeteer@25.15.0 (postinstall: node install.mjs)
 npm warn install-scripts   classic-level@3.0.0 (install: node-gyp-build)
 npm warn install-scripts
