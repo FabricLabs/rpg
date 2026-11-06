@@ -1,7 +1,7 @@
 $ npm i --allow-git=all
 npm warn deprecated whatwg-encoding@2.0.0: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
-added 704 packages, and audited 705 packages in 54s
+added 691 packages, and audited 692 packages in 50s
 
 174 packages are looking for funding
   run `npm fund` for details

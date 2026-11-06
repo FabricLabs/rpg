@@ -57,7 +57,7 @@
   },
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#feature/passport",
+    "@fabric/core": "FabricLabs/fabric#feature/schemas",
     "@fabric/http": "FabricLabs/fabric-http#feature/passport"
   },
   "devDependencies": {
