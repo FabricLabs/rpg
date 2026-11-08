@@ -14,10 +14,23 @@ const LEVEL_EXPONENT = 1.5;
 const KILL_EXPERIENCE_BASE = 30;
 const KILL_EXPERIENCE_EXPONENT = 0.4;
 
+// Past 2^53 a level step stops changing the number and the search never ends.
+function amount (value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, n)) : 0;
+}
+
+function positive (value, fallback) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
 const CURVES = {
   power: {
     levelFor (experience, base = LEVEL_BASE_EXPERIENCE, exponent = LEVEL_EXPONENT) {
-      const xp = Math.max(0, Number(experience) || 0);
+      base = positive(base, LEVEL_BASE_EXPERIENCE);
+      exponent = positive(exponent, LEVEL_EXPONENT);
+      const xp = amount(experience);
       let level = Math.max(1, Math.floor(Math.pow(xp / base, 1 / exponent)));
       while (level > 1 && xp < base * Math.pow(level - 1, exponent)) level -= 1;
       while (xp >= base * Math.pow(level, exponent)) level += 1;
@@ -30,7 +43,7 @@ const CURVES = {
   },
   linear: {
     levelFor (experience, base = LEVEL_BASE_EXPERIENCE) {
-      return Math.floor(Math.max(0, Number(experience) || 0) / base) + 1;
+      return Math.floor(amount(experience) / positive(base, LEVEL_BASE_EXPERIENCE)) + 1;
     },
     experienceFor (level, base = LEVEL_BASE_EXPERIENCE) {
       return (Math.max(1, Math.floor(level)) - 1) * base;

@@ -1,11 +1,11 @@
-FROM node:26.12.1
+FROM node:26.13.0
 WORKDIR /rpg
 
 # if package.json changes. Docker deploys auto-update
-COPY package.json /rpg
-RUN npm install
-RUN npm build
-COPY . ./rpg
+COPY package.json package-lock.json /rpg/
+RUN npm ci
+COPY . /rpg
+RUN npm run build
 
 EXPOSE 9999
 CMD ["npm", "start"]

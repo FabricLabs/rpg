@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const { MAX_MESSAGE_SIZE, HEADER_SIZE } = require('@fabric/core/constants');
+const Key = require('@fabric/core/types/key');
 const Message = require('@fabric/core/types/message');
 
 const RPG = require('../types/rpg');
@@ -83,6 +84,34 @@ describe('@fabric/rpg', function () {
 
       assert.ok(String(link).indexOf('/players/') === 0);
       assert.equal(Object.values(players).filter((player) => player.name === 'Wanderer').length, 1);
+    });
+
+    it('takes mesh frames only from its own key or a listed writer', async function () {
+      const stranger = new Key();
+      const open = new RPG(config);
+      await open.start();
+      const frame = () => Message.fromBuffer(contractUpdateMessage(open.contract.id, { type: 'Player', name: 'Intruder' }, stranger).toBuffer());
+      assert.equal(open.ingestMessage(frame()), null);
+      await open.stop();
+
+      const listed = new RPG(Object.assign({}, config, { writers: [stranger.pubkey.slice(2)] }));
+      await listed.start();
+      const outbound = contractUpdateMessage(listed.contract.id, { type: 'Player', name: 'Friend' }, stranger);
+      const link = listed.ingestMessage(Message.fromBuffer(outbound.toBuffer()));
+      await listed.stop();
+      assert.ok(String(link).indexOf('/players/') === 0);
+    });
+
+    it('refuses a document that names no contract, and caps what peers add', async function () {
+      const rpg = new RPG(Object.assign({}, config, { maxPlayers: 1 }));
+      await rpg.start();
+      assert.equal(rpg.ingestDocument({ type: 'CONTRACT_MESSAGE', fields: { payload: JSON.stringify({ type: 'Player', name: 'Nobody' }) } }), null);
+      const announce = (name) => rpg.ingestMessage(Message.fromBuffer(contractUpdateMessage(rpg.contract.id, { type: 'Player', name }, rpg.key).toBuffer()));
+      const first = announce('One');
+      assert.ok(String(first).indexOf('/players/') === 0);
+      assert.equal(announce('Two'), null);
+      assert.equal(announce('One'), first);
+      await rpg.stop();
     });
 
     it('ignores documents for a different contract', async function () {
