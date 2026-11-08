@@ -7,6 +7,7 @@ const {
 } = require('../constants');
 
 const Actor = require('@fabric/core/types/actor');
+const Message = require('@fabric/core/types/message');
 const Service = require('@fabric/core/types/service');
 const WorldClock = require('./clock');
 
@@ -17,6 +18,9 @@ const {
   contractUpdateMessage,
   decodeFabricMessage
 } = require('./network');
+
+// Default cap on the players and places peers may add.
+const MAX_NETWORK_RECORDS = 10000;
 
 const DEFAULT_RESOURCES = {
   Player: {
@@ -74,6 +78,11 @@ class RPG extends Service {
       port: FABRIC_PORT,
       interval: TICK_INTERVAL,
       autotick: true,
+      // x-only pubkeys (hex) besides this node's own whose frames may write here.
+      writers: [],
+      // New records a peer may add; updates to known ones are always taken.
+      maxPlayers: MAX_NETWORK_RECORDS,
+      maxPlaces: MAX_NETWORK_RECORDS,
       state: {
         clock: 0,
         status: 'PAUSED',
@@ -96,6 +105,8 @@ class RPG extends Service {
     this['@genesis'] = requested.genesis || GENESIS_HASH;
     this.catalog = catalog;
     this._joinNetwork = !!requested.networking;
+    this._writers = new Set((requested.writers || []).map((key) => String(key).toLowerCase()));
+    this._limits = { players: Number(requested.maxPlayers), places: Number(requested.maxPlaces) };
 
     this.network = new FabricNetwork({
       alias: requested.name,
@@ -104,8 +115,9 @@ class RPG extends Service {
       peers: requested.peers,
       port: requested.port
     });
-    this.network.attach((document) => {
-      this.ingestDocument(document);
+    // Mesh frames go through the signer check; `ingestDocument` is for local input.
+    this.network.attach((document, message) => {
+      this.ingestMessage(message);
     });
 
     this._arc = applicationResourceContract({
@@ -204,7 +216,7 @@ class RPG extends Service {
     return this._register('/peers', data);
   }
 
-  _register (path, data) {
+  _register (path, data, limit = Infinity) {
     const actor = new Actor(data || {});
     const collection = path.slice(1);
 
@@ -212,7 +224,14 @@ class RPG extends Service {
       this._state.content[collection] = {};
     }
 
-    const prior = this._state.content[collection][actor.id] || {};
+    const records = this._state.content[collection];
+    const known = Object.prototype.hasOwnProperty.call(records, actor.id);
+    if (!known && Object.keys(records).length >= limit) {
+      this.emit('warning', `Refused a new record in ${path}: ${limit} already`);
+      return null;
+    }
+
+    const prior = known ? records[actor.id] : {};
     this._state.content[collection][actor.id] = Object.assign({}, prior, data, { id: actor.id });
     this.commit();
 
@@ -226,8 +245,38 @@ class RPG extends Service {
     return super._POST(path, data);
   }
 
+  /**
+   * Apply a frame from the mesh. Only a frame signed by this node or one of
+   * `writers` is taken, and peers add at most `maxPlayers` / `maxPlaces`.
+   * @param {Message|Buffer} message
+   * @returns {String|Object|null}
+   */
   ingestMessage (message) {
-    return this.ingestDocument(decodeFabricMessage(message));
+    const author = this._frameAuthor(message);
+    if (!author || !this._mayWrite(author)) {
+      this.emit('warning', 'Rejected a Fabric frame from a signer that may not write here');
+      return null;
+    }
+    return this.ingestDocument(decodeFabricMessage(message), { network: true });
+  }
+
+  _frameAuthor (message) {
+    if (!message || typeof Message.verifyFrameAuthor !== 'function') return null;
+    let frame = null;
+    try {
+      frame = Buffer.isBuffer(message) ? message : (typeof message.toBuffer === 'function' ? message.toBuffer() : null);
+    } catch (_) {
+      return null;
+    }
+    if (!frame) return null;
+    const verified = Message.verifyFrameAuthor(frame);
+    return verified && verified.ok ? String(verified.author).toLowerCase() : null;
+  }
+
+  _mayWrite (author) {
+    const own = this.key && this.key.pubkey ? String(this.key.pubkey).toLowerCase() : '';
+    const ownXOnly = own.length === 66 ? own.slice(2) : own;
+    return author === ownXOnly || this._writers.has(author);
   }
 
   /**
@@ -235,13 +284,15 @@ class RPG extends Service {
    * Players and places are stored locally. `WorldState` is recorded so other
    * game nodes and this service can share one contract stream.
    * @param {{ type: String, fields: Object }|null} document
+   * @param {Object} [origin] `{ network: true }` for a frame from the mesh, which counts against the caps.
    * @returns {String|Object|null}
    */
-  ingestDocument (document) {
+  ingestDocument (document, origin = {}) {
     if (!document || !document.fields) return null;
 
     const fields = document.fields;
-    if (fields.contract && fields.contract !== this.contract.id) return null;
+    if (fields.contract !== this.contract.id) return null;
+    const limits = origin && origin.network ? this._limits : { players: Infinity, places: Infinity };
 
     let payload = fields.payload != null ? fields.payload : fields;
     if (typeof payload === 'string') {
@@ -255,8 +306,8 @@ class RPG extends Service {
 
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
 
-    if (payload.type === 'Player') return this.registerPlayer(payload);
-    if (payload.type === 'Place') return this.registerPlace(payload);
+    if (payload.type === 'Player') return this._register('/players', payload, limits.players);
+    if (payload.type === 'Place') return this._register('/places', payload, limits.places);
 
     if (payload.type === 'WorldState') {
       this._state.content.world = {
