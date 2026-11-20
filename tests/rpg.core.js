@@ -25,6 +25,14 @@ describe('@fabric/rpg', function () {
       assert.equal(typeof RPG, 'function');
     });
 
+    it('keeps the default record cap when a limit is not a non-negative integer', function () {
+      const open = new RPG(config);
+      const broken = new RPG(Object.assign({}, config, { maxPlayers: 'nope', maxPlaces: null }));
+      assert.strictEqual(broken._limits.players, open._limits.players);
+      assert.strictEqual(broken._limits.places, open._limits.places);
+      assert.strictEqual(new RPG(Object.assign({}, config, { maxPlayers: 0 }))._limits.players, 0);
+    });
+
     it('can start and stop without joining the playnet', async function () {
       const rpg = new RPG(config);
 

@@ -17,6 +17,8 @@
     "./services/*": "./services/*.js",
     "./types/*.js": "./types/*.js",
     "./types/*": "./types/*.js",
+    "./contracts/*.js": "./contracts/*.js",
+    "./contracts/*": "./contracts/*.js",
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -26,14 +28,14 @@
     "build": "npm run compile",
     "compile": "node scripts/build.js #&& npm run build:scripts",
     "coverage": "c8 npm test",
-    "dev": "webpack serve --static assets",
+    "dev": "npm run build:ui && webpack serve --static assets",
     "docs": "npm run build && jsdoc -c jsdoc.json types README.md -d docs && http-server docs -p 8000",
     "make:coverage": "npm run coverage && c8 report --reporter html",
     "report:coverage": "npm run make:coverage && c8 report --reporter=text-lcov > reports/coverage.lcov",
     "report:install": "rm -rf node_modules && mkdir -p reports && rm -f package-lock.json && echo \"$ npm i --allow-git=all\" > reports/install.log && npm i --allow-git=all >> reports/install.log 2>&1",
     "review:coverage": "npm run make:coverage && http-server reports/code-coverage -p 8000",
     "start": "npm run compile && node scripts/node.js",
-    "static": "npm run build && http-server assets -p 8000",
+    "static": "npm run build:ui && npm run build && http-server assets -p 8000",
     "test": "mocha tests"
   },
   "repository": {
@@ -57,7 +59,7 @@
   },
   "homepage": "https://github.com/FabricLabs/rpg#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#feature/schemas",
+    "@fabric/core": "FabricLabs/fabric#feature/testnet5",
     "@fabric/http": "FabricLabs/fabric-http#feature/passport"
   },
   "devDependencies": {

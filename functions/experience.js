@@ -17,6 +17,7 @@ const KILL_EXPERIENCE_EXPONENT = 0.4;
 // Past 2^53 a level step stops changing the number and the search never ends.
 function amount (value) {
   const n = Number(value);
+  if (n === Infinity) return Number.MAX_SAFE_INTEGER;
   return Number.isFinite(n) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, n)) : 0;
 }
 
@@ -37,6 +38,8 @@ const CURVES = {
       return level;
     },
     experienceFor (level, base = LEVEL_BASE_EXPERIENCE, exponent = LEVEL_EXPONENT) {
+      base = positive(base, LEVEL_BASE_EXPERIENCE);
+      exponent = positive(exponent, LEVEL_EXPONENT);
       const target = Math.max(1, Math.floor(level));
       return target <= 1 ? 0 : Math.ceil(base * Math.pow(target - 1, exponent));
     }
@@ -46,6 +49,7 @@ const CURVES = {
       return Math.floor(amount(experience) / positive(base, LEVEL_BASE_EXPERIENCE)) + 1;
     },
     experienceFor (level, base = LEVEL_BASE_EXPERIENCE) {
+      base = positive(base, LEVEL_BASE_EXPERIENCE);
       return (Math.max(1, Math.floor(level)) - 1) * base;
     }
   }

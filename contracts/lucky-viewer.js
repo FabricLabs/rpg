@@ -1,4 +1,4 @@
-module.exports = function LuckyWinnner (input) {
+module.exports = function LuckyWinnner (input, settings = {}) {
   // Dependencies
   const Actor = require('@fabric/core/types/actor');
   const Machine = require('@fabric/core/types/machine');
@@ -21,22 +21,22 @@ module.exports = function LuckyWinnner (input) {
   const actor = new Actor(input);
   const contest = {
     created: created,
-    duration: settings.duration,
+    duration: settings.duration || null,
     input: { ...actor.toObject(), '@id': actor.id }
   };
 
   // Data sourcing
   const swarm = new Swarm();
 
-  // Execution
+  // Execution. The Machine runs names registered with define(); a bare function
+  // is coerced to 0 and never calls the winner operation.
   const machine = new Machine({
-    script: [
-      OP_FIND_WINNER
-    ],
     state: {
       contest
     }
   });
+  machine.define('OP_FIND_WINNER', OP_FIND_WINNER);
+  machine.settings.script = ['OP_FIND_WINNER'];
 
   // Spawn threads
   machine.start();

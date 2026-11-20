@@ -106,7 +106,12 @@ class RPG extends Service {
     this.catalog = catalog;
     this._joinNetwork = !!requested.networking;
     this._writers = new Set((requested.writers || []).map((key) => String(key).toLowerCase()));
-    this._limits = { players: Number(requested.maxPlayers), places: Number(requested.maxPlaces) };
+    const recordLimit = (value) => {
+      if (value == null || value === '') return MAX_NETWORK_RECORDS;
+      const n = Number(value);
+      return Number.isInteger(n) && n >= 0 ? n : MAX_NETWORK_RECORDS;
+    };
+    this._limits = { players: recordLimit(requested.maxPlayers), places: recordLimit(requested.maxPlaces) };
 
     this.network = new FabricNetwork({
       alias: requested.name,
