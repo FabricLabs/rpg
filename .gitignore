@@ -1,2 +1,7 @@
 node_modules
 reports/code-coverage/
+
+# Semantic UI copied from @fabric/http by build:ui (HTTPServer serves the same files from the package)
+/assets/semantic*
+/assets/scripts/semantic*.js
+/assets/themes/fabric/

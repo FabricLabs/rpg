@@ -326,6 +326,19 @@ describe('@fabric/rpg rules', function () {
       assert.strictEqual(experience.levelFor(250, 'linear'), 3);
     });
 
+    it('finds a level for any experience, however large or broken', function () {
+      for (const xp of [1e25, 1e300, Infinity, -Infinity, NaN, '1e400']) {
+        const level = experience.levelFor(xp);
+        assert.ok(Number.isFinite(level) && level >= 1, `levelFor(${xp}) = ${level}`);
+      }
+      assert.strictEqual(experience.levelFor(Infinity), experience.levelFor(Number.MAX_SAFE_INTEGER));
+      assert.ok(experience.levelFor(Infinity) > 1);
+      assert.strictEqual(experience.levelFor(500, 'power', { base: 0, exponent: -1 }), experience.levelFor(500));
+      assert.strictEqual(experience.experienceFor(3, 'power', { base: 0, exponent: -1 }), experience.experienceFor(3));
+      assert.strictEqual(experience.experienceFor(4, 'linear', { base: 0 }), experience.experienceFor(4, 'linear'));
+      assert.ok(Number.isFinite(experience.levelFor(Infinity, 'linear')));
+    });
+
     it('takes a host base and exponent for the power curve', function () {
       const steep = { exponent: 1.65 };
       assert.strictEqual(experience.experienceFor(3, 'power', steep), 314);
